@@ -147,6 +147,16 @@ class WindowsTests(unittest.TestCase):
                 )
 
             ffi.FfiProduct.side_effect = create_product
+
+            def select_product(path, *, factory):
+                return factory(
+                    path,
+                    symbol_prefix=(
+                        "software_licensing_polar_" if path == root else "software_licensing_"
+                    ),
+                    specification="native.toml",
+                )
+
             modules = dict(
                 windows=shared,
                 c_compiler=c_compiler,
@@ -180,15 +190,7 @@ class WindowsTests(unittest.TestCase):
                 patch.object(windows.Path, "home", return_value=root / "developer"),
                 patch.object(windows, "acceptance_source", return_value=source),
                 patch.object(windows, "load", side_effect=modules.__getitem__) as load_tooling,
-                patch.object(
-                    windows,
-                    "ffi_product",
-                    side_effect=lambda path, *, factory: factory(
-                        path,
-                        symbol_prefix="software_licensing_polar_",
-                        specification="native.toml",
-                    ),
-                ) as vendor_product,
+                patch.object(windows, "ffi_product", side_effect=select_product),
                 patch.object(
                     windows, "support_inputs", side_effect=[tool_inputs, final_tool_inputs]
                 ),
@@ -219,10 +221,10 @@ class WindowsTests(unittest.TestCase):
                     return
                 windows.main([])
 
-            vendor_product.assert_called_once_with(root, factory=ffi.FfiProduct)
             core, vendor = ffi.FfiProduct.call_args_list
             self.assertEqual(core.args[0].name, "core")
-            self.assertEqual(core.kwargs["specification"], "tools/native.py")
+            self.assertEqual(core.kwargs["specification"], "native.toml")
+            self.assertEqual(vendor.args[0], root)
             self.assertEqual(vendor.kwargs["specification"], "native.toml")
             shared.native_environment.assert_called_once_with(host, {}, target_architecture="x64")
             shared.require_rust_target_stdlib.assert_called_once_with("rust-stdlib", windows.TARGET)

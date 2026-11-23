@@ -8,7 +8,7 @@ let package = Package(
     .package(name: "software-licensing-polar", path: "../sdk"),
     .package(
       url: "https://github.com/naviapps/software-licensing.git",
-      revision: "b69902197a294598901aa3c595f8cfb3b11c7404"),
+      revision: "b69391d690fd7d197a50970279b9274da5d54295"),
   ],
   targets: [
     .executableTarget(

@@ -8,5 +8,5 @@ publish = false
 
 [dependencies]
 software-licensing-polar = { git = "https://github.com/naviapps/software-licensing-polar.git", rev = "@SDK_REVISION@" }
-software-licensing = { git = "https://github.com/naviapps/software-licensing.git", rev = "b69902197a294598901aa3c595f8cfb3b11c7404" }
+software-licensing = { git = "https://github.com/naviapps/software-licensing.git", rev = "b69391d690fd7d197a50970279b9274da5d54295" }
 tokio = { version = "=1.54.1", features = ["macros", "rt"] }

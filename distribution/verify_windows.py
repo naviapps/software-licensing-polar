@@ -26,23 +26,6 @@ from distribution import verify_bindings as bindings
 
 ROOT = Path(__file__).resolve().parents[1]
 RECEIPT = "software-licensing-polar-windows.json"
-CORE_WITHOUT_ABI_MACRO = "b69902197a294598901aa3c595f8cfb3b11c7404"
-
-
-def core_product(root, revision):
-    product = load("ffi").FfiProduct
-    if revision == CORE_WITHOUT_ABI_MACRO:
-
-        class PinnedCore(product):
-            def abi_versions(self, *, windows=False):
-                # The unchanged C fixture at this exact pin asserts the same ABI.
-                return {"software_licensing_abi_version": 4}
-
-        product = PinnedCore
-    if (root / "native.toml").is_file():
-        return ffi_product(root, factory=product)
-    # Older pinned core revisions bind their receipts to the historical Python recipe.
-    return product(root, symbol_prefix="software_licensing_", specification="tools/native.py")
 
 
 def acceptance_source(env):
@@ -59,27 +42,6 @@ def stage_core(env, destination):
         != revision
     ):
         raise ValueError("Resolved SoftwareLicensing checkout differs from the pinned revision")
-    # Keep the producer specification in the exact staged core revision.
-    core_recipe_paths = set(
-        subprocess.check_output(
-            [
-                "git",
-                "ls-tree",
-                "--name-only",
-                revision,
-                "--",
-                "LICENSE",
-                "native.toml",
-                "tools/native.py",
-            ],
-            cwd=resolved,
-            env=env,
-            text=True,
-        ).splitlines()
-    )
-    recipe = core_recipe_paths & {"native.toml", "tools/native.py"}
-    if len(recipe) != 1:
-        raise ValueError("The pinned SoftwareLicensing source must own one native recipe")
     # Build the core's own locked workspace without writing to Cargo's dependency checkout.
     archive = subprocess.check_output(
         [
@@ -90,7 +52,8 @@ def stage_core(env, destination):
             "Cargo.lock",
             "rust-toolchain.toml",
             "crates",
-            *sorted(core_recipe_paths),
+            "LICENSE",
+            "native.toml",
             "ThirdParty",
             "bindings/dotnet",
             "README.md",
@@ -240,8 +203,9 @@ def main(argv=None):
                 *[f"--remap-path-prefix={path}={alias}" for path, alias in remaps],
             ]
         )
-        core_native = core_product(core, revision)
-        vendor_native = ffi_product(ROOT, factory=load("ffi").FfiProduct)
+        factory = load("ffi").FfiProduct
+        core_native = ffi_product(core, factory=factory)
+        vendor_native = ffi_product(ROOT, factory=factory)
         bindings.run("cargo", "fmt", "--all", "--", "--check", cwd=ROOT, env=env)
         accepted = {}
         native_output = candidate / "dlls"

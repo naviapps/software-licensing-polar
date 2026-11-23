@@ -5,7 +5,6 @@ version: 'v0.0.3'
 workflows:
     '.github/workflows/check.yml':
         - 'actions/checkout@v6.1.0'
-        - 'jdx/mise-action@v5.3.0'
         - 'naviapps/sdk-tooling@main'
 dependencies:
     'actions/checkout@v6.1.0':
@@ -18,14 +17,9 @@ dependencies:
         commit: 'sha1-a98b56852c35b8e3190ac28c8c2271da59106c68'
         owner_id: 44036562
         repo_id: 192625306
-    'jdx/mise-action@v5.3.0':
-        ref: 'v5.3.0'
-        commit: 'sha1-924e7c586e33d7d4bae9c14e26c5d22e2beb6e78'
-        owner_id: 216188
-        repo_id: 738284564
     'naviapps/sdk-tooling@main':
         ref: 'main'
-        commit: 'sha1-213f58bc1505f57b5768e7d1eed94a48487d31d0'
+        commit: 'sha1-51fde4fe947c1032b35b7e6bac47d5199c396891'
         owner_id: 14840203
         repo_id: 1439873358
         uses:

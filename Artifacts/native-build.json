@@ -1043,7 +1043,7 @@
           "lib"
         ],
         "name": "software-licensing",
-        "source": "git+https://github.com/naviapps/software-licensing.git?rev=b69902197a294598901aa3c595f8cfb3b11c7404#b69902197a294598901aa3c595f8cfb3b11c7404",
+        "source": "git+https://github.com/naviapps/software-licensing.git?rev=b69391d690fd7d197a50970279b9274da5d54295#b69391d690fd7d197a50970279b9274da5d54295",
         "targetName": "software_licensing",
         "version": "0.1.0"
       },
@@ -2659,7 +2659,7 @@
           "lib"
         ],
         "name": "software-licensing",
-        "source": "git+https://github.com/naviapps/software-licensing.git?rev=b69902197a294598901aa3c595f8cfb3b11c7404#b69902197a294598901aa3c595f8cfb3b11c7404",
+        "source": "git+https://github.com/naviapps/software-licensing.git?rev=b69391d690fd7d197a50970279b9274da5d54295#b69391d690fd7d197a50970279b9274da5d54295",
         "targetName": "software_licensing",
         "version": "0.1.0"
       },
@@ -7369,18 +7369,19 @@
         },
         "inputs": {
           "Cargo.toml": "24512ca897be9bb916b387e2ca06988ee8b63e87ebd6d8bfa90bb296a21d9adf",
-          "crates/core/Cargo.toml": "8b74a715db573739ac7e53e8429375673537b5829a4a7642a18484a2826d69bc",
+          "crates/core/Cargo.toml": "9a5939b84a5b51b52f8dde366dada24c8e4fd1b57e8bd85dd69828c3cb8b2d1d",
           "crates/core/src/access.rs": "f24e24e4a21f60f90c45f878cd45df4b81617b9ce64d57a20d17ff97dfafc6f4",
-          "crates/core/src/lib.rs": "31c48eb54d30bfb13f8d40047af346d411b5299cc74dd8399d80c689f1ac6863",
+          "crates/core/src/lib.rs": "d54b5fdfcbcf5eb65bb86d3a1e5a8bc9559cd621a9f81a59c74a5baac5708623",
           "crates/core/src/model.rs": "8bf312ef8b45abba277e49ad36e8b8aae1a01e8754d6f647b16da384e6dac173",
           "crates/core/src/persistence.rs": "b308cc31beac7c2a6d4c3b2ce3c636165fe016d4566ee7f68b535f8485f1b06b",
-          "crates/core/src/session.rs": "5b5f1b8679ad08fa8c8f41d812eb31ea48133aa79301bc91d562047592046c2d",
+          "crates/core/src/session.rs": "abdd373c6fcb414d2a33b3da38a2d6751c0d637a358ce60750c5c9fa907011d6",
           "crates/core/tests/access.rs": "eae2e0acddfd761199383fcf774cb10166549e68046b93f315956874d4a20ace",
+          "crates/core/tests/effect_completion.rs": "4e42af10e04ef6881d729667b296d99afc9de566a4885c5394cc4d30c15b836b",
           "crates/core/tests/lifecycle.rs": "70e7086377a3ce49cf77567d77f1343b4802971afb5da462e189aeb6c89463a0",
           "crates/core/tests/values.rs": "f2550675b90bbbab8cd2948e619f60d937886398f437ab7557ced8b48ff5a6f9"
         },
         "name": "software-licensing",
-        "source": "git+https://github.com/naviapps/software-licensing.git?rev=b69902197a294598901aa3c595f8cfb3b11c7404#b69902197a294598901aa3c595f8cfb3b11c7404",
+        "source": "git+https://github.com/naviapps/software-licensing.git?rev=b69391d690fd7d197a50970279b9274da5d54295#b69391d690fd7d197a50970279b9274da5d54295",
         "version": "0.1.0"
       },
       {
@@ -7389,7 +7390,7 @@
           "x86_64-apple-darwin": []
         },
         "inputs": {
-          "Cargo.toml": "ffc5d2315e58f70ce8576f8998ee6639e1519eb997f5c6f4830e5c6f7c8d0a9f"
+          "Cargo.toml": "0347f56332533dcc9a9554c02c36c91fea7ee73be54f71c98f17528feab09008"
         },
         "name": "software-licensing-polar",
         "source": "workspace",
@@ -7401,7 +7402,7 @@
           "x86_64-apple-darwin": []
         },
         "inputs": {
-          "Cargo.toml": "ffc5d2315e58f70ce8576f8998ee6639e1519eb997f5c6f4830e5c6f7c8d0a9f",
+          "Cargo.toml": "0347f56332533dcc9a9554c02c36c91fea7ee73be54f71c98f17528feab09008",
           "crates/ffi/Cargo.toml": "f53230be95592502e04b99cbed5a8b48c9f391f8e63f78252617ea8f37bdceb7"
         },
         "name": "software-licensing-polar-ffi",
@@ -10040,8 +10041,8 @@
       "x86_64-apple-darwin"
     ],
     "workspaceInputs": {
-      "Cargo.lock": "6b859a8e15da1edc92bc6286d61e21cd6722f6ef8b014ef0454339fd4789b5c0",
-      "Cargo.toml": "ffc5d2315e58f70ce8576f8998ee6639e1519eb997f5c6f4830e5c6f7c8d0a9f",
+      "Cargo.lock": "fd37c37a5e3b8b0c048cf03e51c3bf29ce841ca8f23a68ee7823b94771feef26",
+      "Cargo.toml": "0347f56332533dcc9a9554c02c36c91fea7ee73be54f71c98f17528feab09008",
       "crates/ffi/Cargo.toml": "f53230be95592502e04b99cbed5a8b48c9f391f8e63f78252617ea8f37bdceb7",
       "rust-toolchain.toml": "d13306be0ecda81ce779baa290ffb417380d525928477f16200884b5169cca33"
     }
@@ -10058,8 +10059,8 @@
     "_software_licensing_polar_result_view"
   ],
   "inputs": {
-    "Cargo.lock": "6b859a8e15da1edc92bc6286d61e21cd6722f6ef8b014ef0454339fd4789b5c0",
-    "Cargo.toml": "ffc5d2315e58f70ce8576f8998ee6639e1519eb997f5c6f4830e5c6f7c8d0a9f",
+    "Cargo.lock": "fd37c37a5e3b8b0c048cf03e51c3bf29ce841ca8f23a68ee7823b94771feef26",
+    "Cargo.toml": "0347f56332533dcc9a9554c02c36c91fea7ee73be54f71c98f17528feab09008",
     "LICENSE": "e18e92825e5b064c568d67d636729c2d8669b61ea9d68b0fa5283b713d70aab1",
     "ThirdParty/LicenseKit/LICENSE": "b39443ebe1456bafd85250f7b01f85f3b4807b7db9e445298f2c442e020b6265",
     "ThirdParty/Rust/COPYRIGHT": "172020dbfd5b53a226dfde77616190a48dcff519b0bc0e6deb91a8450782c4af",
@@ -10273,7 +10274,7 @@
     "Artifacts/CSoftwareLicensingPolar.xcframework/macos-arm64_x86_64/CSoftwareLicensingPolar.framework/Headers": "036ae9446c4f0c59046671d1d96e2de4f606b340d8a5c1927b2d51bc293e0365",
     "Artifacts/CSoftwareLicensingPolar.xcframework/macos-arm64_x86_64/CSoftwareLicensingPolar.framework/Modules": "278b6b2d8f8418e2e4877a67a109b6e3865174e4fa7405870a643e95cbc2f783",
     "Artifacts/CSoftwareLicensingPolar.xcframework/macos-arm64_x86_64/CSoftwareLicensingPolar.framework/Resources": "c213ee8e9c523538d862da3e5716b64bf090f6a1be08914954ae33cfbda7dbb2",
-    "Artifacts/CSoftwareLicensingPolar.xcframework/macos-arm64_x86_64/CSoftwareLicensingPolar.framework/Versions/A/CSoftwareLicensingPolar": "3334fa845e72b1a6b54d63a3ab3be9a469fcb0ed47b396eb87f7c3eb0ee65cb0",
+    "Artifacts/CSoftwareLicensingPolar.xcframework/macos-arm64_x86_64/CSoftwareLicensingPolar.framework/Versions/A/CSoftwareLicensingPolar": "d6bec13298c7b610b16594bc3ccfa5f3f0da687dd1bbaa6114232343e89b43e8",
     "Artifacts/CSoftwareLicensingPolar.xcframework/macos-arm64_x86_64/CSoftwareLicensingPolar.framework/Versions/A/Headers/software_licensing_polar.h": "f5dd928e20d36ecd518dda6a9de5113220698450e25df98bd4d6fcc040e99d8c",
     "Artifacts/CSoftwareLicensingPolar.xcframework/macos-arm64_x86_64/CSoftwareLicensingPolar.framework/Versions/A/Modules/module.modulemap": "2467ace3b408c876cc350ad33913fe4529ec7f8a1ee87a4d0288e5d41c7258de",
     "Artifacts/CSoftwareLicensingPolar.xcframework/macos-arm64_x86_64/CSoftwareLicensingPolar.framework/Versions/A/Resources/Info.plist": "c5f783ffc783e2b4c11ed6a9066c858f865098db9a42170dfe24eb9657f166b7",
