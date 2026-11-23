@@ -14,9 +14,7 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 from xml.sax.saxutils import escape
 
-from _tooling import load
-
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parents[2]
 VENDOR_PACKAGE = "NaviApps.SoftwareLicensing.Polar"
 CORE_PACKAGE = "NaviApps.SoftwareLicensing"
 
@@ -213,7 +211,9 @@ def main():
         print(prepare_dotnet(dict(os.environ)))
         return
     if sys.platform != "darwin":
-        raise SystemExit("Use tools/windows.py on an existing Windows ARM64 worker for x64")
+        raise SystemExit("Run the Windows distribution fixture on an existing worker for x64")
+    from sdk_tooling.adapters import load
+
     tooling = load("bindings")
     env = dict(
         os.environ,

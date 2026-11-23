@@ -1,48 +1,49 @@
+SDK_TOOLING ?= mise run sdk-tooling --
 SWIFT_FLAGS := -Xswiftc -strict-concurrency=complete -Xswiftc -warnings-as-errors
 
 .DEFAULT_GOAL := check
-.PHONY: check check-source test-managed check-distribution native native-verify lint test test-rust test-tools test-c test-dotnet test-consumer test-installed-consumers format
+.PHONY: check check-source test-managed check-distribution native native-verify lint test test-rust test-fixtures test-c test-dotnet test-consumer test-installed-consumers format
 
 check: check-source test test-consumer
 
 check-source: lint test-rust test-managed
 
-check-distribution: native-verify test-tools test-c test-dotnet
+check-distribution: native-verify test-fixtures test-c test-dotnet
 
 native:
-	python3 tools/native.py
+	$(SDK_TOOLING) native
 
 native-verify:
-	python3 tools/native.py --verify
+	$(SDK_TOOLING) native --verify
 
 lint:
-	mise run sdk-tooling -- quality check --dotnet
+	$(SDK_TOOLING) quality check --dotnet
 	cargo clippy --workspace --all-targets --locked --offline -- -D warnings
 
 format:
-	mise run sdk-tooling -- quality format --dotnet
+	$(SDK_TOOLING) quality format --dotnet
 
 test:
 	swift test $(SWIFT_FLAGS)
 
 test-consumer:
-	mise run sdk-tooling -- swift-consumer
+	$(SDK_TOOLING) swift-consumer
 
 test-installed-consumers:
-	mise run sdk-tooling -- installed-consumers
+	$(SDK_TOOLING) installed-consumers
 
 test-rust:
 	cargo test --workspace --locked --offline
 
 test-c:
-	python3 tools/bindings.py --c-only
+	$(SDK_TOOLING) python -m fixtures.distribution.bindings --c-only
 
 test-dotnet:
-	python3 tools/bindings.py --dotnet-only
+	$(SDK_TOOLING) python -m fixtures.distribution.bindings --dotnet-only
 
-test-tools:
-	python3 -B -m unittest discover -s tools/tests -v
+test-fixtures:
+	$(SDK_TOOLING) python -m unittest discover -s fixtures/distribution/tests -v
 
 test-managed:
-	python3 -B tools/bindings.py --prepare-dotnet
+	python3 -B -m fixtures.distribution.bindings --prepare-dotnet
 	dotnet run --configuration Release --project bindings/dotnet/tests/SoftwareLicensing.Polar.Tests/SoftwareLicensing.Polar.Tests.csproj

@@ -1,19 +1,13 @@
 """Verify the provider's managed dependency and package policy."""
 
-import importlib.util
 import json
-import sys
 import tempfile
 import unittest
 import xml.etree.ElementTree as ET
 from pathlib import Path
 from unittest.mock import patch
 
-ROOT = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(ROOT / "tools"))
-spec = importlib.util.spec_from_file_location("bindings", ROOT / "tools/bindings.py")
-bindings = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(bindings)
+from fixtures.distribution import bindings
 
 
 class DependencySourceTests(unittest.TestCase):

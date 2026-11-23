@@ -15,11 +15,12 @@ import tomllib
 from contextlib import ExitStack
 from pathlib import Path
 
-from _tooling import load, support_inputs
+from sdk_tooling.adapters import load, support_inputs
+from sdk_tooling.native_plan import builder
 
-import bindings
+from fixtures.distribution import bindings
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parents[2]
 TARGET = "x86_64-pc-windows-msvc"
 RID = "win-x64"
 RECEIPT = "software-licensing-polar-windows.json"
@@ -61,7 +62,7 @@ def stage_core(env, destination):
     url = "https://github.com/naviapps/software-licensing.git"
     lock = tomllib.loads((ROOT / "Cargo.lock").read_text())["package"]
     sources = [p.get("source") for p in lock if p["name"] == "software-licensing"]
-    swift = json.loads((ROOT / "tools/swift-packages.json").read_text())
+    swift = json.loads((ROOT / "fixtures/distribution/swift-packages.json").read_text())
     if (
         not re.fullmatch(r"[a-f0-9]{40}", revision)
         or dependency.get("git") != url
@@ -77,13 +78,27 @@ def stage_core(env, destination):
         != revision
     ):
         raise ValueError("Resolved SoftwareLicensing checkout differs from the pinned revision")
-    # Historical core revisions may predate a first-party LICENSE.
-    licenses = subprocess.check_output(
-        ["git", "ls-tree", "--name-only", revision, "--", "LICENSE"],
-        cwd=resolved,
-        env=env,
-        text=True,
-    ).splitlines()
+    # Keep the producer specification in the exact staged core revision.
+    core_recipe_paths = set(
+        subprocess.check_output(
+            [
+                "git",
+                "ls-tree",
+                "--name-only",
+                revision,
+                "--",
+                "LICENSE",
+                "native.toml",
+                "tools/native.py",
+            ],
+            cwd=resolved,
+            env=env,
+            text=True,
+        ).splitlines()
+    )
+    recipe = core_recipe_paths & {"native.toml", "tools/native.py"}
+    if len(recipe) != 1:
+        raise ValueError("The pinned SoftwareLicensing source must own one native recipe")
     # Build the core's own locked workspace without writing to Cargo's dependency checkout.
     archive = subprocess.check_output(
         [
@@ -94,13 +109,12 @@ def stage_core(env, destination):
             "Cargo.lock",
             "rust-toolchain.toml",
             "crates",
-            "tools/native.py",
+            *sorted(core_recipe_paths),
             "ThirdParty",
             "bindings/dotnet",
             "README.md",
             ".editorconfig",
             ".gitattributes",
-            *licenses,
         ],
         cwd=resolved,
         env=env,
@@ -261,12 +275,11 @@ def main(argv=None):
     parser.add_argument("--architecture", choices=("x64",), default="x64")
     parser.parse_args(argv)
     source = acceptance_source(os.environ)
-    tool_inputs = support_inputs()
+    tool_inputs = support_inputs(ROOT)
     windows = load("windows")
     tooling = load("bindings")
     artifacts = load("artifacts")
     cargo = load("cargo")
-    builder = load("native").NativeBuilder
     environment = {
         key.upper(): value
         for key, value in os.environ.items()
@@ -319,10 +332,14 @@ def main(argv=None):
                 *[f"--remap-path-prefix={path}={alias}" for path, alias in remaps],
             ]
         )
-        core_native = builder(core, symbol_prefix="software_licensing_", minimum_macos="26.0")
-        vendor_native = builder(
-            ROOT, symbol_prefix="software_licensing_polar_", minimum_macos="26.0"
-        )
+        if (core / "native.toml").is_file():
+            core_native = builder(core, tooling=load)
+        else:
+            # Older pinned core revisions bind their receipts to the historical Python recipe.
+            core_native = load("native").NativeBuilder(
+                core, symbol_prefix="software_licensing_", minimum_macos="26.0"
+            )
+        vendor_native = builder(ROOT, tooling=load)
         bindings.run("cargo", "fmt", "--all", "--", "--check", cwd=ROOT, env=env)
         accepted = {}
         native_output = candidate / "dlls"
@@ -408,7 +425,7 @@ def main(argv=None):
         )
         if source != acceptance_source(os.environ):
             raise ValueError("Windows x64 acceptance source changed")
-        if tool_inputs != support_inputs():
+        if tool_inputs != support_inputs(ROOT):
             raise ValueError("Windows x64 acceptance tooling changed")
         if any(digest(library) != evidence["sha256"] for library, evidence in accepted.values()):
             raise ValueError("Accepted Windows x64 DLL changed during package validation")

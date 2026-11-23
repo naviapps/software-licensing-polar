@@ -1,19 +1,16 @@
 """Portable tests for the Windows x64 Polar and pinned-core acceptance driver."""
 
-import importlib.util
 import json
-import sys
 import tempfile
 import unittest
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import MagicMock, call, patch
 
-ROOT = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(ROOT / "tools"))
-spec = importlib.util.spec_from_file_location("polar_windows", ROOT / "tools/windows.py")
-windows = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(windows)
+from sdk_tooling.adapters import load
+
+from fixtures.distribution import windows
+
 TARGETS = {"arm64": "aarch64-pc-windows-msvc", "x64": windows.TARGET}
 
 
@@ -133,13 +130,20 @@ class WindowsTests(unittest.TestCase):
 
             source = ("b" * 40, None)
             revision = "c" * 40
-            tool_inputs = {"tools/support.py": "d" * 64}
-            final_tool_inputs = {"tools/support.py": "e" * 64} if change_support else tool_inputs
+            tool_inputs = {"native.toml": "d" * 64}
+            final_tool_inputs = {"native.toml": "e" * 64} if change_support else tool_inputs
             with (
                 patch.object(windows, "ROOT", root),
                 patch.object(windows.Path, "home", return_value=root / "developer"),
                 patch.object(windows, "acceptance_source", return_value=source),
-                patch.object(windows, "load", side_effect=modules.__getitem__),
+                patch.object(windows, "load", side_effect=modules.__getitem__) as load_tooling,
+                patch.object(
+                    windows,
+                    "builder",
+                    side_effect=lambda path, **_: create_builder(
+                        path, symbol_prefix="software_licensing_polar_", minimum_macos="26.0"
+                    ),
+                ) as vendor_builder,
                 patch.object(
                     windows, "support_inputs", side_effect=[tool_inputs, final_tool_inputs]
                 ),
@@ -170,6 +174,7 @@ class WindowsTests(unittest.TestCase):
                     return
                 windows.main([])
 
+            vendor_builder.assert_called_once_with(root, tooling=load_tooling)
             shared.native_environment.assert_called_once_with(host, {}, target_architecture="x64")
             shared.require_rust_target_stdlib.assert_called_once_with("rust-stdlib", windows.TARGET)
             targets = [entry.args for entry in run.call_args_list if "--target" in entry.args]
@@ -208,8 +213,6 @@ class WindowsTests(unittest.TestCase):
             self.assertEqual(receipt["toolchain"]["host"], compiler_host)
 
     def test_retains_two_archives_and_receipt_without_overwriting_unrelated_files(self):
-        from _tooling import load
-
         artifacts = load("artifacts")
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

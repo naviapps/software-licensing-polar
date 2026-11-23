@@ -83,7 +83,7 @@ worker; keep the callback context alive through completion and never unwind acro
 C. Exclusive handle destruction must not race a call borrowing that handle.
 
 .NET exposes the same configuration and async provider interface. See
-[the managed guide](bindings/dotnet/README.md). `tools/bindings.py --prepare-dotnet`
+[the managed guide](bindings/dotnet/README.md). The managed preparation step
 resolves the pinned core source without a sibling path or native rebuild. The
 native libraries and original notices must accompany a packaged .NET consumer.
 
@@ -155,9 +155,10 @@ administration belong to the merchant's operator workflow.
 ## Development and verification
 
 Use the tools pinned by `mise.toml` and `rust-toolchain.toml`. The `sdk-tooling`
-task uses a public, fixed SDK Tooling revision through uv. SDK-specific native and
-packaging drivers live under `tools/`. SwiftPM and NuGet consumers can install the
-SDK directly.
+task uses a public, fixed SDK Tooling revision through uv. `native.toml`
+defines the native artifact, and `fixtures/distribution/` contains the
+SDK-specific packaging checks. SwiftPM and NuGet consumers can install the SDK
+directly.
 
 ```sh
 mise trust mise.toml
@@ -180,13 +181,12 @@ The fixtures use synthetic responses or invalid or pre-cancelled requests.
 
 ### Distribution checks
 
-Set `NAVI_SDK_TOOLING_SOURCE` to the absolute path to a clean SDK Tooling
-checkout at the revision pinned in `mise.toml`. Run `mise exec -- make
-check-distribution` for native provenance, C ownership, managed callback
-fixtures and installed NuGet checks. The NuGet consumer exercises cancelled
-activation, typed preflight rejection, failed storage, retry and restart.
-Reuse the pinned tooling for `make native` after changing native inputs and
-for `make native-verify`.
+Run `mise exec -- make check-distribution` for native provenance, C
+ownership, managed callback fixtures and installed NuGet checks. The NuGet
+consumer exercises cancelled activation, typed preflight rejection, failed
+storage, retry and restart.
+Run `mise exec -- make native` after changing native inputs and
+`mise exec -- make native-verify` to verify the tracked result.
 
 The standalone Swift consumer resolves the pinned core without host credentials.
 Run `mise run sdk-tooling -- swift-consumer --distribution --git-config PATH`
@@ -198,9 +198,15 @@ bundle as `--git-dependency-source "naviapps/software-licensing=$dependency"` to
 outside this checkout to retain the result. This validates local Git delivery.
 
 Windows packages target `win-x64`. On an owned prepared Windows ARM64 worker,
-run `python -E -S -B tools/windows.py` with the absolute path to the pinned x64
-.NET SDK executable in `DOTNET_BIN`. ARM64-hosted MSVC builds the two x64
-DLLs. Rust, C, and .NET fixtures run as x64 processes through Windows emulation.
+set `DOTNET_BIN` to the absolute path of the pinned x64 .NET SDK executable.
+Run the distribution fixture from the repository root.
+
+```sh
+mise run sdk-tooling -- python -m fixtures.distribution.windows
+```
+
+ARM64-hosted MSVC builds the two x64 DLLs. Rust, C, and .NET fixtures run as
+x64 processes through Windows emulation.
 The driver builds the immutable SoftwareLicensing source separately and accepts
 the two NuGet packages together. Accepted packages and evidence are retained
 under `.native-build/win-x64/<version>` and, when set, `NAVI_CI_ARTIFACTS`.
