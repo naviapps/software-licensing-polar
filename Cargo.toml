@@ -19,7 +19,7 @@ reqwest = { version = "0.13.5", default-features = false, features = [
 ] }
 serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1", features = ["float_roundtrip"] }
-software-licensing = { git = "https://github.com/naviapps/software-licensing.git", rev = "d2c93007c933e5cf6b65d7e9fff14e473efb1cd0" }
+software-licensing = { git = "https://github.com/naviapps/software-licensing.git", rev = "ceda779224b9e52500f452923d5018150f2ac902" }
 software-licensing-polar = { path = "crates/provider" }
 time = { version = "0.3", features = ["parsing", "formatting"] }
 tokio = { version = "1", features = [

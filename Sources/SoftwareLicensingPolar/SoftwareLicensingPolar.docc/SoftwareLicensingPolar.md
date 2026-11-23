@@ -1,6 +1,6 @@
 # ``SoftwareLicensingPolar``
 
-Use Polar licensing in macOS 26 or later apps with Swift 6.4 or later.
+Use Polar licensing in macOS 26 or later apps with Swift 6.3 or later.
 
 ## Overview
 

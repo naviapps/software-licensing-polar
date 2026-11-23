@@ -1,4 +1,4 @@
-// swift-tools-version: 6.4
+// swift-tools-version: 6.3
 import PackageDescription
 
 let package = Package(
@@ -8,7 +8,7 @@ let package = Package(
     .package(name: "software-licensing-polar", path: "../sdk"),
     .package(
       url: "https://github.com/naviapps/software-licensing.git",
-      revision: "d2c93007c933e5cf6b65d7e9fff14e473efb1cd0"),
+      revision: "ceda779224b9e52500f452923d5018150f2ac902"),
   ],
   targets: [
     .executableTarget(

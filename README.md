@@ -33,7 +33,7 @@ source `polar`.
 
 ### Swift
 
-Use macOS 26 or later and Swift 6.4. Select this repository's
+Use macOS 26 or later and Swift 6.3. Select this repository's
 `SoftwareLicensingPolar` product with the matching SoftwareLicensing dependency.
 The source-bound universal framework means Swift consumers need no Rust compiler.
 
@@ -193,8 +193,9 @@ the two NuGet packages together. Accepted packages and evidence are retained
 under `.native-build/win-x64/<version>` and, when set, `NAVI_CI_ARTIFACTS`.
 
 GitHub Actions runs the SDK and standalone consumer checks on Xcode 27 and
-Windows x64 with the pinned SoftwareLicensing and tooling sources. CI uses
-fixture providers. Test actual provider integration separately.
+Windows x64 with the pinned SoftwareLicensing and tooling sources. The macOS
+workflow also checks the SDK and its standalone Swift consumer with Xcode 26.6.
+CI uses fixture providers. Test actual provider integration separately.
 
 ## License
 
