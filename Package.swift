@@ -1,11 +1,21 @@
 // swift-tools-version: 6.3
+import Foundation
 import PackageDescription
+
+private func coreCheckoutPath(_ path: String) -> String {
+  let manifestDirectory = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
+  let absolutePath = URL(fileURLWithPath: path, relativeTo: manifestDirectory).path
+  // SwiftPM compares dependency paths, so aliases such as /var and /private/var must agree.
+  guard let resolved = realpath(absolutePath, nil) else { return path }
+  defer { free(resolved) }
+  return String(cString: resolved)
+}
 
 // A host developing both packages may use one explicit local core checkout.
 // Normal installation and isolated CI resolve the immutable remote revision.
 let core: Package.Dependency =
   if let path = Context.environment["SOFTWARE_LICENSING_PACKAGE_PATH"], !path.isEmpty {
-    .package(name: "software-licensing", path: path)
+    .package(name: "software-licensing", path: coreCheckoutPath(path))
   } else {
     .package(
       url: "https://github.com/naviapps/software-licensing.git",
