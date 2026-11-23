@@ -4,9 +4,9 @@ Rust owns fixed HTTPS transport, strict Polar codecs, API version, deadlines, ca
 
 Use main; parent owns commits, publication and VM lifecycle. Never operate real licenses or customers. Tests use owned loopback fixtures and invalid/pre-cancelled inputs. Keep the `polar` source distinct from other issuers; never probe an existing license at a different provider. Preserve uncertain mutation evidence; never interpret 404 as a successful mutation. All shell commands use login:false.
 
-Use the SDK's standalone `make check` for contributor changes. Use the pinned
-SDK Tooling checkout for distribution checks and changes to source-bound native
-artifacts. Preserve original third-party notices, and rebuild native artifacts
+Use `make check` for contributor changes. The public SDK Tooling revision in
+`mise.toml` supplies common lint and consumer checks. Use that same revision for
+distribution checks and changes to source-bound native artifacts. Preserve original third-party notices, and rebuild native artifacts
 after Rust changes. Report Rust, C, Swift, .NET, remote CI and provider evidence
 separately. Use GitHub-hosted CI. Before publication, run the full gate locally on
 the exact pinned sources.

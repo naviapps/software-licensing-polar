@@ -154,9 +154,10 @@ administration belong to the merchant's operator workflow.
 
 ## Development and verification
 
-Use the tools pinned by `mise.toml` and `rust-toolchain.toml`. The developer
-scripts live in this repository under `tools/`. Ordinary SDK consumers can use
-SwiftPM or NuGet directly.
+Use the tools pinned by `mise.toml` and `rust-toolchain.toml`. The `sdk-tooling`
+task uses a public, fixed SDK Tooling revision through uv. SDK-specific native and
+packaging drivers live under `tools/`. SwiftPM and NuGet consumers can install the
+SDK directly.
 
 ```sh
 mise trust mise.toml
@@ -165,8 +166,8 @@ mise exec -- cargo fetch --locked
 mise exec -- make check
 ```
 
-`make check` runs source lint, Rust Clippy and tests, strict Swift tests and a
-standalone SwiftPM consumer using this SDK checkout. The consumer exercises the
+`make check` runs source lint, Rust Clippy and tests, the managed provider
+fixture, strict Swift tests and an external SwiftPM consumer using this SDK checkout. The consumer exercises the
 public Polar provider with the pinned SoftwareLicensing core.
 Rust protocol tests use local values. The owned loopback transport also exercises
 release recovery with the pinned licensing core, from an interrupted journal or a
@@ -180,7 +181,7 @@ The fixtures use synthetic responses or invalid or pre-cancelled requests.
 ### Distribution checks
 
 Set `NAVI_SDK_TOOLING_SOURCE` to the absolute path to a clean SDK Tooling
-checkout at the commit in `tools/tooling-sources.json`. Run `mise exec -- make
+checkout at the revision pinned in `mise.toml`. Run `mise exec -- make
 check-distribution` for native provenance, C ownership, managed callback
 fixtures and installed NuGet checks. The NuGet consumer exercises cancelled
 activation, typed preflight rejection, failed storage, retry and restart.
@@ -188,13 +189,13 @@ Reuse the pinned tooling for `make native` after changing native inputs and
 for `make native-verify`.
 
 The standalone Swift consumer resolves the pinned core without host credentials.
-Pass `--git-config PATH` to `tools/consumer.py` to use a Git configuration that
-rewrites the core's URL to a local mirror containing that commit during the
-detailed distribution check.
+Run `mise run sdk-tooling -- swift-consumer --distribution --git-config PATH`
+to use a Git configuration that redirects the core's URL to a local mirror
+containing that commit.
 For independently installed Rust/C checks, pass a complete core repository or Git
 bundle as `--git-dependency-source "naviapps/software-licensing=$dependency"` to
-`tools/install-consumers.py`. Use `--evidence` with a new path outside this checkout
-to retain the result. This validates local Git delivery.
+`mise run sdk-tooling -- installed-consumers`. Use `--evidence` with a new path
+outside this checkout to retain the result. This validates local Git delivery.
 
 Windows packages target `win-x64`. On an owned prepared Windows ARM64 worker,
 run `python -E -S -B tools/windows.py` with the absolute path to the pinned x64
@@ -204,8 +205,8 @@ The driver builds the immutable SoftwareLicensing source separately and accepts
 the two NuGet packages together. Accepted packages and evidence are retained
 under `.native-build/win-x64/<version>` and, when set, `NAVI_CI_ARTIFACTS`.
 
-Maintainers can run the macOS and Windows x64 distribution gates in the private
-SDK Tooling repository. Substitute the full SDK commit SHA on `main`:
+Maintainers can run the macOS and Windows x64 distribution gates in the
+[SDK Tooling repository](https://github.com/naviapps/sdk-tooling). Substitute the full SDK commit SHA on `main`:
 
 ```sh
 gh workflow run check-sdk-distribution.yml -R naviapps/sdk-tooling \
