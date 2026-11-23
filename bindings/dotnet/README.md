@@ -99,11 +99,10 @@ pre-cancelled operations, which cannot contact Polar. Rust tests use owned
 loopback HTTP fixtures. None establish live provider behavior or migrate customers.
 
 For native local tests, use the
-[pinned tooling tasks](../../README.md#distribution-checks). Set
-`SOFTWARE_LICENSING_POLAR_NATIVE_LIBRARY` to the exact
-source-matched provider library, and `SOFTWARE_LICENSING_NATIVE_LIBRARY` to the
-matching base library. `make test-c` and `make test-dotnet` consume macOS
-framework executables without rebuilding them. The clean NuGet consumer
+[pinned tooling tasks](../../README.md#distribution-checks). `make test-c` and
+`make test-dotnet` consume macOS framework executables without rebuilding them.
+The managed fixture build copies the selected provider and base libraries beside
+the executable. The clean NuGet consumer
 resolves both packaged native assets, then exercises cancellation, typed Polar
 preflight rejection, failed storage, retry and restart using an in-memory store.
 

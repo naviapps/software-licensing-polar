@@ -237,7 +237,7 @@ class WindowsTests(unittest.TestCase):
             managed = dotnet_tools.run_managed.call_args
             self.assertEqual(managed.args[0], dotnet)
             self.assertEqual(managed.kwargs["runtime"], windows.RID)
-            self.assertEqual(managed.kwargs["properties"]["UseAppHost"], "false")
+            self.assertEqual(managed.kwargs["arguments"], ("--native",))
             pair = pack.call_args.args
             self.assertEqual(pair[0], dotnet)
             self.assertEqual(
@@ -246,6 +246,9 @@ class WindowsTests(unittest.TestCase):
             )
             self.assertEqual(pair[4], windows.RID)
             self.assertEqual(pack.call_args.kwargs, {"load_tools": load_tooling})
+            properties = managed.kwargs["properties"]
+            self.assertEqual(Path(properties["PolarNativeLibrary"]), pair[2])
+            self.assertEqual(Path(properties["SoftwareLicensingNativeLibrary"]), pair[3])
             receipt = retain.call_args.args[1]
             self.assertEqual(retain.call_args.kwargs["artifacts"], artifacts_dir)
             self.assertEqual(receipt["source"], source[0])

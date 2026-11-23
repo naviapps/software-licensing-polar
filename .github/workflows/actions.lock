@@ -5,7 +5,6 @@ version: 'v0.0.3'
 workflows:
     '.github/workflows/check.yml':
         - 'actions/checkout@v6.1.0'
-        - 'actions/setup-dotnet@v6.0.0'
         - 'jdx/mise-action@v5.3.0'
         - 'naviapps/sdk-tooling@main'
 dependencies:
@@ -26,6 +25,8 @@ dependencies:
         repo_id: 738284564
     'naviapps/sdk-tooling@main':
         ref: 'main'
-        commit: 'sha1-e86f06c7ec1a395328f47c7dcfc40be65e4f5bce'
+        commit: 'sha1-306b97044d6d2ed4769a22e22034981dbb932f4c'
         owner_id: 14840203
         repo_id: 1439873358
+        uses:
+            - 'actions/setup-dotnet@v6.0.0'

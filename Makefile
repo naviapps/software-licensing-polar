@@ -1,21 +1,29 @@
 SDK_TOOLING ?= mise run sdk-tooling --
 SWIFT_FLAGS := -Xswiftc -strict-concurrency=complete -Xswiftc -warnings-as-errors
+C_HEADER := crates/ffi/include/software_licensing_polar.h
+CBINDGEN := cbindgen --config crates/ffi/cbindgen.toml crates/ffi/src/lib.rs
 
 .DEFAULT_GOAL := check
-.PHONY: check check-source test-managed check-distribution native native-verify lint test test-rust test-distribution-tools test-c test-dotnet test-consumer test-installed-consumers format clean
+.PHONY: check check-source test-managed check-distribution native native-verify check-header generate-header lint test test-rust test-distribution-tools test-c test-dotnet test-consumer test-installed-consumers format clean
 
 check: check-source test test-consumer
 
-check-source: lint test-rust test-managed
+check-source: lint check-header test-rust test-managed
 
 check-distribution: native-verify test-distribution-tools test-c test-dotnet
 	python3 -B -m distribution.verify_bindings --verify-swift-pin
 
-native:
+native: check-header
 	$(SDK_TOOLING) xcframework
 
-native-verify:
+native-verify: check-header
 	$(SDK_TOOLING) xcframework --verify
+
+check-header:
+	bash -o pipefail -c '$(CBINDGEN) | diff -u "$(C_HEADER)" -'
+
+generate-header:
+	$(CBINDGEN) --output "$(C_HEADER)"
 
 lint:
 	$(SDK_TOOLING) quality check --dotnet

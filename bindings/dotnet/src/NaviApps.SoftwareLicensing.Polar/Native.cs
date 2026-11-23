@@ -1,4 +1,3 @@
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text.Json;
@@ -78,17 +77,7 @@ internal sealed class PInvokeProviderNative : IProviderNative
 {
     private const string Library = "software_licensing_polar";
     internal static readonly PInvokeProviderNative Instance = new();
-    static PInvokeProviderNative() => NativeLibrary.SetDllImportResolver(typeof(PInvokeProviderNative).Assembly, Resolve);
     private PInvokeProviderNative() { }
-    private static IntPtr Resolve(string name, Assembly assembly, DllImportSearchPath? search)
-    {
-        if (name != Library) return IntPtr.Zero;
-        var explicitPath = Environment.GetEnvironmentVariable("SOFTWARE_LICENSING_POLAR_NATIVE_LIBRARY");
-        if (!string.IsNullOrEmpty(explicitPath)) return NativeLibrary.Load(explicitPath);
-        string file = OperatingSystem.IsWindows() ? Library + ".dll" : OperatingSystem.IsMacOS() ? "lib" + Library + ".dylib" : "lib" + Library + ".so";
-        string packaged = Path.Combine(AppContext.BaseDirectory, "runtimes", RuntimeInformation.RuntimeIdentifier, "native", file);
-        return File.Exists(packaged) ? NativeLibrary.Load(packaged) : NativeLibrary.Load(file, assembly, search);
-    }
     [StructLayout(LayoutKind.Sequential)]
     private readonly struct SoftwareLicensingPolarResultView { public readonly uint Code; public readonly IntPtr Data; public readonly nuint Length; }
     [DllImport(Library, EntryPoint = "software_licensing_polar_abi_version", CallingConvention = CallingConvention.Cdecl)]

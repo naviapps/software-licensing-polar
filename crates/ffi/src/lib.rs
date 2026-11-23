@@ -19,7 +19,7 @@ pub struct SoftwareLicensingPolarResultView {
     pub length: usize,
 }
 type SoftwareLicensingPolarCompletion =
-    extern "C" fn(*mut c_void, *mut SoftwareLicensingPolarResult);
+    Option<extern "C" fn(context: *mut c_void, result: *mut SoftwareLicensingPolarResult)>;
 
 impl SoftwareLicensingPolarResult {
     fn result<T: serde::Serialize>(value: Result<T, Failure>) -> *mut Self {
@@ -62,7 +62,7 @@ fn runtime() -> Result<&'static Runtime, Failure> {
 }
 
 struct Completion {
-    callback: Option<SoftwareLicensingPolarCompletion>,
+    callback: SoftwareLicensingPolarCompletion,
     context: usize,
 }
 impl Completion {
@@ -81,11 +81,17 @@ impl Drop for Completion {
     }
 }
 
+/// ABI 3 preserves retry timing and mutation outcomes. Cancellation during a
+/// retry wait returns the received rejection and its retry advice. A new
+/// unconfirmed mutation may instead have an unknown outcome.
 #[unsafe(no_mangle)]
 pub extern "C" fn software_licensing_polar_abi_version() -> u32 {
     3
 }
 
+/// Copies configuration JSON without network effects. On failure, returns null
+/// and writes an owned failure into `error` if provided.
+///
 /// # Safety
 /// Input is readable for length bytes. Error is null or writable for one owned result.
 #[unsafe(no_mangle)]
@@ -132,18 +138,20 @@ pub unsafe extern "C" fn software_licensing_polar_provider_destroy(
     }
 }
 
+/// Copies intent JSON. A non-null return completes exactly once, including errors
+/// and cancellation. Completion may run on a Rust worker or before this call returns.
+/// Null provider/callback returns null and produces no callback.
+///
 /// # Safety
 /// Provider stays live through this call; input is readable for length bytes.
 /// Callback must not unwind and owns its result. Context stays valid until callback.
-/// A non-null return completes exactly once, possibly before this call returns.
-/// Null provider/callback returns null and produces no callback.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn software_licensing_polar_operation_start(
     provider: *const SoftwareLicensingPolarProvider,
     data: *const u8,
     length: usize,
     context: *mut c_void,
-    callback: Option<SoftwareLicensingPolarCompletion>,
+    callback: SoftwareLicensingPolarCompletion,
 ) -> *mut SoftwareLicensingPolarOperation {
     let Some(provider) = (unsafe { provider.as_ref() }) else {
         return std::ptr::null_mut();
@@ -204,6 +212,9 @@ pub unsafe extern "C" fn software_licensing_polar_operation_destroy(
     }
 }
 
+/// Code 0 indicates success and may contain credentials. Code 1 indicates stable,
+/// credential-free failure JSON. Copy the view before destroying its owner.
+///
 /// # Safety
 /// Owner is null or live; views are borrowed until owner is destroyed.
 #[unsafe(no_mangle)]

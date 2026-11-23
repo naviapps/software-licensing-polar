@@ -378,26 +378,13 @@ def main(argv=None):
         vendor_library, vendor_evidence = accepted["vendor"]
         if any(name.startswith(vendor_native.symbol_prefix) for name in core_evidence["exports"]):
             raise ValueError("Core DLL exposes Polar provider operations")
-        test_env = dict(
-            env,
-            SOFTWARE_LICENSING_NATIVE_LIBRARY=str(core_library),
-            SOFTWARE_LICENSING_POLAR_NATIVE_LIBRARY=str(vendor_library),
-        )
-        core_project = (
-            core
-            / "bindings/dotnet/src"
-            / bindings.CORE_PACKAGE
-            / (bindings.CORE_PACKAGE + ".csproj")
-        )
-        load("dotnet").run_managed(
+        bindings.managed_tests(
             dotnet,
-            ROOT
-            / "bindings/dotnet/tests/SoftwareLicensing.Polar.Tests/SoftwareLicensing.Polar.Tests.csproj",
-            cwd=ROOT,
-            properties={"SoftwareLicensingProject": str(core_project), "UseAppHost": "false"},
-            arguments=("--native",),
-            env=test_env,
-            verify_style=True,
+            core,
+            vendor_library,
+            core_library,
+            env,
+            load_tools=load,
             runtime=RID,
         )
         packages = bindings.pack_and_consume(
@@ -406,7 +393,7 @@ def main(argv=None):
             vendor_library,
             core_library,
             RID,
-            test_env,
+            env,
             candidate,
             load_tools=load,
         )

@@ -6,6 +6,7 @@ idiomatic_version_file_enable_tools = ["rust"]
 [tools]
 python = "3.15.1"
 dotnet = "10.0.403"
+"cargo:cbindgen" = "0.29.4"
 ruff = "0.17.3"
 dprint = "0.64.3"
 actionlint = "1.7.12"
@@ -17,7 +18,7 @@ uv = "0.13.6"
 "github:bnjbvr/cargo-machete" = { version = "0.9.2", platforms.windows-arm64.asset_pattern = "*-x86_64-pc-windows-msvc.tar.gz" }
 
 [tasks.sdk-tooling]
-run = "uvx --from git+https://github.com/naviapps/sdk-tooling.git@5e81874d4864541b5eace3ebce2eb407ef868739 sdk-tooling"
+run = "uvx --from git+https://github.com/naviapps/sdk-tooling.git@306b97044d6d2ed4769a22e22034981dbb932f4c sdk-tooling"
 
 [tasks.lint]
 description = "Check owned source formatting and semantic lint before builds"

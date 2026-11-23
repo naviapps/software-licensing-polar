@@ -7020,9 +7020,9 @@
     "ThirdParty/zerovec-derive-0.11.7/LICENSE": "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2",
     "ThirdParty/zmij-1.0.23/LICENSE-MIT": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
     "crates/ffi/Cargo.toml": "33c8f1fc01724a8e7f13a8f76a2c173d872062d02ac8e41f2bda02fb92f67130",
-    "crates/ffi/include/software_licensing_polar.h": "da75d7b9a2e6679454b650291acbaa47377fb3c7a357ef1a00fb36a52f283e68",
+    "crates/ffi/include/software_licensing_polar.h": "d7434b4870bd128dd9c5793741a62810f27dc315738647df6e984811144954f7",
     "crates/ffi/module.modulemap": "2467ace3b408c876cc350ad33913fe4529ec7f8a1ee87a4d0288e5d41c7258de",
-    "crates/ffi/src/lib.rs": "9dbe052c9301a90371e850dd1ca57c9ba3af6a0855c26f03011381bff6686876",
+    "crates/ffi/src/lib.rs": "5d0ff71051fbc246294954b52f620c8397933669562d85a8fad390a37eff654b",
     "native.toml": "740f2349759a004c27607106af277c1113f7c0678ea919caadb8a39778170c4d",
     "rust-toolchain.toml": "d13306be0ecda81ce779baa290ffb417380d525928477f16200884b5169cca33",
     "src/lib.rs": "b28cc609b38471b560df5f87f78da456ba27dc57ad6550e915b1ad0f2ce583a4",
@@ -7036,12 +7036,12 @@
     "Artifacts/CSoftwareLicensingPolar.xcframework/macos-arm64_x86_64/CSoftwareLicensingPolar.framework/Headers": "036ae9446c4f0c59046671d1d96e2de4f606b340d8a5c1927b2d51bc293e0365",
     "Artifacts/CSoftwareLicensingPolar.xcframework/macos-arm64_x86_64/CSoftwareLicensingPolar.framework/Modules": "278b6b2d8f8418e2e4877a67a109b6e3865174e4fa7405870a643e95cbc2f783",
     "Artifacts/CSoftwareLicensingPolar.xcframework/macos-arm64_x86_64/CSoftwareLicensingPolar.framework/Resources": "c213ee8e9c523538d862da3e5716b64bf090f6a1be08914954ae33cfbda7dbb2",
-    "Artifacts/CSoftwareLicensingPolar.xcframework/macos-arm64_x86_64/CSoftwareLicensingPolar.framework/Versions/A/CSoftwareLicensingPolar": "65af6ae70a532bb1298714ed7d635380540ce7b287c99f2a026ae369bf12a608",
-    "Artifacts/CSoftwareLicensingPolar.xcframework/macos-arm64_x86_64/CSoftwareLicensingPolar.framework/Versions/A/Headers/software_licensing_polar.h": "da75d7b9a2e6679454b650291acbaa47377fb3c7a357ef1a00fb36a52f283e68",
+    "Artifacts/CSoftwareLicensingPolar.xcframework/macos-arm64_x86_64/CSoftwareLicensingPolar.framework/Versions/A/CSoftwareLicensingPolar": "ce78366d9b865e3f3f6a690b16f1666dc6f39cd6fb8f9fcfbb924b2ad4803460",
+    "Artifacts/CSoftwareLicensingPolar.xcframework/macos-arm64_x86_64/CSoftwareLicensingPolar.framework/Versions/A/Headers/software_licensing_polar.h": "d7434b4870bd128dd9c5793741a62810f27dc315738647df6e984811144954f7",
     "Artifacts/CSoftwareLicensingPolar.xcframework/macos-arm64_x86_64/CSoftwareLicensingPolar.framework/Versions/A/Modules/module.modulemap": "2467ace3b408c876cc350ad33913fe4529ec7f8a1ee87a4d0288e5d41c7258de",
     "Artifacts/CSoftwareLicensingPolar.xcframework/macos-arm64_x86_64/CSoftwareLicensingPolar.framework/Versions/A/Resources/Info.plist": "c5f783ffc783e2b4c11ed6a9066c858f865098db9a42170dfe24eb9657f166b7",
     "Artifacts/CSoftwareLicensingPolar.xcframework/macos-arm64_x86_64/CSoftwareLicensingPolar.framework/Versions/A/Resources/ThirdPartyNotices.txt": "b2f995f09757b1dfbb473a27096a305d20a61827dab73c66306e9373599fcc75",
-    "Artifacts/CSoftwareLicensingPolar.xcframework/macos-arm64_x86_64/CSoftwareLicensingPolar.framework/Versions/A/_CodeSignature/CodeResources": "5d97336162884d966c9d8d9335df06f245328e27de41e752b9e2f2665723fd07",
+    "Artifacts/CSoftwareLicensingPolar.xcframework/macos-arm64_x86_64/CSoftwareLicensingPolar.framework/Versions/A/_CodeSignature/CodeResources": "37faafa0fde2bc365f79211fe0c5a0902eab8f5790ee2ef3af43fbf4d587815b",
     "Artifacts/CSoftwareLicensingPolar.xcframework/macos-arm64_x86_64/CSoftwareLicensingPolar.framework/Versions/Current": "ee26006c07174064a7bed9b283a8b016d74a295e05c4e23a1846538d69b23c5f"
   },
   "productionSources": [
@@ -7057,6 +7057,6 @@
     "crates/rustc-dep-info/src/main.rs": "0a59fb162cc855001899ad9b83875fac0ed837e73caafd116453352c9b56e2cf",
     "ffi.py": "805e7507a2a59c5c5d3edb2d654a2276ea8677ac1b755aa0dee466af87651d85",
     "native_plan.py": "126791c1993dded2be0f46784a28528d40ed1218c46d1f1aadb2c026f047dcd3",
-    "xcframework.py": "2c092ab03e898689b14b35f65897c64197f75e162272b0066912504afbdfb7f9"
+    "xcframework.py": "37d848a3d58af479b8c13c6466cef1917029e4a9709e986a66a6a4ff1e431e08"
   }
 }

@@ -9,5 +9,13 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../../src/NaviApps.SoftwareLicensing.Polar/NaviApps.SoftwareLicensing.Polar.csproj" />
+    <None Include="$(PolarNativeLibrary)" Condition="'$(PolarNativeLibrary)' != ''" CopyToOutputDirectory="Always">
+      <Link Condition="'$(OS)' == 'Windows_NT'">software_licensing_polar.dll</Link>
+      <Link Condition="'$(OS)' != 'Windows_NT'">libsoftware_licensing_polar.dylib</Link>
+    </None>
+    <None Include="$(SoftwareLicensingNativeLibrary)" Condition="'$(SoftwareLicensingNativeLibrary)' != ''" CopyToOutputDirectory="Always">
+      <Link Condition="'$(OS)' == 'Windows_NT'">software_licensing.dll</Link>
+      <Link Condition="'$(OS)' != 'Windows_NT'">libsoftware_licensing.dylib</Link>
+    </None>
   </ItemGroup>
 </Project>

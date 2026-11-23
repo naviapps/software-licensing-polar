@@ -19,6 +19,7 @@ from xml.sax.saxutils import escape
 ROOT = Path(__file__).resolve().parents[1]
 VENDOR_PACKAGE = "NaviApps.SoftwareLicensing.Polar"
 CORE_PACKAGE = "NaviApps.SoftwareLicensing"
+LEGACY_CORE_NATIVE_OVERRIDE = "SOFTWARE_LICENSING_NATIVE_LIBRARY"
 CORE_URL = "https://github.com/naviapps/software-licensing.git"
 
 
@@ -201,10 +202,7 @@ def pack_and_consume(dotnet, core, vendor_library, core_library, rid, env, outpu
         env=env,
         runtime=rid,
         properties={"Nullable": "enable", "TreatWarningsAsErrors": "true"},
-        clear_environment=(
-            "SOFTWARE_LICENSING_NATIVE_LIBRARY",
-            "SOFTWARE_LICENSING_POLAR_NATIVE_LIBRARY",
-        ),
+        clear_environment=(LEGACY_CORE_NATIVE_OVERRIDE,),
         exclude_paths=(
             ROOT / "target",
             core / "target",
@@ -213,6 +211,27 @@ def pack_and_consume(dotnet, core, vendor_library, core_library, rid, env, outpu
         ),
     )
     return hashes
+
+
+def managed_tests(dotnet, core, library, core_library, env, *, load_tools, runtime=None):
+    core_project = core / "bindings/dotnet/src" / CORE_PACKAGE / (CORE_PACKAGE + ".csproj")
+    # The pinned core still recognizes a legacy runtime override.
+    env = {key: value for key, value in env.items() if key.upper() != LEGACY_CORE_NATIVE_OVERRIDE}
+    load_tools("dotnet").run_managed(
+        dotnet,
+        ROOT
+        / "bindings/dotnet/tests/SoftwareLicensing.Polar.Tests/SoftwareLicensing.Polar.Tests.csproj",
+        env=env,
+        cwd=ROOT,
+        properties={
+            "SoftwareLicensingProject": str(core_project),
+            "SoftwareLicensingNativeLibrary": str(core_library),
+            "PolarNativeLibrary": str(library),
+        },
+        arguments=("--native",),
+        verify_style=True,
+        runtime=runtime,
+    )
 
 
 def main():
@@ -273,19 +292,7 @@ def main():
         core_library = framework_binary(core, "CSoftwareLicensing")
         if not core_library.is_file():
             raise SystemExit("The resolved core's tracked framework is missing")
-        env["SOFTWARE_LICENSING_POLAR_NATIVE_LIBRARY"] = str(library)
-        env["SOFTWARE_LICENSING_NATIVE_LIBRARY"] = str(core_library)
-        core_project = core / "bindings/dotnet/src" / CORE_PACKAGE / (CORE_PACKAGE + ".csproj")
-        load("dotnet").run_managed(
-            dotnet,
-            ROOT
-            / "bindings/dotnet/tests/SoftwareLicensing.Polar.Tests/SoftwareLicensing.Polar.Tests.csproj",
-            env=env,
-            cwd=ROOT,
-            properties={"SoftwareLicensingProject": str(core_project)},
-            arguments=("--native",),
-            verify_style=True,
-        )
+        managed_tests(dotnet, core, library, core_library, env, load_tools=load)
         rid = "osx-arm64" if platform.machine().lower() in ("arm64", "aarch64") else "osx-x64"
         packages = pack_and_consume(
             dotnet, core, library, core_library, rid, env, output, load_tools=load
