@@ -13,7 +13,7 @@ concurrency:
 jobs:
   swift:
     name: Swift
-    uses: naviapps/sdk-tooling/.github/workflows/check-swift.yml@888bf13f109ac7dc806b29478cc9c4acacdf6515
+    uses: naviapps/sdk-tooling/.github/workflows/check-swift.yml@e86f06c7ec1a395328f47c7dcfc40be65e4f5bce
   source:
     name: Source checks
     runs-on: macos-26
@@ -49,7 +49,7 @@ jobs:
       - uses: actions/checkout@v6.1.0
         with:
           persist-credentials: false
-      - uses: naviapps/sdk-tooling/.github/actions/test-rust-windows@888bf13f109ac7dc806b29478cc9c4acacdf6515
+      - uses: naviapps/sdk-tooling/.github/actions/test-rust-windows@main
       - uses: actions/setup-dotnet@v6.0.0
         env:
           DOTNET_INSTALL_DIR: ${{ runner.temp }}/dotnet

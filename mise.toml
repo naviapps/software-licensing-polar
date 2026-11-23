@@ -17,7 +17,7 @@ uv = "0.13.6"
 "github:bnjbvr/cargo-machete" = { version = "0.9.2", platforms.windows-arm64.asset_pattern = "*-x86_64-pc-windows-msvc.tar.gz" }
 
 [tasks.sdk-tooling]
-run = "uvx --from git+https://github.com/naviapps/sdk-tooling.git@888bf13f109ac7dc806b29478cc9c4acacdf6515 sdk-tooling"
+run = "uvx --from git+https://github.com/naviapps/sdk-tooling.git@e86f06c7ec1a395328f47c7dcfc40be65e4f5bce sdk-tooling"
 
 [tasks.lint]
 description = "Check owned source formatting and semantic lint before builds"
