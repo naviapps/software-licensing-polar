@@ -3,7 +3,9 @@
 
 import argparse
 import io
+import json
 import os
+import shutil
 import subprocess
 import tarfile
 import tempfile
@@ -26,28 +28,29 @@ from distribution import verify_bindings as bindings
 
 ROOT = Path(__file__).resolve().parents[1]
 RECEIPT = "software-licensing-polar-windows.json"
+CORE_WINDOWS_BUILD = Path("dependencies/software-licensing")
 
 
 def acceptance_source(env):
     return load("windows_delivery").acceptance_source(ROOT, match_actions=True, environment=env)
 
 
-def stage_core(env, destination):
+def stage_core(env, destination, *, include_macos=False):
     revision = bindings.locked_core_revision()
-    resolved = bindings.core_root(env, target=TARGET)
+    resolved = bindings.core_root(env, target=None if include_macos else TARGET)
+    git_env = dict(env, GIT_NO_REPLACE_OBJECTS="1")
     if (
         subprocess.check_output(
-            ["git", "rev-parse", "HEAD"], cwd=resolved, env=env, text=True
+            ["git", "rev-parse", "HEAD"], cwd=resolved, env=git_env, text=True
         ).strip()
         != revision
     ):
         raise ValueError("Resolved SoftwareLicensing checkout differs from the pinned revision")
     # Build the core's own locked workspace without writing to Cargo's dependency checkout.
-    archive = subprocess.check_output(
-        [
-            "git",
-            "archive",
-            revision,
+    paths = (
+        []
+        if include_macos
+        else [
             "Cargo.toml",
             "Cargo.lock",
             "rust-toolchain.toml",
@@ -59,13 +62,39 @@ def stage_core(env, destination):
             "README.md",
             ".editorconfig",
             ".gitattributes",
-        ],
-        cwd=resolved,
-        env=env,
+        ]
+    )
+    archive = subprocess.check_output(
+        ["git", "archive", revision, *paths], cwd=resolved, env=git_env
     )
     with tarfile.open(fileobj=io.BytesIO(archive)) as source:
         source.extractall(destination, filter="data")
     return revision
+
+
+def export_native(artifact_root, native_products, native_evidence, artifacts):
+    artifact_root.mkdir(parents=True, exist_ok=True)
+    destination = artifact_root / "sdk-windows"
+    if destination.exists() or destination.is_symlink():
+        raise ValueError("Polar Windows export requires a new artifact directory")
+    with tempfile.TemporaryDirectory(dir=artifact_root, prefix="polar-native-") as directory:
+        staged = Path(directory) / destination.name
+        for name, product in native_products.items():
+            output = product.root / ".native-build"
+            built = output / "windows" / RID
+            selected = staged if name == "vendor" else staged / CORE_WINDOWS_BUILD
+            evidence = native_evidence[name][1]
+            selected.mkdir(parents=True, exist_ok=True)
+            with artifacts.build_lock(output):
+                native_receipt = built / "native-build.json"
+                if digest(native_receipt) != evidence["receiptSha256"]:
+                    raise ValueError("Polar Windows native receipt changed after acceptance")
+                inventory = json.loads(native_receipt.read_text(encoding="utf-8"))["outputs"]
+                shutil.copytree(built, selected / RID, symlinks=True)
+                actual = artifacts.hashes(artifacts.files(selected / RID), selected / RID)
+                if actual != inventory | {"native-build.json": evidence["receiptSha256"]}:
+                    raise ValueError("Exported Polar Windows files differ from the accepted build")
+        staged.rename(destination)
 
 
 def verify_notices(cargo, native, env):
@@ -147,6 +176,9 @@ def main(argv=None):
     parser.add_argument(
         "--native-aot", action="store_true", help="Publish and run the Native AOT consumer"
     )
+    parser.add_argument(
+        "--export-native", action="store_true", help="Export both accepted Windows native builds"
+    )
     args = parser.parse_args(argv)
     source = acceptance_source(os.environ)
     tool_inputs = support_inputs(ROOT)
@@ -162,6 +194,8 @@ def main(argv=None):
     compiler_host = windows.MSVC_TARGETS[host]
     env, tools, dotnet = windows.native_environment(host, environment, target_architecture="x64")
     artifact_root = load("vm_environment").artifacts_dir(env)
+    if args.export_native and artifact_root is None:
+        parser.error("--export-native requires an owned artifact directory")
     env.update(DOTNET_GENERATE_ASPNET_CERTIFICATE="false", RUSTUP_AUTO_INSTALL="0")
     dotnet_version = subprocess.check_output(
         [dotnet, "--version"], cwd=ROOT, env=env, text=True
@@ -212,7 +246,8 @@ def main(argv=None):
         bindings.run("cargo", "fmt", "--all", "--", "--check", cwd=ROOT, env=env)
         accepted = {}
         native_output = candidate / "dlls"
-        for name, native in (("core", core_native), ("vendor", vendor_native)):
+        native_products = {"core": core_native, "vendor": vendor_native}
+        for name, native in native_products.items():
             # Keep test output separate from the source-bound native build stages.
             test_env = dict(env, CARGO_TARGET_DIR=str(candidate / (name + "-test")))
             commands = ("--workspace", "--target", TARGET, "--locked", "--offline")
@@ -311,15 +346,18 @@ def main(argv=None):
         }
         if args.native_aot:
             receipt["nativeAotFixtureExecuted"] = True
-        publish_versioned_x64(
-            candidate / "packages",
-            receipt,
-            version=vendor_native.version,
-            receipt_name=RECEIPT,
-            output_dir=output,
-            artifact_root=artifact_root,
-            tooling=artifacts,
-        )
+        if args.export_native:
+            export_native(artifact_root, native_products, accepted, artifacts)
+        else:
+            publish_versioned_x64(
+                candidate / "packages",
+                receipt,
+                version=vendor_native.version,
+                receipt_name=RECEIPT,
+                output_dir=output,
+                artifact_root=artifact_root,
+                tooling=artifacts,
+            )
     print(f"Windows x64 Polar and SoftwareLicensing acceptance passed on Windows {host}.")
 
 

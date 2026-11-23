@@ -11,3 +11,7 @@ rust_registry_dependencies = { tokio = ["macros", "rt"] }
 [rust_c.c]
 framework = "Artifacts/CSoftwareLicensingPolar.xcframework/macos-arm64_x86_64/CSoftwareLicensingPolar.framework"
 header = "software_licensing_polar.h"
+
+[nuget]
+package_id = "NaviApps.SoftwareLicensing.Polar"
+fixtures = ["fixtures/consumers/dotnet/Program.cs"]

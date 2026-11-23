@@ -11,8 +11,11 @@ Use .NET 10 with a matching package runtime. Use `win-x64` with x64 .NET on
 Windows, including on Windows 11 ARM64 under emulation. Use `osx-arm64` on
 Apple Silicon or `osx-x64` on Intel, with the corresponding .NET SDK.
 
-Put both `.nupkg` files from the same [platform acceptance run](https://github.com/naviapps/software-licensing-polar#distribution-checks)
-in one local feed. The provider references the base package automatically.
+Download the `software-licensing-polar-nuget-<revision>-<attempt>` artifact
+from a successful [SDK distribution run](https://github.com/naviapps/sdk-tooling/actions/workflows/check-sdk-distribution.yml).
+Put the provider and the Software Licensing package from the artifact's
+`dependencies/` directory in the same local feed. Both packages cover all three
+runtimes, and the provider requires the matching base version.
 In an empty consumer directory, create a console project and add the exact provider
 version.
 
@@ -135,10 +138,11 @@ resolves both packaged native assets, then exercises cancellation, typed Polar
 preflight rejection, failed storage, retry and restart using an in-memory store.
 
 The Windows [distribution fixture](../../README.md#distribution-checks) builds
-and runs `win-x64` packages on a native Windows x64 worker. A prepared Windows
-ARM64 worker can run the same x64 fixtures through emulation. The macOS fixture
-packs and tests the host runtime (`osx-arm64` or `osx-x64`) using the universal
-native libraries.
+and tests the two x64 DLLs and their local package pair. A prepared Windows
+ARM64 worker can run the same x64 fixtures through emulation. The distribution
+workflow then combines the accepted DLLs and the macOS frameworks into a pair
+of three-runtime packages. It restores and runs that exact pair in a fresh feed
+for each architecture.
 
 The GitHub-hosted Windows x64 distribution check also publishes and runs the
 Native AOT package fixture with JSON reflection disabled. On a prepared native
@@ -147,7 +151,5 @@ the same check from the SDK root with
 `mise run sdk-tooling -- windows -m distribution.verify_windows --native-aot`.
 For emulation on Windows ARM64, use the standard command without `--native-aot`.
 
-The isolated consumer restores the provider and its paired core package from an
-owned local feed. For local installation after verification, use
-`build/bindings/packages/` on macOS or `.native-build/win-x64/0.1.0/` on Windows
-as a NuGet source. Use the two packages from the same platform acceptance run.
+Local source verification uses its own runtime-specific package pair. Keep
+those files and the combined distribution pair in separate feeds.

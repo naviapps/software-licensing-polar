@@ -9,6 +9,8 @@
     <Description>Rust-owned Polar License API provider for NaviApps.SoftwareLicensing.</Description>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
     <PublishRepositoryUrl>false</PublishRepositoryUrl>
     <EnableSourceControlManagerQueries>false</EnableSourceControlManagerQueries>
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
@@ -17,17 +19,21 @@
   </PropertyGroup>
   <Import Project="../../../../build/bindings/core.props" Condition="Exists('../../../../build/bindings/core.props')" />
   <ItemGroup>
-    <ProjectReference Include="$(SoftwareLicensingProject)" Condition="'$(SoftwareLicensingProject)' != ''" />
+    <ProjectReference Include="$(SoftwareLicensingProject)" Condition="'$(SdkNativeRuntimeAssets)' == '' and '$(SoftwareLicensingProject)' != ''" />
+    <PackageReference Include="NaviApps.SoftwareLicensing" Version="[0.1.0]" Condition="'$(SdkNativeRuntimeAssets)' != ''" />
+    <None Include="$(SdkNativeRuntimeAssets)/**/*" Condition="'$(SdkNativeRuntimeAssets)' != ''"
+          Pack="true" PackagePath="runtimes/%(RecursiveDir)%(Filename)%(Extension)" />
     <None Include="../../README.md" Pack="true" PackagePath="/README.md" />
     <None Include="$(PolarNativeLibrary)" Condition="'$(PolarRuntimeIdentifier)' != '' and '$(PolarNativeFileName)' != ''" Pack="true" PackagePath="runtimes/$(PolarRuntimeIdentifier)/native/$(PolarNativeFileName)" />
     <None Include="../../../../LICENSE" Pack="true" PackagePath="/" />
     <None Include="../../../../ThirdParty/**/*" Exclude="../../../../ThirdParty/**/.DS_Store;../../../../ThirdParty/**/registry-notices.json" Pack="true" PackagePath="licenses/" />
   </ItemGroup>
-  <Target Name="RequireSoftwareLicensingSource" BeforeTargets="CollectPackageReferences;PrepareForBuild">
+  <Target Name="RequireSoftwareLicensingSource" BeforeTargets="CollectPackageReferences;PrepareForBuild"
+          Condition="'$(SdkNativeRuntimeAssets)' == ''">
     <Error Condition="'$(SoftwareLicensingProject)' == ''" Text="Run python3 -B -m distribution.verify_bindings --prepare-dotnet from the repository root to resolve the pinned core SDK, or set SoftwareLicensingProject explicitly for coordinated development." />
     <Error Condition="'$(SoftwareLicensingProject)' != '' and !Exists('$(SoftwareLicensingProject)')" Text="Resolved core project is missing. Run python3 -B -m distribution.verify_bindings --prepare-dotnet again." />
   </Target>
-  <Target Name="RequirePolarNativeAsset" BeforeTargets="GenerateNuspec">
+  <Target Name="RequirePolarNativeAsset" BeforeTargets="GenerateNuspec" Condition="'$(SdkNativeRuntimeAssets)' == ''">
     <Error Condition="'$(PolarRuntimeIdentifier)' == '' or '$(PolarNativeFileName)' == ''" Text="Use the platform packaging tool with a source-built Polar native library." />
     <Error Condition="!Exists('$(PolarNativeLibrary)')" Text="The source-built Polar native library is missing." />
   </Target>

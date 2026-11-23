@@ -1,5 +1,6 @@
 """Portable tests for the Windows x64 Polar and pinned-core acceptance driver."""
 
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -32,8 +33,48 @@ class WindowsTests(unittest.TestCase):
         ):
             windows.stage_core({}, Path("isolated-build"))
         git.assert_called_once_with(
-            ["git", "rev-parse", "HEAD"], cwd=Path("from-cargo"), env={}, text=True
+            ["git", "rev-parse", "HEAD"],
+            cwd=Path("from-cargo"),
+            env={"GIT_NO_REPLACE_OBJECTS": "1"},
+            text=True,
         )
+
+    def test_export_keeps_both_native_receipts_and_rejects_changed_build_outputs(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            artifacts = load("artifacts")
+            products, evidence = {}, {}
+            for name in ("core", "vendor"):
+                source = root / name
+                built = source / ".native-build/windows" / windows.RID
+                built.mkdir(parents=True)
+                library = built / f"{name}.dll"
+                library.write_bytes(name.encode())
+                receipt = built / "native-build.json"
+                receipt.write_text(json.dumps({"outputs": {library.name: windows.digest(library)}}))
+                products[name] = SimpleNamespace(root=source)
+                evidence[name] = (library, {"receiptSha256": windows.digest(receipt)})
+
+            destination = root / "artifacts"
+            destination.mkdir()
+            windows.export_native(destination, products, evidence, artifacts)
+            exported = destination / "sdk-windows"
+            self.assertEqual(
+                windows.digest(exported / windows.RID / "native-build.json"),
+                evidence["vendor"][1]["receiptSha256"],
+            )
+            self.assertEqual(
+                windows.digest(
+                    exported / "dependencies/software-licensing" / windows.RID / "native-build.json"
+                ),
+                evidence["core"][1]["receiptSha256"],
+            )
+            bad_candidate = root / "changed"
+            bad_candidate.mkdir()
+            evidence["vendor"][0].write_bytes(b"changed")
+            with self.assertRaisesRegex(ValueError, "differ from the accepted build"):
+                windows.export_native(bad_candidate, products, evidence, artifacts)
+            self.assertFalse((bad_candidate / "sdk-windows").exists())
 
     def test_windows_receipt_binds_root_provider_and_cargo_configuration(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -117,7 +158,12 @@ class WindowsTests(unittest.TestCase):
     def test_x64_aot_pipeline_publishes_only_after_running_the_package_pair(self):
         self.check_x64_pipeline("x64", TARGETS["x64"], native_aot=True)
 
-    def check_x64_pipeline(self, host, compiler_host, *, change_support=False, native_aot=False):
+    def test_combined_export_retains_native_inputs_instead_of_the_windows_only_pair(self):
+        self.check_x64_pipeline("x64", TARGETS["x64"], native_aot=True, export_native=True)
+
+    def check_x64_pipeline(
+        self, host, compiler_host, *, change_support=False, native_aot=False, export_native=False
+    ):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             (root / "global.json").write_text(
@@ -201,6 +247,7 @@ class WindowsTests(unittest.TestCase):
                 patch.object(windows, "verify_inherited_notices"),
                 patch.object(windows, "stage_library", side_effect=stage),
                 patch.object(windows, "publish_versioned_x64") as retain,
+                patch.object(windows, "export_native") as export,
                 patch.object(windows.bindings, "run") as run,
                 patch.object(
                     windows.bindings, "pack_and_consume", return_value={"packages": "sentinel"}
@@ -222,7 +269,18 @@ class WindowsTests(unittest.TestCase):
                         windows.main([])
                     retain.assert_not_called()
                     return
-                windows.main(["--native-aot"] if native_aot else [])
+                options = ["--native-aot"] if native_aot else []
+                if export_native:
+                    options.append("--export-native")
+                windows.main(options)
+                if export_native:
+                    retain.assert_not_called()
+                    export.assert_called_once()
+                    self.assertEqual(export.call_args.args[0], artifacts_dir)
+                    self.assertEqual(set(export.call_args.args[1]), {"core", "vendor"})
+                    self.assertTrue(pack.call_args.kwargs["native_aot"])
+                    return
+                export.assert_not_called()
 
             core, vendor = ffi.FfiProduct.call_args_list
             self.assertEqual(core.args[0].name, "core")
