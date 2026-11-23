@@ -11,10 +11,17 @@ concurrency:
   group: polar-sdk-${{ github.ref }}
   cancel-in-progress: true
 jobs:
+  swift:
+    name: Swift
+    uses: naviapps/sdk-tooling/.github/workflows/check-swift.yml@888bf13f109ac7dc806b29478cc9c4acacdf6515
   source:
-    name: macOS 26 lint and tests
+    name: Source checks
     runs-on: macos-26
     timeout-minutes: 25
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+      GIT_TERMINAL_PROMPT: "0"
+      DOTNET_CLI_TELEMETRY_OPTOUT: "1"
     steps:
       - uses: actions/checkout@v6.1.0
         with:
@@ -26,26 +33,36 @@ jobs:
           add_shims_to_path: false
       - name: Fetch locked Rust dependencies
         run: mise exec -- cargo fetch --locked
-      - name: Check the Rust SDK
-        run: mise exec -- make check
-  macos:
-    name: macOS 27 tests
-    runs-on: xcode-27
-    timeout-minutes: 25
-    steps:
-      - uses: actions/checkout@v6.1.0
-        with:
-          persist-credentials: false
-      - name: Install the pinned Rust toolchain
-        run: rustup install --no-self-update
-      - name: Test the Rust SDK
-        run: cargo test --locked
+      - name: Check source and bindings
+        run: mise exec -- make check-source
   windows:
-    name: Windows x64 tests
+    name: Windows x64 Rust and .NET tests
     runs-on: windows-2025
     timeout-minutes: 30
+    env:
+      CARGO_BUILD_TARGET: x86_64-pc-windows-msvc
+      DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+      DOTNET_CLI_USE_MSBUILD_SERVER: "0"
+      MSBUILDDISABLENODEREUSE: "1"
+      GIT_TERMINAL_PROMPT: "0"
     steps:
       - uses: actions/checkout@v6.1.0
         with:
           persist-credentials: false
       - uses: naviapps/sdk-tooling/.github/actions/test-rust-windows@888bf13f109ac7dc806b29478cc9c4acacdf6515
+      - uses: actions/setup-dotnet@v6.0.0
+        env:
+          DOTNET_INSTALL_DIR: ${{ runner.temp }}/dotnet
+        with:
+          dotnet-version: "10.0.403"
+          architecture: x64
+      - name: Test .NET provider with the locked licensing core
+        run: |
+          $metadata = cargo metadata --format-version 1 --locked --filter-platform $env:CARGO_BUILD_TARGET | ConvertFrom-Json
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $core = @($metadata.packages | Where-Object name -eq 'software-licensing')
+          if ($core.Count -ne 1) { throw 'Expected one Cargo-locked SoftwareLicensing package.' }
+          $root = Join-Path (Split-Path -Parent $core[0].manifest_path) '../..'
+          $project = Join-Path $root 'bindings/dotnet/src/NaviApps.SoftwareLicensing/NaviApps.SoftwareLicensing.csproj'
+          if (!(Test-Path -LiteralPath $project -PathType Leaf)) { throw 'The locked core source lacks a managed project.' }
+          dotnet run --project bindings/dotnet/tests/SoftwareLicensing.Polar.Tests/SoftwareLicensing.Polar.Tests.csproj --configuration Release "-p:SoftwareLicensingProject=$project"

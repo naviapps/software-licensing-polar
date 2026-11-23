@@ -1,0 +1,20 @@
+[package]
+name = "software-licensing-polar-ffi"
+version = "0.1.0"
+edition = "2024"
+license = "MIT"
+publish = false
+repository = "https://github.com/naviapps/software-licensing-polar"
+rust-version = "1.99"
+
+[lib]
+name = "software_licensing_polar"
+crate-type = ["staticlib", "cdylib"]
+
+[dependencies]
+serde = "1"
+serde_json = "1"
+software-licensing.workspace = true
+software-licensing-polar = { path = "../.." }
+tokio = { version = "1", features = ["net", "rt-multi-thread", "sync", "time"] }
+zeroize = "1"

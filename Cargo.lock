@@ -803,6 +803,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "software-licensing-polar-ffi"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "software-licensing",
+ "software-licensing-polar",
+ "tokio",
+ "zeroize",
+]
+
+[[package]]
 name = "stable_deref_trait"
 version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"

@@ -1,12 +1,11 @@
 /target/
+.build/
 /.native-build/
-.DS_Store
-
-# Local outputs from checkouts before the Rust-only migration.
-/.build/
 /build/
 /.swiftpm/
 **/bin/
 **/obj/
+**/__pycache__/
 /bindings/dotnet/runtimes/
+.DS_Store
 /Package.resolved

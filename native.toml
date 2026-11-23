@@ -1,0 +1,4 @@
+[[artifacts]]
+id = "sdk"
+symbol_prefix = "software_licensing_polar_"
+minimum_macos = "26.0"

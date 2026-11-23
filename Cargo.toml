@@ -7,6 +7,10 @@ publish = false
 repository = "https://github.com/naviapps/software-licensing-polar"
 rust-version = "1.99"
 
+[workspace]
+members = ["crates/ffi"]
+resolver = "3"
+
 # The installed-consumer check reads this shared type dependency from the workspace.
 [workspace.dependencies]
 software-licensing = { git = "https://github.com/naviapps/software-licensing.git", rev = "b69902197a294598901aa3c595f8cfb3b11c7404" }
@@ -26,3 +30,8 @@ tokio = { version = "1", features = ["macros", "time"] }
 
 [dev-dependencies]
 tokio = { version = "1", features = ["io-util", "net", "rt", "sync"] }
+
+[profile.release]
+lto = "thin"
+codegen-units = 1
+strip = "none"
