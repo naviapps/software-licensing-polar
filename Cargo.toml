@@ -13,7 +13,7 @@ resolver = "3"
 
 # The installed-consumer check reads this shared type dependency from the workspace.
 [workspace.dependencies]
-software-licensing = { git = "https://github.com/naviapps/software-licensing.git", rev = "7eca335326b61a67cff1679975194a0babd780ed" }
+software-licensing = { git = "https://github.com/naviapps/software-licensing.git", rev = "0d601499646fb9209d547de699b98ef0022f4d8e" }
 
 [dependencies]
 httpdate = "1"

@@ -19,7 +19,7 @@ let core: Package.Dependency =
   } else {
     .package(
       url: "https://github.com/naviapps/software-licensing.git",
-      revision: "7eca335326b61a67cff1679975194a0babd780ed")
+      revision: "0d601499646fb9209d547de699b98ef0022f4d8e")
   }
 
 let package = Package(
