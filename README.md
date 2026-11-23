@@ -192,9 +192,8 @@ The driver builds the immutable SoftwareLicensing source separately and accepts
 the two NuGet packages together. Accepted packages and evidence are retained
 under `.native-build/win-x64/<version>` and, when set, `NAVI_CI_ARTIFACTS`.
 
-GitHub Actions runs independent tool fixtures on Xcode 27 and Windows x64
-while dependencies are private. The full gates require the pinned
-SoftwareLicensing and tooling sources to be publicly accessible. CI runs against
+GitHub Actions runs the SDK and standalone consumer checks on Xcode 27 and
+Windows x64 with the pinned SoftwareLicensing and tooling sources. CI uses
 fixture providers. Test actual provider integration separately.
 
 ## License
