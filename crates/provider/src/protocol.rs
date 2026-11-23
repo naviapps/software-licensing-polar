@@ -137,15 +137,21 @@ pub struct Intent {
     pub license_key: Option<String>,
     pub activation: Option<Activation>,
 }
-#[derive(Serialize)]
-#[serde(rename_all = "camelCase")]
 pub(crate) struct HttpRequest {
     pub url: String,
     pub body: String,
-    pub headers: std::collections::BTreeMap<String, String>,
+    operation: Operation,
+    license_key: String,
+    activation_id: Option<String>,
+    benefit_id: Option<String>,
 }
-#[derive(Deserialize)]
-#[serde(rename_all = "camelCase", deny_unknown_fields)]
+
+pub(crate) const REQUEST_HEADERS: [(&str, &str); 3] = [
+    ("Accept", "application/json"),
+    ("Content-Type", "application/json"),
+    ("Polar-Version", API_VERSION),
+];
+
 pub(crate) struct HttpResponse {
     pub status_code: u16,
     pub body: String,
@@ -158,18 +164,13 @@ impl HttpResponse {
         self.api_version.as_deref() == Some(API_VERSION)
     }
 }
-#[derive(Serialize)]
-#[serde(rename_all = "camelCase")]
-pub(crate) struct Decision {
-    pub reply: Option<ProviderReply>,
-    pub retry_delay_seconds: Option<f64>,
-    pub retry_failure: Option<Failure>,
+pub(crate) enum Decision {
+    Complete(Result<ProviderReply, Failure>),
+    Retry { delay: f64, rejection: Failure },
 }
-fn credentials(
-    config: &PolarLicenseConfig,
-    intent: &Intent,
-) -> Result<(String, Option<String>), Failure> {
-    if intent.operation == Operation::Activate {
+
+pub(crate) fn request(config: &PolarLicenseConfig, intent: Intent) -> Result<HttpRequest, Failure> {
+    let (license_key, activation_id, benefit_id) = if intent.operation == Operation::Activate {
         if intent.activation.is_some() {
             return Err(bad_configuration());
         }
@@ -177,57 +178,46 @@ fn credentials(
         if key.is_empty() || key.len() > 4096 {
             return Err(Failure::new(ErrorCode::InvalidLicenseKey));
         }
-        return Ok((key, None));
-    }
-    let a = intent.activation.as_ref().ok_or_else(bad_configuration)?;
-    if a.source != "polar"
-        || !config
-            .license_scope
-            .benefit_ids
-            .contains(&a.plan_identifier)
-    {
-        return Err(Failure::new(ErrorCode::InvalidLicense));
-    }
-    let a = a.clone().normalized()?;
-    let key = a
-        .license_key
-        .as_ref()
-        .filter(|k| !k.is_empty())
-        .ok_or_else(bad_configuration)?
-        .clone();
-    let instance = a
-        .activation_identifier
-        .as_ref()
-        .ok_or_else(bad_configuration)?;
-    canonical_uuid(instance).map_err(|_| bad_configuration())?;
-    Ok((key, Some(instance.clone())))
-}
-pub(crate) fn request(
-    config: &PolarLicenseConfig,
-    intent: &Intent,
-) -> Result<HttpRequest, Failure> {
-    config.validated()?;
-    let (key, instance) = credentials(config, intent)?;
-    let mut value = json!({"key": key, "organization_id": config.license_scope.organization_id});
+        (key, None, None)
+    } else {
+        let activation = intent.activation.ok_or_else(bad_configuration)?;
+        if activation.source != "polar"
+            || !config
+                .license_scope
+                .benefit_ids
+                .contains(&activation.plan_identifier)
+        {
+            return Err(Failure::new(ErrorCode::InvalidLicense));
+        }
+        let activation = activation.normalized()?;
+        let key = activation
+            .license_key
+            .as_ref()
+            .ok_or_else(bad_configuration)?;
+        let instance = activation
+            .activation_identifier
+            .as_ref()
+            .ok_or_else(bad_configuration)?;
+        canonical_uuid(instance).map_err(|_| bad_configuration())?;
+        let benefit =
+            (intent.operation == Operation::Validate).then(|| activation.plan_identifier.clone());
+        (key.clone(), Some(instance.clone()), benefit)
+    };
+    let mut value =
+        json!({"key": license_key, "organization_id": config.license_scope.organization_id});
     let operation = match intent.operation {
         Operation::Activate => {
             value["label"] = config.instance_name()?.into();
             "activate"
         }
-        Operation::Validate => {
-            value["benefit_id"] = intent
-                .activation
-                .as_ref()
-                .ok_or_else(bad_configuration)?
-                .plan_identifier
-                .clone()
-                .into();
-            "validate"
-        }
+        Operation::Validate => "validate",
         Operation::Deactivate => "deactivate",
     };
-    if let Some(instance) = instance {
-        value["activation_id"] = instance.into();
+    if let Some(benefit) = &benefit_id {
+        value["benefit_id"] = json!(benefit);
+    }
+    if let Some(instance) = &activation_id {
+        value["activation_id"] = json!(instance);
     }
     Ok(HttpRequest {
         url: format!(
@@ -235,36 +225,32 @@ pub(crate) fn request(
             config.environment.origin()
         ),
         body: value.to_string(),
-        headers: [
-            ("Accept".into(), "application/json".into()),
-            ("Content-Type".into(), "application/json".into()),
-            ("Polar-Version".into(), API_VERSION.into()),
-        ]
-        .into(),
+        operation: intent.operation,
+        license_key,
+        activation_id,
+        benefit_id,
     })
 }
 /// A successful activation retains its device identity even if expiration occurs
 /// while the response is in flight. The core persists it without granting access.
 pub(crate) fn respond(
     config: &PolarLicenseConfig,
-    intent: &Intent,
+    request: &HttpRequest,
     response: HttpResponse,
     attempt: u32,
     now: f64,
-) -> Result<Decision, Failure> {
-    config.validated()?;
-    credentials(config, intent)?;
+) -> Decision {
     if response.body.len() > MAX_RESPONSE_BYTES
         || !(100..=599).contains(&response.status_code)
         || attempt == 0
         || attempt > config.maximum_request_attempts
     {
-        return Err(bad_response());
+        return Decision::Complete(Err(bad_response()));
     }
     // Versioned response evidence survives an unavailable local wall clock.
     let now = valid_time(now).is_ok().then_some(now);
     let retry_advice = retry_after(response.retry_after.as_deref(), now);
-    let read_only = intent.operation == Operation::Validate;
+    let read_only = request.operation == Operation::Validate;
     let retryable = (response.status_code == 429 && (read_only || response.matches_api_version()))
         || (read_only && (500..=599).contains(&response.status_code));
     if retryable
@@ -274,11 +260,10 @@ pub(crate) fn respond(
         let wait =
             retry_advice.unwrap_or(config.base_retry_delay * 2f64.powi((attempt - 1) as i32));
         if wait <= config.maximum_retry_delay {
-            return Ok(Decision {
-                reply: None,
-                retry_delay_seconds: Some(wait),
-                retry_failure: Some(http_failure(&response, None, Some(wait), intent.operation)),
-            });
+            return Decision::Retry {
+                delay: wait,
+                rejection: http_failure(&response, None, Some(wait), request.operation),
+            };
         }
     }
     let value = serde_json::from_str::<Value>(&response.body).ok();
@@ -287,11 +272,11 @@ pub(crate) fn respond(
             &response,
             value.as_ref(),
             retry_advice.unwrap_or_default(),
-            intent.operation,
+            request.operation,
         ))
     } else if !response.matches_api_version() {
         Err(bad_response())
-    } else if intent.operation == Operation::Deactivate {
+    } else if request.operation == Operation::Deactivate {
         if response.status_code == 204 && response.body.is_empty() {
             Ok(ProviderReply::Deactivated)
         } else {
@@ -303,27 +288,23 @@ pub(crate) fn respond(
         value
             .as_ref()
             .ok_or_else(bad_response)
-            .and_then(|value| parse(config, intent, value, now))
+            .and_then(|value| parse(config, request, value, now))
     };
-    Ok(Decision {
-        reply: Some(result.unwrap_or_else(|mut failure| {
-            if intent.operation != Operation::Validate && failure.mutation_outcome.is_none() {
-                failure.mutation_outcome = Some(MutationOutcome::Unknown);
-            }
-            ProviderReply::Failed { failure }
-        })),
-        retry_delay_seconds: None,
-        retry_failure: None,
-    })
+    Decision::Complete(result.map_err(|mut failure| {
+        if !read_only && failure.mutation_outcome.is_none() {
+            failure.mutation_outcome = Some(MutationOutcome::Unknown);
+        }
+        failure
+    }))
 }
 fn parse(
     config: &PolarLicenseConfig,
-    intent: &Intent,
+    request: &HttpRequest,
     value: &Value,
     now: Option<f64>,
 ) -> Result<ProviderReply, Failure> {
-    let (key, submitted_instance) = credentials(config, intent)?;
-    let license = if intent.operation == Operation::Activate {
+    let activating = request.operation == Operation::Activate;
+    let license = if activating {
         value.get("license_key").ok_or_else(bad_response)?
     } else {
         value
@@ -332,10 +313,10 @@ fn parse(
     let org = uuid_field(license, "organization_id")?;
     let benefit = uuid_field(license, "benefit_id")?;
     let identity_failure = || {
-        if intent.operation == Operation::Validate {
-            bad_response()
-        } else {
+        if activating {
             Failure::new(ErrorCode::InvalidLicense)
+        } else {
+            bad_response()
         }
     };
     if org != config.license_scope.organization_id
@@ -344,25 +325,25 @@ fn parse(
             .benefit_ids
             .iter()
             .any(|s| s == benefit)
-        || license.get("key").and_then(Value::as_str) != Some(key.as_str())
+        || license.get("key").and_then(Value::as_str) != Some(request.license_key.as_str())
     {
         return Err(identity_failure());
     }
-    let instance = if intent.operation == Operation::Activate {
+    let instance = if activating {
         value
     } else {
         value.get("activation").ok_or_else(bad_response)?
     };
     let instance_id = uuid_field(instance, "id")?;
     if uuid_field(instance, "license_key_id")? != license_id
-        || submitted_instance
+        || request
+            .activation_id
             .as_deref()
             .is_some_and(|expected| expected != instance_id)
-        || (intent.operation == Operation::Validate
-            && intent
-                .activation
-                .as_ref()
-                .is_some_and(|a| a.plan_identifier != benefit))
+        || request
+            .benefit_id
+            .as_deref()
+            .is_some_and(|id| id != benefit)
     {
         return Err(identity_failure());
     }
@@ -374,7 +355,7 @@ fn parse(
     // Both subscriptions and perpetual purchases may have null expiry. Never infer
     // product tier or lifetime ownership from this field; benefit identity owns that.
     let expires_at = date(license.get("expires_at").ok_or_else(bad_response)?)?;
-    match intent.operation {
+    match request.operation {
         Operation::Activate => {
             let activated_at = date(instance.get("created_at").ok_or_else(bad_response)?)?
                 .ok_or_else(bad_response)?;
@@ -383,7 +364,7 @@ fn parse(
                     source: "polar".into(),
                     plan_identifier: benefit.into(),
                     activated_at,
-                    license_key: Some(key),
+                    license_key: Some(request.license_key.clone()),
                     activation_identifier: Some(instance_id.into()),
                     expires_at,
                 }

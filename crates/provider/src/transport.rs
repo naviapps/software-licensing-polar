@@ -1,4 +1,7 @@
-use crate::{Intent, PolarLicenseConfig, protocol};
+use crate::{
+    Intent, PolarLicenseConfig,
+    protocol::{self, Decision},
+};
 use reqwest::{Client, ClientBuilder, header::RETRY_AFTER};
 use software_licensing::{
     Activation, ErrorCode, Failure, MutationOutcome, Operation, ProviderReply, Validation,
@@ -70,21 +73,16 @@ impl PolarLicenseProvider {
         // Each await has the total deadline applied below. An outer timeout would
         // discard a known rate-limit rejection while sleeping, or a confirmed
         // mutation response just received at its deadline.
-        let result = self
-            .execute_until(intent, deadline, cancelled)
+        self.execute_until(intent, deadline, cancelled)
             .await
-            .and_then(|reply| match reply {
-                ProviderReply::Failed { failure } => Err(failure),
-                reply => Ok(reply),
-            });
-        result.map_err(|mut failure| {
-            if operation == Operation::Validate {
-                failure.mutation_outcome = None;
-            } else if failure.mutation_outcome.is_none() {
-                failure.mutation_outcome = Some(failure.mutation_outcome());
-            }
-            failure
-        })
+            .map_err(|mut failure| {
+                if operation == Operation::Validate {
+                    failure.mutation_outcome = None;
+                } else if failure.mutation_outcome.is_none() {
+                    failure.mutation_outcome = Some(failure.mutation_outcome());
+                }
+                failure
+            })
     }
 
     pub async fn activate(&self, license_key: impl Into<String>) -> Result<Activation, Failure> {
@@ -136,14 +134,15 @@ impl PolarLicenseProvider {
         cancelled: impl Future<Output = ()>,
     ) -> Result<ProviderReply, Failure> {
         tokio::pin!(cancelled);
-        let prepared = protocol::request(&self.configuration, &intent)?;
+        let prepared = protocol::request(&self.configuration, intent)?;
+        let url = prepared.url.as_str();
         #[cfg(test)]
-        let url = self.test_endpoint.as_ref().map_or_else(
-            || prepared.url.clone(),
-            |base| format!("{base}/{}", prepared.url.rsplit('/').next().unwrap()),
-        );
-        #[cfg(not(test))]
-        let url = prepared.url.clone();
+        let test_url = self
+            .test_endpoint
+            .as_ref()
+            .map(|base| format!("{base}/{}", url.rsplit('/').next().unwrap()));
+        #[cfg(test)]
+        let url = test_url.as_deref().unwrap_or(url);
 
         let mut last_rejection = None;
         for attempt in 1..=self.configuration.maximum_request_attempts {
@@ -162,7 +161,7 @@ impl PolarLicenseProvider {
             );
             let response = self
                 .send(
-                    &url,
+                    url,
                     &prepared,
                     request_deadline,
                     cancelled.as_mut(),
@@ -172,33 +171,30 @@ impl PolarLicenseProvider {
             let now = SystemTime::now();
             #[cfg(test)]
             let now = self.test_wall_time.unwrap_or(now);
-            let decision = protocol::respond(
+            let (delay, rejection) = match protocol::respond(
                 &self.configuration,
-                &intent,
+                &prepared,
                 response,
                 attempt,
                 utc_time(now),
-            )?;
-            if let Some(reply) = decision.reply {
-                return Ok(reply);
-            }
-            let delay = decision
-                .retry_delay_seconds
-                .ok_or_else(unexpected_response)?;
+            ) {
+                Decision::Complete(result) => return result,
+                Decision::Retry { delay, rejection } => (delay, rejection),
+            };
             let wake = Instant::now() + Duration::from_secs_f64(delay);
             if wake >= deadline {
-                return Err(decision.retry_failure.unwrap_or_else(transport_failure));
+                return Err(rejection);
             }
-            last_rejection = decision.retry_failure;
             #[cfg(test)]
             if let Some(observer) = &self.retry_wait {
                 observer.notify_one();
             }
             tokio::select! {
                 biased;
-                _ = &mut cancelled => return Err(last_rejection.unwrap_or_else(|| cancelled_failure(MutationOutcome::NotApplied))),
+                _ = &mut cancelled => return Err(rejection),
                 _ = sleep_until(wake) => {},
             }
+            last_rejection = Some(rejection);
         }
         Err(unexpected_response())
     }
@@ -212,7 +208,7 @@ impl PolarLicenseProvider {
         last_rejection: Option<&Failure>,
     ) -> Result<protocol::HttpResponse, Failure> {
         let mut request = self.client.post(url).body(prepared.body.clone());
-        for (name, value) in &prepared.headers {
+        for (name, value) in protocol::REQUEST_HEADERS {
             request = request.header(name, value);
         }
         let entered = AtomicBool::new(false);

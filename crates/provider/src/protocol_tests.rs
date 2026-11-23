@@ -1,52 +1,18 @@
-use crate::protocol::{
-    API_VERSION, Decision, Environment, HttpResponse, Intent, PolarLicenseConfig, request, respond,
+use crate::{
+    protocol::{API_VERSION, Decision, Environment, HttpResponse, Intent, request, respond},
+    test_fixtures::{
+        BENEFIT, CREATED, INSTANCE, ORGANIZATION, OTHER, activation, config, granted_response,
+        intent,
+    },
 };
 use serde_json::{Value, json};
 use software_licensing::{
-    Activation, Command, Effect, ErrorCode, Failure, MutationOutcome, Operation, Policy,
-    ProviderReply, Record, Session, Status,
+    Command, Effect, ErrorCode, Failure, MutationOutcome, Operation, Policy, ProviderReply, Record,
+    Session, Status,
 };
 
-const ORG: &str = "11111111-1111-4111-8111-111111111111";
-const BENEFIT: &str = "22222222-2222-4222-8222-222222222222";
-const LICENSE: &str = "33333333-3333-4333-8333-333333333333";
-const INSTANCE: &str = "44444444-4444-4444-8444-444444444444";
-const OTHER: &str = "55555555-5555-4555-8555-555555555555";
-const CREATED: f64 = 1_700_000_000.0;
 const NOW: f64 = CREATED + 100.0;
 
-fn config() -> PolarLicenseConfig {
-    serde_json::from_value(json!({"environment":"sandbox","activationInstanceName":"Fixture","licenseScope":{"organizationId":ORG,"benefitIds":[BENEFIT]}})).unwrap()
-}
-fn activation() -> Activation {
-    Activation {
-        source: "polar".into(),
-        plan_identifier: BENEFIT.into(),
-        activated_at: CREATED,
-        license_key: Some("TEST-KEY".into()),
-        activation_identifier: Some(INSTANCE.into()),
-        expires_at: None,
-    }
-}
-fn intent(operation: Operation) -> Intent {
-    Intent {
-        operation,
-        license_key: (operation == Operation::Activate).then(|| "TEST-KEY".into()),
-        activation: (operation != Operation::Activate).then(activation),
-    }
-}
-fn success(operation: Operation) -> Value {
-    let key = json!({"id":LICENSE,"organization_id":ORG,"benefit_id":BENEFIT,"key":"TEST-KEY","status":"granted","expires_at":null});
-    let mut instance = json!({"id":INSTANCE,"license_key_id":LICENSE,"label":"Fixture","meta":{},"created_at":"2023-11-14T22:13:20Z","modified_at":null});
-    if operation == Operation::Activate {
-        instance["license_key"] = key;
-        instance
-    } else {
-        let mut key = key;
-        key["activation"] = instance;
-        key
-    }
-}
 fn response(status: u16, value: Option<Value>) -> HttpResponse {
     HttpResponse {
         status_code: status,
@@ -56,20 +22,24 @@ fn response(status: u16, value: Option<Value>) -> HttpResponse {
     }
 }
 fn decision(operation: Operation, status: u16, value: Option<Value>) -> Decision {
-    respond(
-        &config(),
-        &intent(operation),
-        response(status, value),
-        1,
-        NOW,
-    )
-    .unwrap()
+    decide(intent(operation), response(status, value))
+}
+fn decide(intent: Intent, response: HttpResponse) -> Decision {
+    let config = config();
+    let request = request(&config, intent).unwrap();
+    respond(&config, &request, response, 1, NOW)
+}
+fn complete(decision: Decision) -> Result<ProviderReply, Failure> {
+    match decision {
+        Decision::Complete(result) => result,
+        Decision::Retry { .. } => panic!("Expected completion"),
+    }
 }
 fn failure(decision: Decision) -> Failure {
-    match decision.reply.unwrap() {
-        ProviderReply::Failed { failure } => failure,
-        _ => panic!("Expected failure"),
-    }
+    complete(decision).err().expect("Expected failure")
+}
+fn session_reply(decision: Decision) -> ProviderReply {
+    complete(decision).unwrap_or_else(|failure| ProviderReply::Failed { failure })
 }
 fn persist(
     session: &mut Session,
@@ -90,14 +60,11 @@ fn persist(
 }
 
 #[test]
-fn request_rejects_an_invalid_license_scope() {
+fn configuration_rejects_an_empty_license_scope() {
     let mut config = config();
     config.license_scope.benefit_ids.clear();
     assert_eq!(
-        request(&config, &intent(Operation::Activate))
-            .err()
-            .unwrap()
-            .code,
+        config.validated().unwrap_err().code,
         ErrorCode::InvalidProviderConfiguration
     );
 }
@@ -113,7 +80,7 @@ fn fixed_versioned_public_json_requests_do_not_send_tokens_or_usage() {
             Operation::Validate,
             Operation::Deactivate,
         ] {
-            let request = request(&cfg, &intent(operation)).unwrap();
+            let request = request(&cfg, intent(operation)).unwrap();
             let base = if environment == Environment::Production {
                 "https://api.polar.sh"
             } else {
@@ -128,11 +95,8 @@ fn fixed_versioned_public_json_requests_do_not_send_tokens_or_usage() {
                 request.url,
                 format!("{base}/v1/customer-portal/license-keys/{action}")
             );
-            assert_eq!(request.headers.len(), 3);
-            assert_eq!(request.headers["Polar-Version"], API_VERSION);
-            assert_eq!(request.headers["Content-Type"], "application/json");
             let body: Value = serde_json::from_str(&request.body).unwrap();
-            assert_eq!(body["organization_id"], ORG);
+            assert_eq!(body["organization_id"], ORGANIZATION);
             assert_eq!(body["key"], "TEST-KEY");
             assert!(body.get("increment_usage").is_none());
             assert!(body.get("meta").is_none());
@@ -149,7 +113,7 @@ fn fixed_versioned_public_json_requests_do_not_send_tokens_or_usage() {
     }
     let mut input = intent(Operation::Activate);
     input.license_key = Some(" quote\"&=\\\n key ".into());
-    let body: Value = serde_json::from_str(&request(&config(), &input).unwrap().body).unwrap();
+    let body: Value = serde_json::from_str(&request(&config(), input).unwrap().body).unwrap();
     assert_eq!(body["key"], "quote\"&=\\key");
 }
 #[test]
@@ -165,14 +129,14 @@ fn foreign_or_incomplete_activation_never_reaches_any_provider() {
                 3 => a.activation_identifier = Some("not-a-uuid".into()),
                 _ => a.license_key = None,
             };
-            assert!(request(&config(), &input).is_err());
+            assert!(request(&config(), input).is_err());
         }
     }
     for key in ["".to_owned(), "  \n".to_owned(), "x".repeat(4097)] {
         let mut input = intent(Operation::Activate);
         input.license_key = Some(key);
         assert_eq!(
-            request(&config(), &input).err().unwrap().code,
+            request(&config(), input).err().unwrap().code,
             ErrorCode::InvalidLicenseKey
         );
     }
@@ -181,14 +145,14 @@ fn foreign_or_incomplete_activation_never_reaches_any_provider() {
 fn valid_activation_and_validation_preserve_benefit_and_optional_expiration() {
     for operation in [Operation::Activate, Operation::Validate] {
         for expires in [Value::Null, json!("2023-11-15T22:13:20.125Z")] {
-            let mut value = success(operation);
+            let mut value = granted_response(operation);
             let key = if operation == Operation::Activate {
                 &mut value["license_key"]
             } else {
                 &mut value
             };
             key["expires_at"] = expires.clone();
-            match decision(operation, 200, Some(value)).reply.unwrap() {
+            match complete(decision(operation, 200, Some(value))).unwrap() {
                 ProviderReply::Activated { activation } => {
                     assert_eq!(activation.source, "polar");
                     assert_eq!(activation.plan_identifier, BENEFIT);
@@ -239,7 +203,7 @@ fn scope_key_and_activation_identity_must_match_for_both_success_shapes() {
             (format!("{prefix}/key"), json!("DIFFERENT-KEY")),
             (format!("{activation_prefix}/license_key_id"), json!(OTHER)),
         ] {
-            let mut value = success(operation);
+            let mut value = granted_response(operation);
             *value.pointer_mut(&pointer).unwrap() = replacement;
             let failure = failure(decision(operation, 200, Some(value)));
             assert_eq!(
@@ -265,7 +229,7 @@ fn scope_key_and_activation_identity_must_match_for_both_success_shapes() {
             format!("{prefix}/benefit_id"),
             format!("{activation_prefix}/id"),
         ] {
-            let mut value = success(operation);
+            let mut value = granted_response(operation);
             *value.pointer_mut(&pointer).unwrap() = json!("malformed");
             assert_eq!(
                 failure(decision(operation, 200, Some(value))).code,
@@ -273,7 +237,7 @@ fn scope_key_and_activation_identity_must_match_for_both_success_shapes() {
             );
         }
     }
-    let mut value = success(Operation::Validate);
+    let mut value = granted_response(Operation::Validate);
     value["activation"]["id"] = json!(OTHER);
     assert_eq!(
         failure(decision(Operation::Validate, 200, Some(value))).code,
@@ -282,23 +246,17 @@ fn scope_key_and_activation_identity_must_match_for_both_success_shapes() {
 
     let mut configuration = config();
     configuration.license_scope.benefit_ids.push(OTHER.into());
-    let mut value = success(Operation::Validate);
+    let mut value = granted_response(Operation::Validate);
     value["benefit_id"] = json!(OTHER);
-    let result = respond(
-        &configuration,
-        &intent(Operation::Validate),
-        response(200, Some(value)),
-        1,
-        NOW,
-    )
-    .unwrap();
+    let request = request(&configuration, intent(Operation::Validate)).unwrap();
+    let result = respond(&configuration, &request, response(200, Some(value)), 1, NOW);
     assert_eq!(failure(result).code, ErrorCode::UnexpectedProviderResponse);
 }
 #[test]
 fn successful_response_requires_explicit_expiry_status_and_created_identity() {
     for operation in [Operation::Activate, Operation::Validate] {
         for missing in [true, false] {
-            let mut value = success(operation);
+            let mut value = granted_response(operation);
             let key = if operation == Operation::Activate {
                 &mut value["license_key"]
             } else {
@@ -315,7 +273,7 @@ fn successful_response_requires_explicit_expiry_status_and_created_identity() {
             );
         }
         for status in ["revoked", "disabled", "active", "GRANTED"] {
-            let mut value = success(operation);
+            let mut value = granted_response(operation);
             let key = if operation == Operation::Activate {
                 &mut value["license_key"]
             } else {
@@ -333,7 +291,7 @@ fn successful_response_requires_explicit_expiry_status_and_created_identity() {
         }
     }
     for created in [Value::Null, json!("invalid"), json!(1)] {
-        let mut value = success(Operation::Activate);
+        let mut value = granted_response(Operation::Activate);
         value["created_at"] = created;
         assert_eq!(
             failure(decision(Operation::Activate, 200, Some(value))).code,
@@ -344,18 +302,17 @@ fn successful_response_requires_explicit_expiry_status_and_created_identity() {
 #[test]
 fn expired_in_flight_activation_retains_release_identity_and_validation_rejects_elapsed_key() {
     let expiry = CREATED + 50.0;
-    let mut created = success(Operation::Activate);
+    let mut created = granted_response(Operation::Activate);
     created["license_key"]["expires_at"] = json!("2023-11-14T22:14:10Z");
-    let ProviderReply::Activated { activation } = decision(Operation::Activate, 200, Some(created))
-        .reply
-        .unwrap()
+    let ProviderReply::Activated { activation } =
+        complete(decision(Operation::Activate, 200, Some(created))).unwrap()
     else {
         panic!("Need activation identity")
     };
     assert_eq!(activation.expires_at, Some(expiry));
     assert!(activation.expired(NOW));
     assert_eq!(activation.activation_identifier.as_deref(), Some(INSTANCE));
-    let mut checked = success(Operation::Validate);
+    let mut checked = granted_response(Operation::Validate);
     checked["expires_at"] = json!("2023-11-14T22:14:10Z");
     assert_eq!(
         failure(decision(Operation::Validate, 200, Some(checked))).code,
@@ -365,8 +322,8 @@ fn expired_in_flight_activation_retains_release_identity_and_validation_rejects_
 #[test]
 fn only_versioned_empty_204_confirms_deactivation() {
     assert!(matches!(
-        decision(Operation::Deactivate, 204, None).reply,
-        Some(ProviderReply::Deactivated)
+        complete(decision(Operation::Deactivate, 204, None)),
+        Ok(ProviderReply::Deactivated)
     ));
     for (status, value) in [
         (200, None),
@@ -392,11 +349,11 @@ fn missing_or_wrong_api_version_never_grants_access() {
                 } else {
                     200
                 },
-                (operation != Operation::Deactivate).then(|| success(operation)),
+                (operation != Operation::Deactivate).then(|| granted_response(operation)),
             );
             reply.api_version = version;
             assert_eq!(
-                failure(respond(&config(), &intent(operation), reply, 1, NOW).unwrap()).code,
+                failure(decide(intent(operation), reply)).code,
                 ErrorCode::UnexpectedProviderResponse
             );
         }
@@ -453,7 +410,7 @@ fn typed_rejections_differ_from_generic_version_router_404_and_never_echo_provid
                 Some(json!({"error":kind,"detail":"PRIVATE-KEY","input":"PRIVATE-KEY"})),
             );
             reply.api_version = version.map(str::to_owned);
-            let failure = failure(respond(&config(), &intent(operation), reply, 1, NOW).unwrap());
+            let failure = failure(decide(intent(operation), reply));
             assert_eq!(failure.code, expected);
             assert_eq!(failure.status_code, Some(status));
             assert!(
@@ -479,9 +436,9 @@ fn retries_preserve_rate_limit_advice_and_never_replay_uncertain_mutation() {
         Operation::Validate,
         Operation::Deactivate,
     ] {
-        let reply = respond(&config(), &intent(operation), response(503, None), 1, NOW).unwrap();
+        let reply = decide(intent(operation), response(503, None));
         assert_eq!(
-            reply.retry_delay_seconds.is_some(),
+            matches!(reply, Decision::Retry { .. }),
             operation == Operation::Validate
         );
         if operation != Operation::Validate {
@@ -492,18 +449,21 @@ fn retries_preserve_rate_limit_advice_and_never_replay_uncertain_mutation() {
         }
         let mut limited = response(429, None);
         limited.retry_after = Some("2".into());
-        let reply = respond(&config(), &intent(operation), limited, 1, NOW).unwrap();
-        assert_eq!(reply.retry_delay_seconds, Some(2.0));
-        assert_eq!(reply.retry_failure.unwrap().retry_after_seconds, Some(2));
+        let Decision::Retry { delay, rejection } = decide(intent(operation), limited) else {
+            panic!("Expected rate-limit retry");
+        };
+        assert_eq!(delay, 2.0);
+        assert_eq!(rejection.retry_after_seconds, Some(2));
         for after in [
             "9999999999999999999999999999999999999999999999999999999999",
             "Wed, 15 Nov 2023 00:00:00 GMT",
         ] {
             let mut limited = response(429, None);
             limited.retry_after = Some(after.into());
-            let reply = respond(&config(), &intent(operation), limited, 1, NOW).unwrap();
-            assert!(reply.retry_delay_seconds.is_none());
-            assert_eq!(failure(reply).code, ErrorCode::RateLimited);
+            assert_eq!(
+                failure(decide(intent(operation), limited)).code,
+                ErrorCode::RateLimited
+            );
         }
     }
 }
@@ -514,8 +474,7 @@ fn malformed_json_success_and_redirect_mutations_remain_unknown() {
             let mut reply = response(status, None);
             reply.body = body.into();
             assert_eq!(
-                failure(respond(&config(), &intent(operation), reply, 1, NOW).unwrap())
-                    .mutation_outcome,
+                failure(decide(intent(operation), reply)).mutation_outcome,
                 Some(MutationOutcome::Unknown)
             );
         }
@@ -525,7 +484,7 @@ fn malformed_json_success_and_redirect_mutations_remain_unknown() {
 fn untrusted_validation_failures_keep_only_the_saved_grants_bounded_grace() {
     let mut generic_missing = response(404, Some(json!({"detail": "Not Found"})));
     generic_missing.api_version = None;
-    let mut other_activation = success(Operation::Validate);
+    let mut other_activation = granted_response(Operation::Validate);
     other_activation["status"] = json!("revoked");
     other_activation["activation"]["id"] = json!(OTHER);
     let rejected = response(404, Some(json!({"error": "ResourceNotFound"})));
@@ -574,22 +533,18 @@ fn untrusted_validation_failures_keep_only_the_saved_grants_bounded_grace() {
         else {
             panic!("Need validation")
         };
-        let decision = respond(
-            &config(),
-            &Intent {
+        let decision = decide(
+            Intent {
                 operation,
                 license_key,
                 activation,
             },
             response,
-            1,
-            NOW,
-        )
-        .unwrap();
+        );
         let reply = session
             .dispatch(Command::Provider {
                 id,
-                result: decision.reply.unwrap(),
+                result: session_reply(decision),
                 now: NOW,
             })
             .unwrap();
@@ -648,10 +603,7 @@ fn failed_deactivation_keeps_saved_instance_and_pending_release_after_restart() 
         assert_eq!(saved.as_ref(), Some(&a));
         let mut reply = response(404, Some(json!({"error":"ResourceNotFound"})));
         reply.api_version = version.map(str::to_owned);
-        let result = respond(&config(), &intent(operation), reply, 1, NOW)
-            .unwrap()
-            .reply
-            .unwrap();
+        let result = session_reply(decide(intent(operation), reply));
         let reply = session
             .dispatch(Command::Provider {
                 id,
@@ -711,10 +663,7 @@ fn assert_uncertain_activation_survives_reopen(reply: HttpResponse) {
     let Some(Effect::Provider { id, .. }) = start.effect else {
         panic!("Expected activation effect");
     };
-    let result = respond(&config(), &intent(Operation::Activate), reply, 1, NOW)
-        .unwrap()
-        .reply
-        .unwrap();
+    let result = session_reply(decide(intent(Operation::Activate), reply));
     let reply = session
         .dispatch(Command::Provider {
             id,

@@ -9,6 +9,7 @@ check: check-source test test-consumer
 check-source: lint test-rust test-managed
 
 check-distribution: native-verify test-fixtures test-c test-dotnet
+	python3 -B -m fixtures.distribution.bindings --verify-swift-pin
 
 native:
 	$(SDK_TOOLING) native

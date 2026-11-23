@@ -55,21 +55,7 @@ def acceptance_source(env):
 
 
 def stage_core(env, destination):
-    dependency = tomllib.loads((ROOT / "Cargo.toml").read_text())["workspace"]["dependencies"][
-        "software-licensing"
-    ]
-    revision = dependency.get("rev", "")
-    url = "https://github.com/naviapps/software-licensing.git"
-    lock = tomllib.loads((ROOT / "Cargo.lock").read_text())["package"]
-    sources = [p.get("source") for p in lock if p["name"] == "software-licensing"]
-    swift = json.loads((ROOT / "fixtures/distribution/swift-packages.json").read_text())
-    if (
-        not re.fullmatch(r"[a-f0-9]{40}", revision)
-        or dependency.get("git") != url
-        or sources != [f"git+{url}?rev={revision}#{revision}"]
-        or swift != {"naviapps/software-licensing": revision}
-    ):
-        raise ValueError("Polar requires the same immutable SoftwareLicensing dependency")
+    revision = bindings.locked_core_revision()
     resolved = bindings.core_root(env)
     if (
         subprocess.check_output(

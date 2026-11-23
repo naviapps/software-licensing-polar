@@ -12,4 +12,6 @@ pub use transport::PolarLicenseProvider;
 #[cfg(test)]
 mod protocol_tests;
 #[cfg(test)]
+mod test_fixtures;
+#[cfg(test)]
 mod transport_tests;

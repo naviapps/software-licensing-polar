@@ -6,21 +6,67 @@ import hashlib
 import json
 import os
 import platform
+import re
 import shutil
 import subprocess
 import sys
 import tomllib
 import xml.etree.ElementTree as ET
 from pathlib import Path
+from tempfile import TemporaryDirectory
 from xml.sax.saxutils import escape
 
 ROOT = Path(__file__).resolve().parents[2]
 VENDOR_PACKAGE = "NaviApps.SoftwareLicensing.Polar"
 CORE_PACKAGE = "NaviApps.SoftwareLicensing"
+CORE_URL = "https://github.com/naviapps/software-licensing.git"
 
 
 def run(*args, env, cwd=ROOT):
     subprocess.run([str(a) for a in args], cwd=cwd, env=env, check=True)
+
+
+def locked_core_revision():
+    dependency = tomllib.loads((ROOT / "Cargo.toml").read_text())["workspace"]["dependencies"][
+        "software-licensing"
+    ]
+    revision = dependency.get("rev", "")
+    packages = tomllib.loads((ROOT / "Cargo.lock").read_text())["package"]
+    sources = [p.get("source") for p in packages if p["name"] == "software-licensing"]
+    if (
+        dependency.get("git") != CORE_URL
+        or not re.fullmatch(r"[a-f0-9]{40}", revision)
+        or sources != [f"git+{CORE_URL}?rev={revision}#{revision}"]
+    ):
+        raise ValueError("Polar requires one immutable SoftwareLicensing dependency in Cargo")
+    return revision
+
+
+def verify_swift_core_pin(env):
+    revision = locked_core_revision()
+    env = {key: value for key, value in env.items() if key != "SOFTWARE_LICENSING_PACKAGE_PATH"}
+    for package in (ROOT, ROOT / "fixtures/swift-consumer"):
+        with TemporaryDirectory(prefix="polar-swift-pin-") as scratch:
+            manifest = json.loads(
+                subprocess.check_output(
+                    ["swift", "package", "--scratch-path", scratch, "dump-package"],
+                    cwd=package,
+                    env=env,
+                    text=True,
+                )
+            )
+        sources = [
+            source
+            for dependency in manifest["dependencies"]
+            for source in dependency.get("sourceControl", [])
+            if source["identity"] == "software-licensing"
+        ]
+        if (
+            len(sources) != 1
+            or sources[0]["location"].get("remote") != [{"urlString": CORE_URL}]
+            or sources[0]["requirement"] != {"revision": [revision]}
+        ):
+            raise ValueError(f"{package / 'Package.swift'} must use the Cargo-locked core revision")
 
 
 def core_root(env):
@@ -206,9 +252,13 @@ def main():
     )
     mode.add_argument("--c-only", action="store_true")
     mode.add_argument("--dotnet-only", action="store_true")
+    mode.add_argument("--verify-swift-pin", action="store_true")
     args = parser.parse_args()
     if args.prepare_dotnet:
         print(prepare_dotnet(dict(os.environ)))
+        return
+    if args.verify_swift_pin:
+        verify_swift_core_pin(os.environ)
         return
     if sys.platform != "darwin":
         raise SystemExit("Run the Windows distribution fixture on an existing worker for x64")

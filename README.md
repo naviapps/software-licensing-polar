@@ -22,9 +22,8 @@ outputs, not a published feed.
 | `crates/ffi`              | Owned C ABI, header and callback lifecycle tests     |
 | `Sources`, `Tests`        | Swift adapter and no-network fixtures                |
 | `bindings/dotnet`         | .NET adapter, fixtures and package definition        |
-| `fixtures`                | Standalone installed-consumer checks                 |
+| `fixtures`                | Distribution and installed-consumer checks           |
 | `Artifacts`, `ThirdParty` | Source-bound framework and original upstream notices |
-| `tools`                   | Pinned shared build, lint and consumer drivers       |
 
 SoftwareLicensing owns secure-record semantics, operation ordering and offline
 grace. Hosts own storage namespaces, product policy, scheduling, UI and the choice
@@ -182,7 +181,8 @@ The fixtures use synthetic responses or invalid or pre-cancelled requests.
 ### Distribution checks
 
 Run `mise exec -- make check-distribution` for native provenance, C
-ownership, managed callback fixtures and installed NuGet checks. The NuGet
+ownership, managed callback fixtures and installed NuGet checks. This gate also
+compares the evaluated Swift manifests with the Cargo-locked core revision. The NuGet
 consumer exercises cancelled activation, typed preflight rejection, failed
 storage, retry and restart.
 Run `mise exec -- make native` after changing native inputs and

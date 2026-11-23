@@ -1,6 +1,8 @@
 //! Real HTTP against owned loopback sockets. No external provider requests.
 use crate::{
-    API_VERSION, Intent, PolarLicenseConfig, PolarLicenseProvider, protocol::MAX_RESPONSE_BYTES,
+    API_VERSION, Intent, PolarLicenseConfig, PolarLicenseProvider,
+    protocol::MAX_RESPONSE_BYTES,
+    test_fixtures::{INSTANCE, ORGANIZATION, OTHER, activation, granted_response, intent},
 };
 use serde_json::{Value, json};
 use software_licensing::{
@@ -65,7 +67,7 @@ impl Response {
         if operation == Operation::Deactivate {
             Self::http(204, "", "")
         } else {
-            Self::http(200, "", valid_for(operation).to_string())
+            Self::http(200, "", granted_response(operation).to_string())
         }
     }
     fn delayed_headers(mut self) -> Self {
@@ -177,61 +179,15 @@ async fn read_request(stream: &mut TcpStream) -> Captured {
         wall_time: SystemTime::now(),
     }
 }
-const ORGANIZATION: &str = "11111111-1111-4111-8111-111111111111";
-const BENEFIT: &str = "22222222-2222-4222-8222-222222222222";
-const LICENSE: &str = "33333333-3333-4333-8333-333333333333";
-const ACTIVATION: &str = "44444444-4444-4444-8444-444444444444";
-const OTHER: &str = "99999999-9999-4999-8999-999999999999";
-
 fn config() -> PolarLicenseConfig {
-    serde_json::from_value(json!({
-        "environment":"sandbox",
-        "activationInstanceName":"Fixture",
-        "licenseScope":{"organizationId":ORGANIZATION,"benefitIds":[BENEFIT]},
-        "baseRetryDelay":0.01,"maximumRetryDelay":2
-    }))
-    .unwrap()
-}
-fn activation() -> Activation {
-    Activation {
-        source: "polar".into(),
-        plan_identifier: BENEFIT.into(),
-        activated_at: 1700000000.0,
-        license_key: Some("TEST-KEY".into()),
-        activation_identifier: Some(ACTIVATION.into()),
-        expires_at: None,
-    }
-}
-fn intent(operation: Operation) -> Intent {
-    Intent {
-        operation,
-        license_key: (operation == Operation::Activate).then(|| "TEST-KEY".into()),
-        activation: (operation != Operation::Activate).then(activation),
+    PolarLicenseConfig {
+        base_retry_delay: 0.01,
+        maximum_retry_delay: 2.0,
+        ..crate::test_fixtures::config()
     }
 }
 fn valid() -> Value {
-    valid_for(Operation::Activate)
-}
-fn valid_for(operation: Operation) -> Value {
-    let key = json!({
-        "id":LICENSE,"organization_id":ORGANIZATION,"benefit_id":BENEFIT,
-        "key":"TEST-KEY","status":"granted","expires_at":null,
-        "limit_activations":5,"usage":0,"limit_usage":null,"validations":1,
-        "last_validated_at":null
-    });
-    let activation = json!({
-        "id":ACTIVATION,"license_key_id":LICENSE,"label":"Fixture","meta":{},
-        "created_at":"2023-11-14T22:13:20Z","modified_at":null
-    });
-    if operation == Operation::Activate {
-        let mut value = activation;
-        value["license_key"] = key;
-        value
-    } else {
-        let mut value = key;
-        value["activation"] = activation;
-        value
-    }
+    granted_response(Operation::Activate)
 }
 fn failure<T>(result: Result<T, Failure>) -> Failure {
     match result {
@@ -428,7 +384,7 @@ async fn json_utf8_special_characters_and_all_operation_paths() {
     let fields: Value = serde_json::from_str(&request.body).unwrap();
     assert_eq!(fields["key"], "TEST-KEY");
     assert_eq!(fields["organization_id"], ORGANIZATION);
-    assert_eq!(fields["activation_id"], ACTIVATION);
+    assert_eq!(fields["activation_id"], INSTANCE);
     assert!(fields.get("increment_usage").is_none());
     provider.deactivate(activation()).await.unwrap();
     let request = fixture.next().await;
@@ -440,7 +396,7 @@ async fn json_utf8_special_characters_and_all_operation_paths() {
     let fields: Value = serde_json::from_str(&request.body).unwrap();
     assert_eq!(fields["key"], "TEST-KEY");
     assert_eq!(fields["organization_id"], ORGANIZATION);
-    assert_eq!(fields["activation_id"], ACTIVATION);
+    assert_eq!(fields["activation_id"], INSTANCE);
 }
 
 #[tokio::test]
@@ -520,7 +476,7 @@ async fn bounded_content_length_and_streamed_bodies() {
 async fn missing_or_invalid_expiration_fails_without_replaying_successful_requests() {
     for operation in [Operation::Activate, Operation::Validate] {
         for expiration in [None, Some(json!("not a date"))] {
-            let mut value = valid_for(operation);
+            let mut value = granted_response(operation);
             let key = if operation == Operation::Activate {
                 &mut value["license_key"]
             } else {
@@ -740,7 +696,7 @@ async fn invalid_wall_time_preserves_uncertain_activation_after_reopen() {
 
 #[tokio::test]
 async fn invalid_wall_time_only_blocks_clock_dependent_decisions() {
-    let mut expiring = valid_for(Operation::Validate);
+    let mut expiring = granted_response(Operation::Validate);
     expiring["expires_at"] = json!("2035-01-01T00:00:00Z");
     let retry_date = httpdate::fmt_http_date(SystemTime::now() + Duration::from_secs(60));
     let fixture = Fixture::new(vec![
@@ -757,7 +713,7 @@ async fn invalid_wall_time_only_blocks_clock_dependent_decisions() {
     let provider = fixture.provider_with_invalid_wall_time();
 
     let saved = provider.activate("TEST-KEY").await.unwrap();
-    assert_eq!(saved.activation_identifier.as_deref(), Some(ACTIVATION));
+    assert_eq!(saved.activation_identifier.as_deref(), Some(INSTANCE));
     provider.deactivate(saved.clone()).await.unwrap();
     assert!(provider.validate(saved.clone()).await.unwrap().is_valid);
     assert_eq!(
@@ -905,7 +861,7 @@ async fn durable_release_distinguishes_interruption_from_a_polar_retry_deadline(
             );
             assert_eq!(
                 serde_json::from_str::<Value>(&request.body).unwrap()["activation_id"],
-                ACTIVATION
+                INSTANCE
             );
         }
         fixture.assert_attempts(1 + usize::from(rate_limited)).await;
@@ -1199,7 +1155,7 @@ async fn malformed_rejected_and_mismatched_responses_are_secret_safe() {
     }
     for operation in [Operation::Activate, Operation::Validate] {
         for field in ["organization_id", "benefit_id", "key"] {
-            let mut value = valid_for(operation);
+            let mut value = granted_response(operation);
             let key = if operation == Operation::Activate {
                 &mut value["license_key"]
             } else {
@@ -1250,10 +1206,7 @@ async fn expired_success_retains_created_identity_and_bad_input_never_sends() {
     let provider = fixture.provider(config());
     let activation = provider.activate("TEST-KEY").await.unwrap();
     assert_eq!(activation.source, "polar");
-    assert_eq!(
-        activation.activation_identifier.as_deref(),
-        Some(ACTIVATION)
-    );
+    assert_eq!(activation.activation_identifier.as_deref(), Some(INSTANCE));
     assert_eq!(activation.expires_at, Some(1700000005.0));
     assert_eq!(
         failure(provider.activate(" ").await).code,
@@ -1292,7 +1245,7 @@ async fn unconfirmed_api_version_never_accepts_success_or_revokes_a_license() {
             let body = if operation == Operation::Deactivate {
                 String::new()
             } else {
-                valid_for(operation).to_string()
+                granted_response(operation).to_string()
             };
             let status = if operation == Operation::Deactivate {
                 204
