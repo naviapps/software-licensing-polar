@@ -70,16 +70,19 @@ def verify_swift_core_pin(env):
             raise ValueError(f"{package / 'Package.swift'} must use the Cargo-locked core revision")
 
 
-def core_root(env):
+def core_root(env, *, target=None):
     dependency = tomllib.loads((ROOT / "Cargo.toml").read_text())["workspace"]["dependencies"][
         "software-licensing"
     ]
     if "path" in dependency:
         candidate = (ROOT / dependency["path"]).resolve()
     else:
+        command = ["cargo", "metadata", "--locked", "--offline", "--format-version", "1"]
+        if target is not None:
+            command.extend(("--filter-platform", target))
         metadata = json.loads(
             subprocess.check_output(
-                ["cargo", "metadata", "--locked", "--offline", "--format-version", "1"],
+                command,
                 cwd=ROOT,
                 env=env,
                 text=True,

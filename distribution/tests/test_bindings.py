@@ -66,9 +66,19 @@ class DependencySourceTests(unittest.TestCase):
                 ) as command,
             ):
                 self.assertEqual(bindings.core_root({}), core.resolve())
+                target = "x86_64-pc-windows-msvc"
+                self.assertEqual(bindings.core_root({}, target=target), core.resolve())
+            metadata_command = [
+                "cargo",
+                "metadata",
+                "--locked",
+                "--offline",
+                "--format-version",
+                "1",
+            ]
+            self.assertEqual(command.call_args_list[0].args[0], metadata_command)
             self.assertEqual(
-                command.call_args.args[0],
-                ["cargo", "metadata", "--locked", "--offline", "--format-version", "1"],
+                command.call_args_list[1].args[0], [*metadata_command, "--filter-platform", target]
             )
 
 

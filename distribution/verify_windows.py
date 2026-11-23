@@ -51,7 +51,7 @@ def acceptance_source(env):
 
 def stage_core(env, destination):
     revision = bindings.locked_core_revision()
-    resolved = bindings.core_root(env)
+    resolved = bindings.core_root(env, target=TARGET)
     if (
         subprocess.check_output(
             ["git", "rev-parse", "HEAD"], cwd=resolved, env=env, text=True
