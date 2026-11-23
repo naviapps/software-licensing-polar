@@ -781,7 +781,7 @@ dependencies = [
 [[package]]
 name = "software-licensing"
 version = "0.1.0"
-source = "git+https://github.com/naviapps/software-licensing.git?rev=b5e41e21a737f3009da35d41bf0b786c91ede350#b5e41e21a737f3009da35d41bf0b786c91ede350"
+source = "git+https://github.com/naviapps/software-licensing.git?rev=e979b3a2150b8b59c294043aff3ae4d83e50ed35#e979b3a2150b8b59c294043aff3ae4d83e50ed35"
 dependencies = [
  "serde",
  "serde_json",
