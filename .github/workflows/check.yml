@@ -1,0 +1,51 @@
+name: Polar SDK checks
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: polar-sdk-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  source:
+    name: macOS 26 lint and tests
+    runs-on: macos-26
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v6.1.0
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@v5.3.0
+        with:
+          version: "2026.11.12"
+          cache: false
+          add_shims_to_path: false
+      - name: Fetch locked Rust dependencies
+        run: mise exec -- cargo fetch --locked
+      - name: Check the Rust SDK
+        run: mise exec -- make check
+  macos:
+    name: macOS 27 tests
+    runs-on: xcode-27
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v6.1.0
+        with:
+          persist-credentials: false
+      - name: Install the pinned Rust toolchain
+        run: rustup install --no-self-update
+      - name: Test the Rust SDK
+        run: cargo test --locked
+  windows:
+    name: Windows x64 tests
+    runs-on: windows-2025
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6.1.0
+        with:
+          persist-credentials: false
+      - uses: naviapps/sdk-tooling/.github/actions/test-rust-windows@888bf13f109ac7dc806b29478cc9c4acacdf6515

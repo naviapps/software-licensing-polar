@@ -9,18 +9,9 @@
     "**/*.{json,md,toml,yaml,yml}"
   ],
   "excludes": [
-    "**/*.docc/**/*.md",
-    "**/Artifacts/**",
     "**/ThirdParty/**",
-    "**/vendor/**",
-    "**/node_modules/**",
     "**/target/**",
-    "**/.build/**",
     "**/.native-build/**",
-    "**/bin/**",
-    "**/obj/**",
-    "**/build/**",
-    "**/DerivedData/**",
     "**/CHANGELOG*",
     "**/HISTORY*"
   ],

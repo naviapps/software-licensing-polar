@@ -781,7 +781,7 @@ dependencies = [
 [[package]]
 name = "software-licensing"
 version = "0.1.0"
-source = "git+https://github.com/naviapps/software-licensing.git?rev=ceda779224b9e52500f452923d5018150f2ac902#ceda779224b9e52500f452923d5018150f2ac902"
+source = "git+https://github.com/naviapps/software-licensing.git?rev=b69902197a294598901aa3c595f8cfb3b11c7404#b69902197a294598901aa3c595f8cfb3b11c7404"
 dependencies = [
  "serde",
  "serde_json",
@@ -800,18 +800,6 @@ dependencies = [
  "software-licensing",
  "time",
  "tokio",
-]
-
-[[package]]
-name = "software-licensing-polar-ffi"
-version = "0.1.0"
-dependencies = [
- "serde",
- "serde_json",
- "software-licensing",
- "software-licensing-polar",
- "tokio",
- "zeroize",
 ]
 
 [[package]]

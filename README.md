@@ -1,95 +1,36 @@
-# SoftwareLicensingPolar
+# SoftwareLicensing Polar
 
-Standalone Polar license provider for SoftwareLicensing. Rust owns the HTTPS
-transport, protocol validation, cancellation, deadlines and retry decisions;
-Swift, C and .NET are thin bindings. The SDK uses Polar's public customer-portal
-license endpoints. It never contains a merchant token and does not issue licenses,
-create checkouts, migrate customers or manage subscriptions.
+A Rust provider for Polar's public customer-portal license API. It uses
+[SoftwareLicensing](https://github.com/naviapps/software-licensing) types for activation,
+validation, deactivation and failures. SoftwareLicensing owns license state, offline
+grace and recovery. The host owns secure storage, commercial policy and the choice
+of provider.
 
 ## Installation
 
-The Rust crate is `software-licensing-polar`; the Swift product is
-`SoftwareLicensingPolar` and the .NET project/package is
-`NaviApps.SoftwareLicensing.Polar`. Git dependencies use
-immutable full revisions. Swift resolves SoftwareLicensing at the same core pin as
-Cargo; a consumer using both must select the same revision. Install at a completed
-provider commit, rather than tracking `main`. NuGet packages are local validation
-outputs, not a published feed.
+Depend on this Git repository at an exact published revision. The Rust crate is
+`software-licensing-polar` and runs on the host's Tokio runtime. A host that also
+depends on SoftwareLicensing should select the same SoftwareLicensing revision as
+the provider's [Cargo manifest](Cargo.toml), so both use the same Rust types.
 
-| Path                      | Ownership                                            |
-| ------------------------- | ---------------------------------------------------- |
-| `crates/provider`         | Polar protocol and async Rust transport              |
-| `crates/ffi`              | Owned C ABI, header and callback lifecycle tests     |
-| `Sources`, `Tests`        | Swift adapter and no-network fixtures                |
-| `bindings/dotnet`         | .NET adapter, fixtures and package definition        |
-| `fixtures/consumers`      | Independent SDK clients                              |
-| `distribution`            | SDK-specific package checks                          |
-| `Artifacts`, `ThirdParty` | Source-bound framework and original upstream notices |
-
-SoftwareLicensing owns secure-record semantics, operation ordering and offline
-grace. Hosts own storage namespaces, product policy, scheduling, UI and the choice
-of issuer for a new key. Polar validates and deactivates only activations with
-source `polar`.
-
-### Swift
-
-Use macOS 26 or later and Swift 6.3. Select this repository's
-`SoftwareLicensingPolar` product with the matching SoftwareLicensing dependency.
-The source-bound universal framework means Swift consumers need no Rust compiler.
-
-```swift
-import SoftwareLicensing
-import SoftwareLicensingPolar
-
-let provider = try PolarLicenseProvider(
-  configuration: .init(
-    activationInstanceName: "Your chosen device label",
-    licenseScope: .init(
-      organizationID: "<POLAR_ORGANIZATION_UUID>",
-      benefitIDs: ["<POLAR_LICENSE_BENEFIT_UUID>"]),
-    environment: .sandbox))
+```toml
+[dependencies]
+software-licensing-polar = { git = "https://github.com/naviapps/software-licensing-polar.git", rev = "<published-commit-sha>" }
 ```
 
-Replace the placeholder organization/benefit IDs with reviewed identifiers from
-one sandbox organization before constructing the provider. They are configuration,
-not merchant secrets. The constructor rejects placeholders and does no network I/O.
-Use `.production` only with independently reviewed production IDs. Sandbox hosts
-must use a separate QA bundle and secure-storage namespace: both environments use
-source `polar`, so an issuer string does not identify the environment. Never load
-production activations into a sandbox host or reuse its storage in production.
-Add the core's `SoftwareLicensingKeychain` product when using macOS secure storage.
-Keep existing production namespaces and confidential records intact during changes.
-Fixture tests and sandbox trials use their own records.
+Construct a `PolarLicenseProvider` with a `PolarLicenseConfig` and an explicit
+`Environment::Sandbox` or `Environment::Production`. The configuration requires
+a device label, a Polar organization UUID and a nonempty allowlist of license
+benefit UUIDs from the same environment. The constructor validates configuration
+without contacting Polar. Keep sandbox and production license records in separate
+storage namespaces.
 
-### Rust
-
-Use a Tokio runtime and `PolarLicenseProvider::new(PolarLicenseConfig { ... })`.
-`Environment::Sandbox` or `Environment::Production` is mandatory. `activate`,
-`validate`, and `deactivate` are async methods using SoftwareLicensing's common
-activation/validation types. `execute_with_cancellation` returns typed mutation
-outcome evidence when its cancellation future resolves. Dropping its future stops
-local work but cannot return evidence or undo a remote mutation.
-
-### C and .NET
-
-The C header is `crates/ffi/include/software_licensing_polar.h`, with full
-`software_licensing_polar_` exports. The Polar C ABI is 3. Pair the Swift and .NET
-provider with the pinned SoftwareLicensing ABI 4 runtime. The confidential record
-schema remains version 2. Configuration and intent are copied JSON;
-results are owned. Copy a result view before destroying its owner. Every non-null
-started operation completes exactly once, including after cancellation or early
-owner destruction. Completion may run before start returns and runs on a Rust
-worker; keep the callback context alive through completion and never unwind across
-C. Exclusive handle destruction must not race a call borrowing that handle.
-
-.NET exposes the same configuration and async provider interface. See
-[the managed guide](bindings/dotnet/README.md). The managed preparation step
-resolves the pinned core source without a sibling path or native rebuild. The
-native libraries and original notices must accompany a packaged .NET consumer.
-
-Swift and .NET expose retry and timeout properties as optional overrides.
-The bindings omit unset options so Rust applies its defaults for both bindings.
-Explicit numbers in existing configuration JSON keep their meaning.
+The async `activate`, `validate` and `deactivate` methods accept and return
+SoftwareLicensing's public types. `execute_with_cancellation` takes a typed
+`Intent` and returns mutation outcome evidence when cancelled. Dropping the future
+stops local work and discards that evidence. See
+[the Git consumer](fixtures/consumers/rust/src/main.rs) for a complete no-network
+example.
 
 ## Protocol and security contract
 
@@ -130,11 +71,12 @@ failure diagnostics. Error bodies can contain submitted secrets.
 
 ### Failure and recovery
 
-Cancellation is local, not a server rollback. Activation/deactivation failures
-carry `mutationOutcome: notApplied` or `unknown`. If the server may have accepted a
-mutation but its reply was lost or malformed, the provider preserves the unknown
-outcome and stops that operation. A connection failure before a request is sent is not
-applied. A 4xx response without the matching `Polar-Version` preserves the status
+Cancellation stops local work. The server may still apply a request it received.
+Activation and deactivation failures carry `mutationOutcome: notApplied` or
+`unknown`. If the server may have accepted a mutation but its reply was lost or
+malformed, the provider preserves the unknown outcome and stops that operation.
+A connection failure before sending the request yields `notApplied`. A 4xx
+response without the matching `Polar-Version` preserves the status
 and retry advice but leaves a mutation outcome unknown. A 429 can authorize a
 retry of a mutation only when the response carries the matching version.
 Validation can retry 429 and 5xx responses within the configured attempt and
@@ -152,89 +94,38 @@ until an authoritative resolution is available. Preserve the issuing source and
 secure-storage namespace of existing records. Customer and subscription
 administration belong to the merchant's operator workflow.
 
-## Development and verification
+## Development
 
-Use the tools pinned by `mise.toml` and `rust-toolchain.toml`. The `sdk-tooling`
-task uses a public, fixed SDK Tooling revision through uv. `native.toml`
-defines the native artifact, and `distribution/` contains the
-SDK-specific packaging checks. SwiftPM and NuGet consumers can install the SDK
-directly.
+The repository pins Rust in [rust-toolchain.toml](rust-toolchain.toml). Install
+the tools from [mise.toml](mise.toml), then fetch the locked dependencies and run
+the local gate:
 
 ```sh
-mise trust mise.toml
 mise install
 mise exec -- cargo fetch --locked
 mise exec -- make check
 ```
 
-`make check` runs source lint, Rust Clippy and tests, the managed provider
-fixture, strict Swift tests and an external SwiftPM consumer using this SDK checkout. The consumer exercises the
-public Polar provider with the pinned SoftwareLicensing core.
-Rust protocol tests use local values. The owned loopback transport also exercises
-release recovery with the pinned licensing core, from an interrupted journal or a
-recorded `429` retry deadline through a confirmed `204` reply.
+`make check` runs repository lint, Clippy and Rust tests. Protocol tests use
+synthetic inputs and the transport tests use loopback servers. GitHub Actions
+runs Rust tests on macOS 26 and 27 and Windows x64.
 
-GitHub Actions runs the Swift tests and standalone Swift consumer on macOS 26
-with Xcode 26.6 and on macOS 27 with Xcode 27.2. Public Windows x64 CI runs Rust
-tests and the managed provider fixture with the pinned SoftwareLicensing core.
-The fixtures use synthetic responses or invalid or pre-cancelled requests.
-
-### Distribution checks
-
-Run `mise exec -- make check-distribution` for native provenance, C
-ownership, managed callback fixtures and installed NuGet checks. This gate also
-compares the evaluated Swift manifests with the Cargo-locked core revision. The NuGet
-consumer exercises cancelled activation, typed preflight rejection, failed
-storage, retry and restart.
-Run `mise exec -- make native` after changing native inputs and
-`mise exec -- make native-verify` to verify the tracked result.
-
-The standalone Swift consumer resolves the pinned core without host credentials.
-Run `mise run sdk-tooling -- swift-consumer --distribution --git-config PATH`
-to use a Git configuration that redirects the core's URL to a local mirror
-containing that commit.
-For independently installed Rust/C checks, pass a complete core repository or Git
-bundle as `--git-dependency-source "naviapps/software-licensing=$dependency"` to
-`mise run sdk-tooling -- rust-c-consumers`. Use `--evidence` with a new path
-outside this checkout to retain the result. This validates local Git delivery.
-
-Windows packages target `win-x64`. On an owned prepared Windows ARM64 worker,
-set `DOTNET_BIN` to the absolute path of the pinned x64 .NET SDK executable.
-Run the distribution fixture from the repository root.
+The [distribution plan](sdk-distribution.toml) builds and runs a Rust consumer
+from a clean Git checkout on macOS and Windows x64. To run the same check locally,
+point SDK Tooling at a complete checkout or bundle of the pinned SoftwareLicensing
+repository:
 
 ```sh
-mise run sdk-tooling -- python -m distribution.verify_windows
+mise run sdk-tooling -- rust-c-consumers --language rust \
+  --git-dependency-source naviapps/software-licensing=/absolute/path/to/software-licensing
 ```
 
-ARM64-hosted MSVC builds the two x64 DLLs. Rust, C, and .NET fixtures run as
-x64 processes through Windows emulation.
-The driver builds the immutable SoftwareLicensing source separately and accepts
-the two NuGet packages together. Accepted packages and evidence are retained
-under `.native-build/win-x64/<version>`. When `VM_RUNNER_ARTIFACTS_DIR` is supplied,
-copies are retained there under `win-x64/<version>`.
-
-Maintainers can run the macOS and Windows x64 distribution gates in the
-[SDK Tooling repository](https://github.com/naviapps/sdk-tooling). Run this from the intended commit on `main`:
-
-```sh
-gh workflow run check-sdk-distribution.yml -R naviapps/sdk-tooling \
-  -f sdk=software-licensing-polar -f "revision=$(git rev-parse HEAD)"
-```
-
-Test actual provider integration separately.
+On Windows, add `--windows-architecture x64` and use the pinned Rust toolchain
+and Visual Studio C++ build tools. The fixture checks the resolved Rust dependency
+identities and verifies that invalid keys and saved activations fail before
+network access.
 
 ## License
 
-SoftwareLicensingPolar is available under the [MIT License](LICENSE).
-Retain the upstream notices in `ThirdParty/` when redistributing the native libraries.
-
-## Upstream contract references
-
-- [Polar API versioning](https://polar.sh/docs/api-reference/versioning)
-- [License-key benefits and subscription expiry](https://polar.sh/docs/features/benefits/license-keys)
-- [Activation](https://polar.sh/docs/api-reference/customer-portal/license-keys/activate)
-- [Validation](https://polar.sh/docs/api-reference/customer-portal/license-keys/validate)
-- [Deactivation](https://polar.sh/docs/api-reference/customer-portal/license-keys/deactivate)
-- [Upstream schema snapshot](https://github.com/polarsource/polar/blob/433d6bfe53ef5167c7982688d85a114c528235f4/server/polar/license_key/schemas.py)
-
-Review the versioned upstream contract before updating the pinned API version.
+SoftwareLicensing Polar is available under the [MIT License](LICENSE).
+[ThirdParty](ThirdParty) contains upstream notices.

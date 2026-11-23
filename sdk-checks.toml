@@ -1,13 +1,5 @@
-[swift]
-executable = "PolarConsumer"
-inputs = ["Package.swift", "Sources", "Tests", "Artifacts", "ThirdParty", "LICENSE"]
-
 [rust_c]
 git_url = "https://github.com/naviapps/software-licensing-polar.git"
 rust_packages = ["software-licensing-polar"]
 rust_git_dependencies = ["software-licensing"]
 rust_registry_dependencies = { tokio = ["macros", "rt"] }
-
-[rust_c.c]
-framework = "Artifacts/CSoftwareLicensingPolar.xcframework/macos-arm64_x86_64/CSoftwareLicensingPolar.framework"
-header = "software_licensing_polar.h"

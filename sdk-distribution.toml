@@ -1,8 +1,5 @@
 [macos]
 commands = [
-  ["xcrun", "swift", "--version"],
-  ["cargo", "fetch", "--locked"],
-  ["make", "check-distribution"],
   [
     "git",
     "clone",
@@ -12,15 +9,30 @@ commands = [
   [
     "sdk-tooling",
     "rust-c-consumers",
+    "--language",
+    "rust",
     "--git-dependency-source",
     "naviapps/software-licensing={temp}/software-licensing",
   ],
-  ["sdk-tooling", "swift-consumer", "--distribution"],
 ]
 
 [windows]
 commands = [
   ["rustup", "install", "--no-self-update"],
-  ["sdk-tooling", "python", "-m", "unittest", "discover", "-s", "distribution/tests"],
-  ["sdk-tooling", "windows", "-m", "distribution.verify_windows"],
+  [
+    "git",
+    "clone",
+    "https://github.com/naviapps/software-licensing.git",
+    "{temp}/software-licensing",
+  ],
+  [
+    "sdk-tooling",
+    "rust-c-consumers",
+    "--language",
+    "rust",
+    "--windows-architecture",
+    "x64",
+    "--git-dependency-source",
+    "naviapps/software-licensing={temp}/software-licensing",
+  ],
 ]
