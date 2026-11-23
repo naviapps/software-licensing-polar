@@ -15,7 +15,6 @@ commands = [
     "--git-dependency-source",
     "naviapps/software-licensing={temp}/software-licensing",
   ],
-  ["sdk-tooling", "swift-consumer", "--distribution"],
 ]
 
 [windows]
