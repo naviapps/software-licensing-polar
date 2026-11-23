@@ -133,6 +133,7 @@ class WindowsTests(unittest.TestCase):
             tools_revision = "d" * 40
             with (
                 patch.object(windows, "ROOT", root),
+                patch.object(windows.Path, "home", return_value=root / "developer"),
                 patch.object(windows, "acceptance_source", return_value=source),
                 patch.object(windows, "load_candidate", return_value=modules.__getitem__) as select,
                 patch.object(windows, "stage_core", return_value=revision),
