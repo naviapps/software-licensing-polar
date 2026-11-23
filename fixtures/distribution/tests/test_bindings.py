@@ -36,15 +36,6 @@ class DependencySourceTests(unittest.TestCase):
             self.assertEqual(output, root / "build/bindings/core.props")
             self.assertFalse((root.parent / "software-licensing").exists())
 
-    def test_pinned_dependency_cannot_silently_use_a_dev_source_override(self):
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            (root / "Cargo.toml").write_text(
-                '[workspace.dependencies]\nsoftware-licensing = {git="https://example.invalid/core", rev="fixture"}\n'
-            )
-            with patch.object(bindings, "ROOT", root), self.assertRaises(SystemExit):
-                bindings.core_root({"SOFTWARE_LICENSING_SOURCE_PATH": str(root)})
-
     def test_pinned_dependency_resolves_managed_source_from_cargo_metadata(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

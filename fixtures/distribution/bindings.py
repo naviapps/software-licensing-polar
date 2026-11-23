@@ -73,14 +73,7 @@ def core_root(env):
     dependency = tomllib.loads((ROOT / "Cargo.toml").read_text())["workspace"]["dependencies"][
         "software-licensing"
     ]
-    override = env.get("SOFTWARE_LICENSING_SOURCE_PATH")
-    if override:
-        if "git" in dependency:
-            raise SystemExit(
-                "Unset SOFTWARE_LICENSING_SOURCE_PATH when validating the pinned Git dependency"
-            )
-        candidate = Path(override).resolve()
-    elif "path" in dependency:
+    if "path" in dependency:
         candidate = (ROOT / dependency["path"]).resolve()
     else:
         metadata = json.loads(
