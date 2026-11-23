@@ -1,6 +1,12 @@
 using NaviApps.SoftwareLicensing;
 using NaviApps.SoftwareLicensing.Polar;
 
+#if NATIVE_AOT_FIXTURE
+if (System.Runtime.CompilerServices.RuntimeFeature.IsDynamicCodeSupported ||
+    System.Text.Json.JsonSerializer.IsReflectionEnabledByDefault)
+    throw new InvalidOperationException("The Native AOT consumer requires reflection-free JSON.");
+#endif
+
 static void Require(bool condition, string message)
 {
     if (!condition) throw new InvalidOperationException(message);

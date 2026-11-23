@@ -27,7 +27,7 @@ public sealed class PolarLicenseProvider : ILicenseProvider, IDisposable
         ArgumentNullException.ThrowIfNull(configuration);
         this.native = native;
         byte[] bytes;
-        try { bytes = JsonSerializer.SerializeToUtf8Bytes(configuration, Wire.Json); }
+        try { bytes = JsonSerializer.SerializeToUtf8Bytes(configuration, Wire.Type<PolarLicenseConfiguration>()); }
         catch (Exception error) when (error is JsonException or ArgumentException)
         { throw new LicenseException(LicenseErrorCode.InvalidProviderConfiguration); }
         try
@@ -52,25 +52,25 @@ public sealed class PolarLicenseProvider : ILicenseProvider, IDisposable
 
     public async Task<LicenseActivation> ActivateAsync(LicenseActivationRequest request, CancellationToken cancellationToken = default)
     {
-        var reply = await Perform(new { operation = "activate", licenseKey = request.LicenseKey }, cancellationToken).ConfigureAwait(false);
+        var reply = await Perform(new("activate", LicenseKey: request.LicenseKey), cancellationToken).ConfigureAwait(false);
         return Wire.Reply<LicenseActivation>(reply, "activated", "activation");
     }
     public async Task<LicenseValidationResult> ValidateAsync(LicenseActivation activation, CancellationToken cancellationToken = default)
     {
-        var reply = await Perform(new { operation = "validate", activation }, cancellationToken).ConfigureAwait(false);
+        var reply = await Perform(new("validate", Activation: activation), cancellationToken).ConfigureAwait(false);
         return Wire.Reply<LicenseValidationResult>(reply, "validated", "validation");
     }
     public async Task DeactivateAsync(LicenseActivation activation, CancellationToken cancellationToken = default)
     {
-        var reply = await Perform(new { operation = "deactivate", activation }, cancellationToken).ConfigureAwait(false);
+        var reply = await Perform(new("deactivate", Activation: activation), cancellationToken).ConfigureAwait(false);
         Wire.RequireKind(reply, "deactivated");
     }
 
-    private Task<JsonElement> Perform(object intent, CancellationToken token)
+    private Task<JsonElement> Perform(PolarIntent intent, CancellationToken token)
     {
         if (token.IsCancellationRequested) throw NativeFailure.Cancelled(LicenseMutationOutcome.NotApplied);
         byte[] bytes;
-        try { bytes = JsonSerializer.SerializeToUtf8Bytes(intent, Wire.Json); }
+        try { bytes = JsonSerializer.SerializeToUtf8Bytes(intent, Wire.Type<PolarIntent>()); }
         catch (Exception error) when (error is JsonException or ArgumentException)
         {
             throw new LicenseException(new LicenseFailure(

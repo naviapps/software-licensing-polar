@@ -127,7 +127,9 @@ def framework_binary(root, module):
     )
 
 
-def pack_and_consume(dotnet, core, vendor_library, core_library, rid, env, output, *, load_tools):
+def pack_and_consume(
+    dotnet, core, vendor_library, core_library, rid, env, output, *, load_tools, native_aot=False
+):
     """Pack resolved core without modifying its source checkout or runtime staging folder."""
     suffix = ".dll" if rid.startswith("win-") else ".dylib"
     prefix = "" if rid.startswith("win-") else "lib"
@@ -196,6 +198,13 @@ def pack_and_consume(dotnet, core, vendor_library, core_library, rid, env, outpu
             runtime_files={"runtimes/" + rid + "/native/" + filename: staged},
             forbidden_nuspec_elements=("repository",),
         )
+    properties = {
+        "Nullable": "enable",
+        "TreatWarningsAsErrors": "true",
+        "JsonSerializerIsReflectionEnabledByDefault": "false",
+    }
+    if native_aot:
+        properties.update(DefineConstants="NATIVE_AOT_FIXTURE", ILLinkTreatWarningsAsErrors="true")
     nuget.run_isolated_consumer(
         dotnet,
         packages=built,
@@ -204,7 +213,8 @@ def pack_and_consume(dotnet, core, vendor_library, core_library, rid, env, outpu
         work_parent=output,
         env=env,
         runtime=rid,
-        properties={"Nullable": "enable", "TreatWarningsAsErrors": "true"},
+        properties=properties,
+        native_aot=native_aot,
         clear_environment=(LEGACY_CORE_NATIVE_OVERRIDE,),
         exclude_paths=(
             ROOT / "target",

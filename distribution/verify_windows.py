@@ -144,7 +144,10 @@ def stage_library(native, *, windows, artifacts, cargo, env, tools, output, host
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--architecture", choices=("x64",), default="x64")
-    parser.parse_args(argv)
+    parser.add_argument(
+        "--native-aot", action="store_true", help="Publish and run the Native AOT consumer"
+    )
+    args = parser.parse_args(argv)
     source = acceptance_source(os.environ)
     tool_inputs = support_inputs(ROOT)
     windows = load("windows")
@@ -274,6 +277,7 @@ def main(argv=None):
             env,
             candidate,
             load_tools=load,
+            native_aot=args.native_aot,
         )
         if source != acceptance_source(os.environ):
             raise ValueError("Windows x64 acceptance source changed")
@@ -305,6 +309,8 @@ def main(argv=None):
             ],
             "notRun": not_run,
         }
+        if args.native_aot:
+            receipt["nativeAotFixtureExecuted"] = True
         publish_versioned_x64(
             candidate / "packages",
             receipt,

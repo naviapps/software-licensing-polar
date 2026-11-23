@@ -1,25 +1,32 @@
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 
 namespace NaviApps.SoftwareLicensing.Polar;
+
+internal sealed record PolarIntent(string Operation, string? LicenseKey = null, LicenseActivation? Activation = null);
 
 /// <summary>Operation-boundary DTO framing only. HTTP and provider response codecs live in Rust.</summary>
 internal static class Wire
 {
-    internal static readonly JsonSerializerOptions Json = Options();
-    private static JsonSerializerOptions Options()
+    private static readonly WireJsonContext Context = new(new JsonSerializerOptions
     {
-        var options = new JsonSerializerOptions
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+        Converters =
         {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-        };
-        options.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase, allowIntegerValues: false));
-        options.Converters.Add(new UnixDateConverter());
-        options.Converters.Add(new ExactStringConverter());
-        return options;
-    }
+            new JsonStringEnumConverter<PolarLicenseEnvironment>(JsonNamingPolicy.CamelCase, allowIntegerValues: false),
+            new JsonStringEnumConverter<LicenseErrorCode>(JsonNamingPolicy.CamelCase, allowIntegerValues: false),
+            new JsonStringEnumConverter<LicenseMutationOutcome>(JsonNamingPolicy.CamelCase, allowIntegerValues: false),
+            new JsonStringEnumConverter<LicenseStatus>(JsonNamingPolicy.CamelCase, allowIntegerValues: false),
+            new UnixDateConverter(),
+            new ExactStringConverter(),
+        }
+    });
+
+    internal static JsonTypeInfo<T> Type<T>() => (JsonTypeInfo<T>)Context.GetTypeInfo(typeof(T))!;
+
     private sealed class ExactStringConverter : JsonConverter<string>
     {
         private static readonly UTF8Encoding StrictUtf8 = new(encoderShouldEmitUTF8Identifier: false, throwOnInvalidBytes: true);
@@ -48,7 +55,7 @@ internal static class Wire
         try
         {
             using var document = JsonDocument.Parse(bytes);
-            if (code == 1) throw new LicenseException(document.RootElement.Deserialize<LicenseFailure>(Json)
+            if (code == 1) throw new LicenseException(document.RootElement.Deserialize(Type<LicenseFailure>())
                 ?? new(LicenseErrorCode.UnexpectedProviderResponse));
             if (code != 0) throw new LicenseException(LicenseErrorCode.UnexpectedProviderResponse);
             return document.RootElement.Clone();
@@ -60,7 +67,7 @@ internal static class Wire
         try
         {
             RequireKind(reply, kind);
-            return reply.GetProperty(property).Deserialize<T>(Json)
+            return reply.GetProperty(property).Deserialize(Type<T>())
                 ?? throw new LicenseException(LicenseErrorCode.UnexpectedProviderResponse);
         }
         catch (Exception error) when (error is JsonException or InvalidOperationException or KeyNotFoundException or ArgumentException)
@@ -76,3 +83,11 @@ internal static class Wire
         { throw new LicenseException(LicenseErrorCode.UnexpectedProviderResponse); }
     }
 }
+
+[JsonSourceGenerationOptions(GenerationMode = JsonSourceGenerationMode.Metadata)]
+[JsonSerializable(typeof(PolarLicenseConfiguration))]
+[JsonSerializable(typeof(PolarIntent))]
+[JsonSerializable(typeof(LicenseActivation))]
+[JsonSerializable(typeof(LicenseValidationResult))]
+[JsonSerializable(typeof(LicenseFailure))]
+internal sealed partial class WireJsonContext : JsonSerializerContext { }

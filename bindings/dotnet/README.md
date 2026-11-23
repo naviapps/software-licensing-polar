@@ -5,6 +5,34 @@
 storage, persistence and offline policy. This provider owns the separate native
 library `software_licensing_polar`; it does not add exports to the base library.
 
+## Installation
+
+Use .NET 10 with a matching package runtime. Use `win-x64` with x64 .NET on
+Windows, including on Windows 11 ARM64 under emulation. Use `osx-arm64` on
+Apple Silicon or `osx-x64` on Intel, with the corresponding .NET SDK.
+
+Put both `.nupkg` files from the same [platform acceptance run](https://github.com/naviapps/software-licensing-polar#distribution-checks)
+in one local feed. The provider references the base package automatically.
+In an empty consumer directory, create a console project and add the exact provider
+version.
+
+```sh
+dotnet new console --framework net10.0 --no-restore
+dotnet package add NaviApps.SoftwareLicensing.Polar --version "[0.1.0]" --no-restore
+```
+
+Copy the [standalone .NET consumer](https://github.com/naviapps/software-licensing-polar/blob/main/fixtures/consumers/dotnet/Program.cs)
+from the same revision to `Program.cs`. Restore from the verified package directory
+and run with the matching .NET SDK. Substitute your package directory.
+
+```sh
+dotnet restore --source "/path/to/verified/packages" --packages .nuget-packages -p:UseAppHost=false
+dotnet run --no-restore -p:UseAppHost=false
+```
+
+The smoke test exercises provider preflight, cancellation and storage recovery with
+synthetic inputs without contacting Polar.
+
 ## Configuration
 
 Select the environment explicitly, and supply your Polar organization UUID and a
@@ -111,6 +139,13 @@ and runs `win-x64` packages on a native Windows x64 worker. A prepared Windows
 ARM64 worker can run the same x64 fixtures through emulation. The macOS fixture
 packs and tests the host runtime (`osx-arm64` or `osx-x64`) using the universal
 native libraries.
+
+The GitHub-hosted Windows x64 distribution check also publishes and runs the
+Native AOT package fixture with JSON reflection disabled. On a prepared native
+Windows x64 worker with the Visual Studio C++ workload and pinned .NET SDK, run
+the same check from the SDK root with
+`mise run sdk-tooling -- windows -m distribution.verify_windows --native-aot`.
+For emulation on Windows ARM64, use the standard command without `--native-aot`.
 
 The isolated consumer restores the provider and its paired core package from an
 owned local feed. For local installation after verification, use

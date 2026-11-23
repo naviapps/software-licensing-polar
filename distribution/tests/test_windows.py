@@ -114,7 +114,10 @@ class WindowsTests(unittest.TestCase):
     def test_x64_pipeline_does_not_retain_evidence_after_support_changes(self):
         self.check_x64_pipeline("x64", TARGETS["x64"], change_support=True)
 
-    def check_x64_pipeline(self, host, compiler_host, *, change_support=False):
+    def test_x64_aot_pipeline_publishes_only_after_running_the_package_pair(self):
+        self.check_x64_pipeline("x64", TARGETS["x64"], native_aot=True)
+
+    def check_x64_pipeline(self, host, compiler_host, *, change_support=False, native_aot=False):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             (root / "global.json").write_text(
@@ -219,7 +222,7 @@ class WindowsTests(unittest.TestCase):
                         windows.main([])
                     retain.assert_not_called()
                     return
-                windows.main([])
+                windows.main(["--native-aot"] if native_aot else [])
 
             core, vendor = ffi.FfiProduct.call_args_list
             self.assertEqual(core.args[0].name, "core")
@@ -253,7 +256,9 @@ class WindowsTests(unittest.TestCase):
                 ["software_licensing_polar.dll", "software_licensing.dll"],
             )
             self.assertEqual(pair[4], windows.RID)
-            self.assertEqual(pack.call_args.kwargs, {"load_tools": load_tooling})
+            self.assertEqual(
+                pack.call_args.kwargs, {"load_tools": load_tooling, "native_aot": native_aot}
+            )
             properties = managed.kwargs["properties"]
             self.assertEqual(Path(properties["PolarNativeLibrary"]), pair[2])
             self.assertEqual(Path(properties["SoftwareLicensingNativeLibrary"]), pair[3])
@@ -263,6 +268,7 @@ class WindowsTests(unittest.TestCase):
             self.assertEqual(receipt["coreRevision"], revision)
             self.assertEqual(receipt["toolInputs"], tool_inputs)
             self.assertEqual(receipt["runtime"], "win-x64")
+            self.assertEqual(receipt.get("nativeAotFixtureExecuted", False), native_aot)
             self.assertEqual(
                 receipt["execution"], "x64-emulated-on-arm64" if host == "arm64" else "x64-native"
             )

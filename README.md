@@ -9,35 +9,55 @@ of provider.
 
 ## Swift
 
-Add this repository as a SwiftPM dependency at a published Git revision and
-select the `SoftwareLicensingPolar` product. It supplies a universal macOS 26+
-framework for Apple Silicon and Intel.
+Use Swift 6.3 or later on macOS 26 or later, with the universal framework for
+Apple Silicon and Intel. Select a published Polar Git revision and find the
+matching SoftwareLicensing revision in that revision's `Package.swift`.
+
+Create an empty `PolarConsumer` directory and save the following as `Package.swift`.
 
 ```swift
-.package(
-    url: "https://github.com/naviapps/software-licensing-polar.git",
-    revision: "<published-commit-sha>"
+// swift-tools-version: 6.3
+import PackageDescription
+
+let package = Package(
+  name: "PolarConsumer",
+  platforms: [.macOS(.v26)],
+  dependencies: [
+    .package(
+      url: "https://github.com/naviapps/software-licensing-polar.git",
+      revision: "<published-polar-commit>"),
+    .package(
+      url: "https://github.com/naviapps/software-licensing.git",
+      revision: "<core-commit-used-by-polar>"),
+  ],
+  targets: [
+    .executableTarget(
+      name: "PolarConsumer",
+      dependencies: [
+        .product(name: "SoftwareLicensingPolar", package: "software-licensing-polar"),
+        .product(name: "SoftwareLicensing", package: "software-licensing"),
+      ])
+  ]
 )
 ```
 
-Import `SoftwareLicensingPolar` and pass a configured `PolarLicenseProvider` to
-SoftwareLicensing's `LicenseManager`. Configure a separate secure storage namespace
-for each environment. See the
-[standalone Swift consumer](fixtures/consumers/swift/Sources/PolarConsumer/Consumer.swift)
-for a complete example.
+Save the [standalone Swift consumer](fixtures/consumers/swift/Sources/PolarConsumer/Consumer.swift)
+from the selected revision to `Sources/PolarConsumer/Consumer.swift`, then run
+`swift run PolarConsumer`. The consumer checks cancellation and storage recovery
+using synthetic inputs without contacting Polar.
 
-Create the core manager with `try LicenseManager(...)`. Keep the core bindings and
-native artifacts at matching revisions. `LicenseError.Code.incompatibleABIVersion`
+In your app, pass the configured `PolarLicenseProvider` to `try LicenseManager(...)`.
+Configure a separate secure storage namespace for each environment. Keep the core
+bindings and native artifacts at matching revisions. `LicenseError.Code.incompatibleABIVersion`
 identifies a native ABI mismatch. `unsupportedVersion` identifies a saved-record
-version the core cannot read. Use `LicenseRefreshOutcome` when handling refresh
-and release decisions.
+version the core cannot read. Use `LicenseRefreshOutcome` when handling refresh and
+release decisions.
 
 ## .NET
 
 The `NaviApps.SoftwareLicensing.Polar` package provides a Polar implementation of
 `ILicenseProvider` for .NET 10. See the [.NET package guide](bindings/dotnet/README.md)
-for building the package, selecting a supported runtime and connecting it to
-SoftwareLicensing.
+for installing the matched package pair and connecting it to SoftwareLicensing.
 
 ## Rust
 
@@ -49,7 +69,13 @@ the provider's [Cargo manifest](Cargo.toml), so both use the same Rust types.
 ```toml
 [dependencies]
 software-licensing-polar = { git = "https://github.com/naviapps/software-licensing-polar.git", rev = "<published-commit-sha>" }
+software-licensing = { git = "https://github.com/naviapps/software-licensing.git", rev = "<core-commit-used-by-polar>" }
+tokio = { version = "1", features = ["macros", "rt"] }
 ```
+
+For a first run, copy the [standalone Rust consumer](fixtures/consumers/rust/src/main.rs)
+from the selected revision to `src/main.rs` in a Cargo binary project and run
+`cargo run`. Keep the consumer's `Cargo.lock`.
 
 Construct a `PolarLicenseProvider` with a `PolarLicenseConfig` and an explicit
 `Environment::Sandbox` or `Environment::Production`. The configuration requires
@@ -61,9 +87,7 @@ storage namespaces.
 The async `activate`, `validate` and `deactivate` methods accept and return
 SoftwareLicensing's public types. `execute_with_cancellation` takes a typed
 `Intent` and returns mutation outcome evidence when cancelled. Dropping the future
-stops local work and discards that evidence. See
-[the Git consumer](fixtures/consumers/rust/src/main.rs) for a complete no-network
-example.
+stops local work and discards that evidence.
 
 ## Protocol and security contract
 

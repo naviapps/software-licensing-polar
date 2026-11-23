@@ -23,6 +23,7 @@ static async Task<LicenseFailure> Cancelled(Task task, LicenseMutationOutcome? o
 const string organization = "11111111-1111-4111-8111-111111111111";
 const string benefit = "22222222-2222-4222-8222-222222222222";
 const string activationId = "33333333-3333-4333-8333-333333333333";
+Check(!JsonSerializer.IsReflectionEnabledByDefault, "The tests require reflection-free JSON.");
 var config = new PolarLicenseConfiguration("Owned fixture", new(organization, [benefit]), PolarLicenseEnvironment.Sandbox);
 var request = new LicenseActivationRequest("synthetic-key-not-sent");
 Check(NativeFailure.Normalize(new TypeInitializationException("fixture", new DllNotFoundException("synthetic-private-diagnostic"))).Failure.Code == LicenseErrorCode.UnsupportedPlatform, "Native initialization failure must use a stable core SDK error.");
@@ -229,7 +230,7 @@ foreach (var outcome in new[] { LicenseMutationOutcome.NotApplied, LicenseMutati
     using var provider = new PolarLicenseProvider(config, metadata);
     var operation = provider.ActivateAsync(request, cancellation.Token);
     cancellation.Cancel();
-    var outcomeJson = JsonSerializer.Serialize(outcome, Wire.Json);
+    var outcomeJson = JsonSerializer.Serialize(outcome, Wire.Type<LicenseMutationOutcome>());
     metadata.Complete(metadata.LastOperation, 1, "{\"code\":\"cancelled\",\"statusCode\":429,\"retryAfterSeconds\":18446744073709551615,\"mutationOutcome\":" + outcomeJson + "}");
     var failure = await Cancelled(operation, outcome);
     Check(failure.StatusCode == 429 && failure.RetryAfterSeconds == ulong.MaxValue, "Native callback cancellation must retain the exact UInt64 retry delay and HTTP status.");
