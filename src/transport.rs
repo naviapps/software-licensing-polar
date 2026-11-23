@@ -14,6 +14,14 @@ use std::{
 };
 use tokio::time::{Instant, sleep_until, timeout_at};
 
+#[cfg(test)]
+#[derive(Default)]
+pub(crate) struct TestProgress {
+    pub(crate) attempts: std::sync::atomic::AtomicUsize,
+    pub(crate) body_wait: tokio::sync::Notify,
+    pub(crate) retry_wait: tokio::sync::Notify,
+}
+
 /// Reusable asynchronous provider with fixed HTTPS License API endpoints.
 ///
 /// This type owns no runtime and starts no per-operation tasks. Each execution
@@ -28,7 +36,7 @@ pub struct PolarLicenseProvider {
     #[cfg(test)]
     pub(crate) test_wall_time: Option<SystemTime>,
     #[cfg(test)]
-    pub(crate) retry_wait: Option<std::sync::Arc<tokio::sync::Notify>>,
+    pub(crate) test_progress: Option<std::sync::Arc<TestProgress>>,
 }
 
 impl PolarLicenseProvider {
@@ -47,7 +55,7 @@ impl PolarLicenseProvider {
             #[cfg(test)]
             test_wall_time: None,
             #[cfg(test)]
-            retry_wait: None,
+            test_progress: None,
         })
     }
 
@@ -186,8 +194,8 @@ impl PolarLicenseProvider {
                 return Err(rejection);
             }
             #[cfg(test)]
-            if let Some(observer) = &self.retry_wait {
-                observer.notify_one();
+            if let Some(progress) = &self.test_progress {
+                progress.retry_wait.notify_one();
             }
             tokio::select! {
                 biased;
@@ -214,6 +222,10 @@ impl PolarLicenseProvider {
         let entered = AtomicBool::new(false);
         let sending = async {
             entered.store(true, Ordering::Relaxed);
+            #[cfg(test)]
+            if let Some(progress) = &self.test_progress {
+                progress.attempts.fetch_add(1, Ordering::Relaxed);
+            }
             timeout_at(deadline, request.send())
                 .await
                 .map_err(|_| transport_failure())?
@@ -256,6 +268,10 @@ impl PolarLicenseProvider {
                 api_version,
             });
         }
+        #[cfg(test)]
+        if let Some(progress) = &self.test_progress {
+            progress.body_wait.notify_one();
+        }
         let body = tokio::select! {
             biased;
             _ = cancelled.as_mut() => Err(cancelled_failure(MutationOutcome::Unknown)),
@@ -291,7 +307,7 @@ impl PolarLicenseProvider {
             client,
             test_endpoint: Some(endpoint),
             test_wall_time: None,
-            retry_wait: None,
+            test_progress: None,
         })
     }
 }

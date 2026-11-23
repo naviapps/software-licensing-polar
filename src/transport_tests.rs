@@ -3,6 +3,7 @@ use crate::{
     API_VERSION, Intent, PolarLicenseConfig, PolarLicenseProvider,
     protocol::MAX_RESPONSE_BYTES,
     test_fixtures::{INSTANCE, ORGANIZATION, OTHER, activation, granted_response, intent},
+    transport::TestProgress,
 };
 use serde_json::{Value, json};
 use software_licensing::{
@@ -11,6 +12,8 @@ use software_licensing::{
 };
 use std::{
     collections::VecDeque,
+    future::Future,
+    pin::Pin,
     sync::{
         Arc,
         atomic::{AtomicUsize, Ordering},
@@ -20,16 +23,15 @@ use std::{
 use tokio::{
     io::{AsyncReadExt, AsyncWriteExt},
     net::{TcpListener, TcpStream},
-    sync::mpsc,
+    sync::{Notify, mpsc, oneshot},
     task::JoinHandle,
-    time::{Instant, sleep, timeout},
+    time::{Instant, advance, sleep, timeout},
 };
 
 struct Captured {
     request: String,
     body: String,
     at: Instant,
-    wall_time: SystemTime,
 }
 struct Response {
     bytes: Vec<u8>,
@@ -108,9 +110,13 @@ impl Fixture {
                 let response = responses
                     .pop_front()
                     .unwrap_or_else(|| Response::http(500, "", ""));
-                sleep(response.before_headers).await;
+                if !response.before_headers.is_zero() {
+                    sleep(response.before_headers).await;
+                }
                 let _ = stream.write_all(&response.bytes[..response.split]).await;
-                sleep(response.before_body).await;
+                if !response.before_body.is_zero() {
+                    sleep(response.before_body).await;
+                }
                 let _ = stream.write_all(&response.bytes[response.split..]).await;
                 let _ = stream.shutdown().await;
             }
@@ -125,6 +131,15 @@ impl Fixture {
     fn provider(&self, config: PolarLicenseConfig) -> PolarLicenseProvider {
         PolarLicenseProvider::for_test(config, self.endpoint.clone()).unwrap()
     }
+    fn observed_provider(
+        &self,
+        config: PolarLicenseConfig,
+    ) -> (PolarLicenseProvider, Arc<TestProgress>) {
+        let mut provider = self.provider(config);
+        let progress = Arc::new(TestProgress::default());
+        provider.test_progress = Some(progress.clone());
+        (provider, progress)
+    }
     fn provider_with_invalid_wall_time(&self) -> PolarLicenseProvider {
         let mut provider = self.provider(config());
         provider.test_wall_time = Some(UNIX_EPOCH + Duration::from_secs(253_402_300_800));
@@ -136,8 +151,13 @@ impl Fixture {
             .unwrap()
             .unwrap()
     }
-    async fn assert_attempts(&self, expected: usize) {
-        sleep(Duration::from_millis(220)).await;
+    async fn next_while<T>(&mut self, execution: Pin<&mut impl Future<Output = T>>) -> Captured {
+        tokio::select! {
+            _ = execution => panic!("operation completed before the next request"),
+            captured = self.next() => captured,
+        }
+    }
+    fn assert_attempts(&self, expected: usize) {
         assert_eq!(self.count.load(Ordering::SeqCst), expected);
         assert!(!self.task.is_finished(), "fixture failed");
     }
@@ -176,9 +196,48 @@ async fn read_request(stream: &mut TcpStream) -> Captured {
         request,
         body: String::from_utf8(body).unwrap(),
         at: Instant::now(),
-        wall_time: SystemTime::now(),
     }
 }
+
+async fn hold_virtual_time() -> std::sync::mpsc::Sender<()> {
+    // Pause won't stop Tokio from auto-advancing while loopback I/O is pending.
+    // A blocking task inhibits that until its sender drops. The wall-clock
+    // limit lets the fixture's virtual timeout fire if an expected event is lost.
+    let (stop, stopped) = std::sync::mpsc::channel();
+    let (start, started) = oneshot::channel();
+    tokio::task::spawn_blocking(move || {
+        let _ = start.send(());
+        let _ = stopped.recv_timeout(Duration::from_secs(10));
+    });
+    started.await.unwrap();
+    stop
+}
+
+async fn wait_for_phase<T>(execution: Pin<&mut impl Future<Output = T>>, phase: &Notify) {
+    tokio::select! {
+        _ = execution => panic!("operation completed before the expected transport phase"),
+        _ = phase.notified() => {},
+    }
+}
+
+async fn advance_retry<T>(
+    mut execution: Pin<&mut impl Future<Output = T>>,
+    progress: &TestProgress,
+    delay: Duration,
+    attempts: usize,
+) {
+    wait_for_phase(execution.as_mut(), &progress.retry_wait).await;
+    advance(delay - Duration::from_millis(1)).await;
+    tokio::select! {
+        biased;
+        _ = execution => panic!("operation completed before the retry delay"),
+        _ = tokio::task::yield_now() => {},
+    }
+    assert_eq!(progress.attempts.load(Ordering::Relaxed), attempts);
+    // Tokio's millisecond timer rounds the wake instant up.
+    advance(Duration::from_millis(2)).await;
+}
+
 fn config() -> PolarLicenseConfig {
     PolarLicenseConfig {
         base_retry_delay: 0.01,
@@ -196,8 +255,9 @@ fn failure<T>(result: Result<T, Failure>) -> Failure {
     }
 }
 
-#[tokio::test]
+#[tokio::test(start_paused = true)]
 async fn malformed_or_slow_rejection_bodies_retain_http_evidence() {
+    let _clock = hold_virtual_time().await;
     for operation in [
         Operation::Activate,
         Operation::Validate,
@@ -219,12 +279,14 @@ async fn malformed_or_slow_rejection_bodies_retain_http_evidence() {
                 let mut configuration = config();
                 configuration.request_timeout_seconds = 0.5;
                 configuration.operation_timeout_seconds = 1.0;
-                let error = failure(
-                    fixture
-                        .provider(configuration)
-                        .execute(intent(operation))
-                        .await,
-                );
+                let (provider, progress) = fixture.observed_provider(configuration);
+                let execution = provider.execute(intent(operation));
+                tokio::pin!(execution);
+                if body_case == 3 {
+                    wait_for_phase(execution.as_mut(), &progress.body_wait).await;
+                    advance(Duration::from_millis(501)).await;
+                }
+                let error = failure(execution.await);
                 assert_eq!(
                     error.status_code,
                     Some(status),
@@ -246,8 +308,9 @@ async fn malformed_or_slow_rejection_bodies_retain_http_evidence() {
     }
 }
 
-#[tokio::test]
+#[tokio::test(start_paused = true)]
 async fn cancelling_a_retry_wait_retains_the_confirmed_rejection() {
+    let _clock = hold_virtual_time().await;
     for (operation, status) in [
         (Operation::Activate, 429),
         (Operation::Validate, 429),
@@ -255,18 +318,13 @@ async fn cancelling_a_retry_wait_retains_the_confirmed_rejection() {
         (Operation::Validate, 503),
     ] {
         let fixture = Fixture::new(vec![Response::http(status, "Retry-After: 1\r\n", "")]).await;
-        let mut provider = fixture.provider(config());
-        let retry = Arc::new(tokio::sync::Notify::new());
-        provider.retry_wait = Some(retry.clone());
-        let (cancel, cancelled) = tokio::sync::oneshot::channel::<()>();
+        let (provider, progress) = fixture.observed_provider(config());
+        let (cancel, cancelled) = oneshot::channel::<()>();
         let execution = provider.execute_with_cancellation(intent(operation), async {
             let _ = cancelled.await;
         });
         tokio::pin!(execution);
-        tokio::select! {
-            _ = &mut execution => panic!("completed before retry wait"),
-            _ = retry.notified() => {},
-        }
+        wait_for_phase(execution.as_mut(), &progress.retry_wait).await;
         cancel.send(()).unwrap();
         let error = failure(execution.await);
         assert_eq!(
@@ -287,8 +345,9 @@ async fn cancelling_a_retry_wait_retains_the_confirmed_rejection() {
                 Some(software_licensing::MutationOutcome::NotApplied)
             }
         );
-        sleep(Duration::from_millis(1050)).await;
-        assert_eq!(fixture.count.load(Ordering::SeqCst), 1);
+        advance(Duration::from_secs(2)).await;
+        assert_eq!(progress.attempts.load(Ordering::Relaxed), 1);
+        fixture.assert_attempts(1);
     }
 }
 
@@ -339,7 +398,7 @@ async fn cancellation_before_send_is_not_applied_but_an_unconfirmed_send_is_unkn
                 Some(software_licensing::MutationOutcome::Unknown)
             }
         );
-        fixture.assert_attempts(1).await;
+        fixture.assert_attempts(1);
     }
 }
 
@@ -500,7 +559,7 @@ async fn missing_or_invalid_expiration_fails_without_replaying_successful_reques
                 (operation == Operation::Activate)
                     .then_some(software_licensing::MutationOutcome::Unknown)
             );
-            fixture.assert_attempts(1).await;
+            fixture.assert_attempts(1);
         }
     }
 }
@@ -531,7 +590,7 @@ async fn validation_retries_5xx_but_mutations_never_do() {
                     ..Failure::new(ErrorCode::ServerFailure)
                 }
             );
-            fixture.assert_attempts(1).await;
+            fixture.assert_attempts(1);
         }
     }
 }
@@ -586,7 +645,7 @@ async fn rate_limits_retry_all_operations_without_cookies_and_stop_at_attempt_bo
             mutation_outcome: Some(software_licensing::MutationOutcome::NotApplied),
         }
     );
-    fixture.assert_attempts(3).await;
+    fixture.assert_attempts(3);
 }
 
 #[tokio::test]
@@ -691,7 +750,7 @@ async fn invalid_wall_time_preserves_uncertain_activation_after_reopen() {
             .code,
         ErrorCode::ActivationPending
     );
-    fixture.assert_attempts(1).await;
+    fixture.assert_attempts(1);
 }
 
 #[tokio::test]
@@ -739,7 +798,7 @@ async fn invalid_wall_time_only_blocks_clock_dependent_decisions() {
         }
     );
     provider.activate("TEST-KEY").await.unwrap();
-    fixture.assert_attempts(8).await;
+    fixture.assert_attempts(8);
 }
 
 #[tokio::test]
@@ -864,7 +923,7 @@ async fn durable_release_distinguishes_interruption_from_a_polar_retry_deadline(
                 INSTANCE
             );
         }
-        fixture.assert_attempts(1 + usize::from(rate_limited)).await;
+        fixture.assert_attempts(1 + usize::from(rate_limited));
     }
 }
 
@@ -892,40 +951,40 @@ async fn finish_polar_release(
         .unwrap()
 }
 
-#[tokio::test]
+#[tokio::test(start_paused = true)]
 async fn retry_after_seconds_and_http_date_are_respected() {
-    for http_date in [false, true] {
-        // Generate this case's deadline after the previous case finishes. HTTP
-        // dates have whole-second precision and use wall time, not elapsed time.
-        let header = if http_date {
-            httpdate::fmt_http_date(SystemTime::now() + Duration::from_secs(2))
-        } else {
-            "1".to_owned()
-        };
-        let deadline = http_date.then(|| httpdate::parse_http_date(&header).unwrap());
+    let _clock = hold_virtual_time().await;
+    let wall_time = UNIX_EPOCH + Duration::from_secs(1_700_000_000);
+    for (header, delay) in [
+        ("1".to_owned(), Duration::from_secs(1)),
+        (
+            httpdate::fmt_http_date(wall_time + Duration::from_secs(2)),
+            Duration::from_secs(2),
+        ),
+    ] {
         let mut fixture = Fixture::new(vec![
             Response::http(429, &format!("Retry-After: {header}\r\n"), ""),
             Response::success(),
         ])
         .await;
-        fixture
-            .provider(config())
-            .activate("TEST-KEY")
-            .await
-            .unwrap();
+        let (mut provider, progress) = fixture.observed_provider(config());
+        provider.test_wall_time = Some(wall_time);
+        let execution = provider.activate("TEST-KEY");
+        tokio::pin!(execution);
+        advance_retry(execution.as_mut(), &progress, delay, 1).await;
+        execution.await.unwrap();
         let first = fixture.next().await;
         let second = fixture.next().await;
-        let tolerance = Duration::from_millis(40);
-        if let Some(deadline) = deadline {
-            assert!(second.wall_time + tolerance >= deadline);
-        } else {
-            assert!(second.at.duration_since(first.at) + tolerance >= Duration::from_secs(1));
-        }
+        assert_eq!(
+            second.at.duration_since(first.at),
+            delay + Duration::from_millis(1)
+        );
     }
 }
 
-#[tokio::test]
+#[tokio::test(start_paused = true)]
 async fn over_limit_retry_after_is_not_shortened_and_invalid_header_uses_backoff() {
+    let _clock = hold_virtual_time().await;
     for header in [
         "3",
         "99999999999999999999999999999999999999999999999999999999999999999999999999999999999999",
@@ -946,7 +1005,7 @@ async fn over_limit_retry_after_is_not_shortened_and_invalid_header_uses_backoff
             error.mutation_outcome,
             Some(software_licensing::MutationOutcome::NotApplied)
         );
-        fixture.assert_attempts(1).await;
+        fixture.assert_attempts(1);
     }
     let mut configuration = config();
     configuration.base_retry_delay = 0.03;
@@ -956,19 +1015,23 @@ async fn over_limit_retry_after_is_not_shortened_and_invalid_header_uses_backoff
         Response::success_for(Operation::Validate),
     ])
     .await;
-    assert!(
-        fixture
-            .provider(configuration)
-            .validate(activation())
-            .await
-            .unwrap()
-            .is_valid
-    );
+    let (provider, progress) = fixture.observed_provider(configuration);
+    let execution = provider.validate(activation());
+    tokio::pin!(execution);
+    advance_retry(execution.as_mut(), &progress, Duration::from_millis(30), 1).await;
+    advance_retry(execution.as_mut(), &progress, Duration::from_millis(60), 2).await;
+    assert!(execution.await.unwrap().is_valid);
     let first = fixture.next().await;
     let second = fixture.next().await;
     let third = fixture.next().await;
-    assert!(second.at.duration_since(first.at) >= Duration::from_millis(28));
-    assert!(third.at.duration_since(second.at) >= Duration::from_millis(58));
+    assert_eq!(
+        second.at.duration_since(first.at),
+        Duration::from_millis(31)
+    );
+    assert_eq!(
+        third.at.duration_since(second.at),
+        Duration::from_millis(61)
+    );
 }
 
 #[tokio::test]
@@ -986,8 +1049,9 @@ async fn past_http_date_allows_immediate_retry() {
     assert_eq!(fixture.count.load(Ordering::SeqCst), 2);
 }
 
-#[tokio::test]
+#[tokio::test(start_paused = true)]
 async fn header_body_timeouts_and_transport_errors_are_never_replayed() {
+    let _clock = hold_virtual_time().await;
     for operation in [
         Operation::Activate,
         Operation::Validate,
@@ -1002,16 +1066,25 @@ async fn header_body_timeouts_and_transport_errors_are_never_replayed() {
                     .to_vec(),
             ),
         ] {
-            let fixture = Fixture::new(vec![response]).await;
+            let delayed_headers = !response.before_headers.is_zero();
+            let delayed_body = !response.before_body.is_zero();
+            let mut fixture = Fixture::new(vec![response]).await;
             let mut configuration = config();
             configuration.request_timeout_seconds = 0.04;
             configuration.operation_timeout_seconds = 0.1;
-            let error = failure(
-                fixture
-                    .provider(configuration)
-                    .execute(intent(operation))
-                    .await,
-            );
+            let (provider, progress) = fixture.observed_provider(configuration);
+            let execution = provider.execute(intent(operation));
+            tokio::pin!(execution);
+            if delayed_headers {
+                fixture.next_while(execution.as_mut()).await;
+            }
+            if delayed_body {
+                wait_for_phase(execution.as_mut(), &progress.body_wait).await;
+            }
+            if delayed_headers || delayed_body {
+                advance(Duration::from_millis(41)).await;
+            }
+            let error = failure(execution.await);
             assert_eq!(error.code, ErrorCode::TransportFailure);
             assert!(
                 !format!(
@@ -1020,50 +1093,54 @@ async fn header_body_timeouts_and_transport_errors_are_never_replayed() {
                 )
                 .contains("TEST-KEY")
             );
-            fixture.assert_attempts(1).await;
+            fixture.assert_attempts(1);
         }
     }
 }
 
-#[tokio::test]
+#[tokio::test(start_paused = true)]
 async fn total_deadline_includes_retry_sleep_and_body_across_attempts() {
-    for before_headers in [Duration::ZERO, Duration::from_millis(300)] {
+    let _clock = hold_virtual_time().await;
+    for late in [false, true] {
         let mut unavailable = Response::http(503, "", "");
-        unavailable.before_headers = before_headers;
+        if late {
+            unavailable.before_headers = Duration::from_millis(300);
+        }
         let mut body = Response::success_for(Operation::Validate);
         body.before_body = Duration::from_secs(1);
-        let fixture = Fixture::new(vec![unavailable, body]).await;
+        let mut fixture = Fixture::new(vec![unavailable, body]).await;
         let mut configuration = config();
         configuration.request_timeout_seconds = 0.5;
         configuration.operation_timeout_seconds = 0.5;
         configuration.base_retry_delay = 0.3;
-        let provider = fixture.provider(configuration);
+        let (provider, progress) = fixture.observed_provider(configuration);
         let start = Instant::now();
-        let error = failure(provider.validate(activation()).await);
-        let attempts = fixture.count.load(Ordering::SeqCst);
-        // A server-side request count cannot prove that the client received
-        // its response before timeout. Both failures are valid with one request.
-        assert!(matches!(
-            error.code,
-            ErrorCode::ServerFailure | ErrorCode::TransportFailure
-        ));
-        if attempts == 2 {
-            assert_eq!(error.code, ErrorCode::TransportFailure);
-        }
-        // Exclude client construction and leave a scheduling margin on shared
-        // runners. Restarting the timeout after retry sleep would take 800 ms;
-        // waiting for the complete response body would take still longer.
-        assert!(start.elapsed() < Duration::from_millis(700));
-        // A slow first response or scheduler delay can leave too little total
-        // budget for the retry. Both one and two requests are valid; a retry
-        // must never be required merely to satisfy this deadline assertion.
-        if before_headers.is_zero() {
-            assert!((1..=2).contains(&attempts));
+        let execution = provider.validate(activation());
+        tokio::pin!(execution);
+        assert_eq!(fixture.next_while(execution.as_mut()).await.at, start);
+        if late {
+            // 300 ms before the first response plus 300 ms of backoff
+            // cannot fit the original 500 ms operation window.
+            advance(Duration::from_millis(301)).await;
+            let error = failure(execution.await);
+            assert_eq!(error.code, ErrorCode::ServerFailure);
+            assert_eq!(error.status_code, Some(503));
+            assert_eq!(start.elapsed(), Duration::from_millis(301));
+            fixture.assert_attempts(1);
         } else {
-            // 300 ms headers + 300 ms retry delay cannot fit a 500 ms operation.
-            assert_eq!(attempts, 1);
+            advance_retry(execution.as_mut(), &progress, Duration::from_millis(300), 1).await;
+            assert_eq!(
+                fixture.next_while(execution.as_mut()).await.at - start,
+                Duration::from_millis(301)
+            );
+            wait_for_phase(execution.as_mut(), &progress.body_wait).await;
+            // The second response body is still pending when the original
+            // deadline elapses. Its request cannot get a fresh 500 ms budget.
+            advance(Duration::from_millis(200)).await;
+            assert_eq!(failure(execution.await).code, ErrorCode::TransportFailure);
+            assert_eq!(start.elapsed(), Duration::from_millis(501));
+            fixture.assert_attempts(2);
         }
-        fixture.assert_attempts(attempts).await;
     }
 
     let fixture = Fixture::new(vec![Response::http(429, "Retry-After: 1\r\n", "")]).await;
@@ -1077,7 +1154,7 @@ async fn total_deadline_includes_retry_sleep_and_body_across_attempts() {
         rejected.mutation_outcome,
         Some(software_licensing::MutationOutcome::NotApplied)
     );
-    fixture.assert_attempts(1).await;
+    fixture.assert_attempts(1);
 }
 
 #[tokio::test]
@@ -1098,34 +1175,43 @@ async fn connection_refusal_is_not_applied_but_lost_response_is_unknown() {
         lost.mutation_outcome,
         Some(software_licensing::MutationOutcome::Unknown)
     );
-    fixture.assert_attempts(1).await;
+    fixture.assert_attempts(1);
 }
 
-#[tokio::test]
+#[tokio::test(start_paused = true)]
 async fn dropping_future_during_headers_body_or_retry_sleep_has_no_late_attempt() {
-    for response in [
-        Response::success().delayed_headers(),
-        Response::success().delayed_body(),
-        Response::http(429, "Retry-After: 1\r\n", ""),
-    ] {
+    let _clock = hold_virtual_time().await;
+    enum WaitingFor {
+        Headers,
+        Body,
+        Retry,
+    }
+    for phase in [WaitingFor::Headers, WaitingFor::Body, WaitingFor::Retry] {
+        let response = match phase {
+            WaitingFor::Headers => Response::success().delayed_headers(),
+            WaitingFor::Body => Response::success().delayed_body(),
+            WaitingFor::Retry => Response::http(429, "Retry-After: 1\r\n", ""),
+        };
         let mut fixture = Fixture::new(vec![response]).await;
-        let provider = fixture.provider(config());
+        let (provider, progress) = fixture.observed_provider(config());
         {
             let execution = provider.activate("TEST-KEY");
             tokio::pin!(execution);
-            tokio::select! {
-                _ = &mut execution => panic!("operation completed before cancellation"),
-                _ = fixture.next() => {}
-            }
-            // Poll while the server sends headers/body or starts the retry wait.
-            tokio::select! {
-                _ = &mut execution => panic!("operation completed before cancellation"),
-                _ = sleep(Duration::from_millis(20)) => {}
+            match phase {
+                WaitingFor::Headers => {
+                    fixture.next_while(execution.as_mut()).await;
+                }
+                WaitingFor::Body => {
+                    wait_for_phase(execution.as_mut(), &progress.body_wait).await;
+                }
+                WaitingFor::Retry => {
+                    wait_for_phase(execution.as_mut(), &progress.retry_wait).await;
+                }
             }
         }
-        fixture.assert_attempts(1).await;
-        sleep(Duration::from_millis(850)).await;
-        assert_eq!(fixture.count.load(Ordering::SeqCst), 1);
+        advance(Duration::from_secs(2)).await;
+        assert_eq!(progress.attempts.load(Ordering::Relaxed), 1);
+        fixture.assert_attempts(1);
     }
 }
 
@@ -1261,7 +1347,7 @@ async fn unconfirmed_api_version_never_accepts_success_or_revokes_a_license() {
                 (operation != Operation::Validate)
                     .then_some(software_licensing::MutationOutcome::Unknown)
             );
-            fixture.assert_attempts(1).await;
+            fixture.assert_attempts(1);
         }
         let body = r#"{"error":"ResourceNotFound","detail":"TEST-KEY"}"#;
         let bytes=format!("HTTP/1.1 404 Not Found\r\nContent-Length: {}\r\n{version}Connection: close\r\n\r\n{body}",body.len()).into_bytes();
@@ -1296,7 +1382,7 @@ async fn unconfirmed_client_errors_do_not_authorize_mutation_replays() {
                 let result = fixture.provider(config()).execute(intent(operation)).await;
                 if operation == Operation::Validate && status == 429 {
                     assert!(matches!(result, Ok(ProviderReply::Validated { .. })));
-                    fixture.assert_attempts(2).await;
+                    fixture.assert_attempts(2);
                     continue;
                 }
                 assert_eq!(
@@ -1310,7 +1396,7 @@ async fn unconfirmed_client_errors_do_not_authorize_mutation_replays() {
                     },
                     "{operation:?}/{status}/{version:?}"
                 );
-                fixture.assert_attempts(1).await;
+                fixture.assert_attempts(1);
             }
         }
     }
@@ -1335,7 +1421,7 @@ async fn typed_rejections_require_api_version_and_never_report_deactivation_succ
                     .then_some(software_licensing::MutationOutcome::NotApplied)
             );
             assert!(!serde_json::to_string(&error).unwrap().contains("TEST-KEY"));
-            fixture.assert_attempts(1).await;
+            fixture.assert_attempts(1);
         }
     }
 }
@@ -1395,7 +1481,7 @@ async fn saved_activation_wire_rejections_precede_transport() {
             );
         }
     }
-    fixture.assert_attempts(0).await;
+    fixture.assert_attempts(0);
 
     provider.validate(activation()).await.unwrap();
     assert!(
@@ -1413,7 +1499,7 @@ async fn saved_activation_wire_rejections_precede_transport() {
             .request
             .starts_with("POST /v1/customer-portal/license-keys/deactivate ")
     );
-    fixture.assert_attempts(2).await;
+    fixture.assert_attempts(2);
 }
 
 #[tokio::test]
@@ -1443,5 +1529,5 @@ async fn unusable_wire_keys_are_rejected_before_any_transport() {
             "{description}"
         );
     }
-    fixture.assert_attempts(0).await;
+    fixture.assert_attempts(0);
 }

@@ -26,6 +26,12 @@ for each environment. See the
 [standalone Swift consumer](fixtures/consumers/swift/Sources/PolarConsumer/Consumer.swift)
 for a complete example.
 
+Create the core manager with `try LicenseManager(...)`. Keep the core bindings and
+native artifacts at matching revisions. `LicenseError.Code.incompatibleABIVersion`
+identifies a native ABI mismatch. `unsupportedVersion` identifies a saved-record
+version the core cannot read. Use `LicenseRefreshOutcome` when handling refresh
+and release decisions.
+
 ## .NET
 
 The `NaviApps.SoftwareLicensing.Polar` package provides a Polar implementation of

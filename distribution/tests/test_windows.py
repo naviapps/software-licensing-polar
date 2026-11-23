@@ -1,6 +1,5 @@
 """Portable tests for the Windows x64 Polar and pinned-core acceptance driver."""
 
-import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -68,7 +67,9 @@ class WindowsTests(unittest.TestCase):
             built.mkdir()
             dll = built / (native.library + ".dll")
             dll.write_bytes(b"changed DLL")
-            shared, artifacts = MagicMock(), MagicMock()
+            library = dll.with_suffix(".dll.lib")
+            library.write_bytes(b"import library")
+            shared, artifacts = MagicMock(), load("artifacts")
             shared.MSVC_TARGETS = TARGETS
             shared.build_library.return_value = built
             shared.verify_artifact.return_value = (
@@ -79,13 +80,15 @@ class WindowsTests(unittest.TestCase):
                         "host": TARGETS["arm64"],
                         "target": windows.TARGET,
                     },
-                    "outputs": {dll.name: "a" * 64},
+                    "outputs": {
+                        dll.name: "a" * 64,
+                        library.name: artifacts.file_sha256(library),
+                    },
                 },
             )
-            artifacts.stage_native.side_effect = lambda source, destination: source
             with (
                 patch.object(windows, "verify_notices"),
-                self.assertRaisesRegex(ValueError, "DLL differs from its native build receipt"),
+                self.assertRaisesRegex(ValueError, "differs from its verified receipt"),
             ):
                 windows.stage_library(
                     native,
@@ -192,7 +195,7 @@ class WindowsTests(unittest.TestCase):
                 patch.object(windows, "stage_core", return_value=revision),
                 patch.object(windows, "verify_inherited_notices"),
                 patch.object(windows, "stage_library", side_effect=stage),
-                patch.object(windows, "retain_evidence") as retain,
+                patch.object(windows, "publish_versioned_x64") as retain,
                 patch.object(windows.bindings, "run") as run,
                 patch.object(
                     windows.bindings, "pack_and_consume", return_value={"packages": "sentinel"}
@@ -224,7 +227,8 @@ class WindowsTests(unittest.TestCase):
             shared.native_environment.assert_called_once_with(host, {}, target_architecture="x64")
             shared.require_rust_target_stdlib.assert_called_once_with("rust-stdlib", windows.TARGET)
             targets = [entry.args for entry in run.call_args_list if "--target" in entry.args]
-            self.assertEqual(len(targets), 4)
+            self.assertEqual(len(targets), 6)
+            self.assertEqual(targets[:2], [windows.locked_fetch_args()] * 2)
             self.assertTrue(
                 all(entry[entry.index("--target") + 1] == windows.TARGET for entry in targets)
             )
@@ -252,7 +256,7 @@ class WindowsTests(unittest.TestCase):
             self.assertEqual(Path(properties["PolarNativeLibrary"]), pair[2])
             self.assertEqual(Path(properties["SoftwareLicensingNativeLibrary"]), pair[3])
             receipt = retain.call_args.args[1]
-            self.assertEqual(retain.call_args.kwargs["artifacts"], artifacts_dir)
+            self.assertEqual(retain.call_args.kwargs["artifact_root"], artifacts_dir)
             self.assertEqual(receipt["source"], source[0])
             self.assertEqual(receipt["coreRevision"], revision)
             self.assertEqual(receipt["toolInputs"], tool_inputs)
@@ -261,32 +265,6 @@ class WindowsTests(unittest.TestCase):
                 receipt["execution"], "x64-emulated-on-arm64" if host == "arm64" else "x64-native"
             )
             self.assertEqual(receipt["toolchain"]["host"], compiler_host)
-
-    def test_retains_two_archives_and_receipt_without_overwriting_unrelated_files(self):
-        artifacts = load("artifacts")
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            packages = root / "packages"
-            packages.mkdir()
-            for name in ("core.nupkg", "polar.nupkg"):
-                (packages / name).write_text(name)
-            receipt = {"packages": {path.name: windows.digest(path) for path in packages.iterdir()}}
-            local, external = root / "local", root / "external"
-            local.mkdir()
-            output = dict(version="0.1.0", output=local, artifacts=external, tooling=artifacts)
-            windows.retain_evidence(packages, receipt, **output)
-            for path in (local, external):
-                retained = path / "win-x64/0.1.0"
-                self.assertEqual(json.loads((retained / windows.RECEIPT).read_text()), receipt)
-                self.assertEqual(
-                    {p.name: windows.digest(p) for p in retained.glob("*.nupkg")},
-                    receipt["packages"],
-                )
-            unrelated = external / "win-x64/0.1.0/keep.txt"
-            unrelated.write_text("user file")
-            with self.assertRaisesRegex(ValueError, "outside the SDK package pair"):
-                windows.retain_evidence(packages, receipt, **output)
-            self.assertEqual(unrelated.read_text(), "user file")
 
 
 if __name__ == "__main__":

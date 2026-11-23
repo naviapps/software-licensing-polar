@@ -2,27 +2,29 @@
 """Build and accept the Windows x64 Polar and pinned core SDKs."""
 
 import argparse
-import hashlib
 import io
-import json
 import os
-import shutil
 import subprocess
 import tarfile
 import tempfile
 import tomllib
-from contextlib import ExitStack
 from pathlib import Path
 
 from sdk_tooling.adapters import load, support_inputs
+from sdk_tooling.artifacts import file_sha256 as digest
 from sdk_tooling.dotnet import pinned_sdk_version
 from sdk_tooling.native_plan import ffi_product
+from sdk_tooling.windows_delivery import (
+    RID,
+    TARGET,
+    locked_fetch_args,
+    publish_versioned_x64,
+    stage_verified_library,
+)
 
 from distribution import verify_bindings as bindings
 
 ROOT = Path(__file__).resolve().parents[1]
-TARGET = "x86_64-pc-windows-msvc"
-RID = "win-x64"
 RECEIPT = "software-licensing-polar-windows.json"
 CORE_WITHOUT_ABI_MACRO = "b69902197a294598901aa3c595f8cfb3b11c7404"
 
@@ -41,10 +43,6 @@ def core_product(root, revision):
         return ffi_product(root, factory=product)
     # Older pinned core revisions bind their receipts to the historical Python recipe.
     return product(root, symbol_prefix="software_licensing_", specification="tools/native.py")
-
-
-def digest(path):
-    return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 def acceptance_source(env):
@@ -162,15 +160,7 @@ def stage_library(native, *, windows, artifacts, cargo, env, tools, output, host
         }:
             raise ValueError("Windows x64 artifact differs from the selected native host build")
         verify_notices(cargo, native, env)
-        dll = native.library + ".dll"
-        library = artifacts.stage_native(built / dll, output / dll)
-        library_import = artifacts.stage_native(built / (dll + ".lib"), output / (dll + ".lib"))
-        if digest(library) != receipt["outputs"][dll]:
-            raise ValueError("Staged Windows x64 DLL differs from its native build receipt")
-        if digest(library_import) != receipt["outputs"][dll + ".lib"]:
-            raise ValueError(
-                "Staged Windows x64 import library differs from its native build receipt"
-            )
+        library, library_import = stage_verified_library(native, built, output, receipt, artifacts)
         native_receipt = digest(built / "native-build.json")
     exports = windows.verify_library(
         library, native.headers, native.symbol_prefix, tools, env, "x64"
@@ -182,97 +172,10 @@ def stage_library(native, *, windows, artifacts, cargo, env, tools, output, host
         library_import,
         {
             "exports": sorted(exports),
-            "sha256": digest(library),
+            "sha256": receipt["outputs"][library.name],
             "receiptSha256": native_receipt,
         },
     )
-
-
-def retain_evidence(package_directory, receipt, *, version, output, artifacts, tooling):
-    relative = Path(RID) / version
-    local = output / relative
-    external = artifacts / relative if artifacts is not None else local
-    destinations = [local]
-    if local.resolve() != external.resolve():
-        if local.resolve().is_relative_to(external.resolve()) or external.resolve().is_relative_to(
-            local.resolve()
-        ):
-            raise ValueError("Local and external Windows x64 evidence paths must be disjoint")
-        destinations.append(external)
-    names = receipt["packages"].keys() | {RECEIPT}
-
-    def check_destination(path):
-        if (
-            path.parent.is_symlink()
-            or path.parent.is_junction()
-            or path.is_symlink()
-            or path.is_junction()
-            or (
-                path.exists()
-                and (
-                    not path.is_dir()
-                    or any(
-                        entry.name not in names or not entry.is_file() or entry.is_symlink()
-                        for entry in path.iterdir()
-                    )
-                )
-            )
-        ):
-            raise ValueError("Windows x64 evidence contains files outside the SDK package pair")
-
-    def verify(path):
-        if (
-            {entry.name for entry in path.iterdir()} != names
-            or json.loads((path / RECEIPT).read_bytes()) != receipt
-            or any(
-                digest(path / name) != expected for name, expected in receipt["packages"].items()
-            )
-        ):
-            raise ValueError("Windows x64 evidence differs from the accepted SDK package pair")
-
-    with tooling.build_lock(output), ExitStack() as temporary:
-        stages = []
-        for destination in destinations:
-            check_destination(destination)
-            destination.parent.mkdir(parents=True, exist_ok=True)
-            scratch = temporary.enter_context(
-                tempfile.TemporaryDirectory(dir=destination.parent, prefix="polar-evidence-")
-            )
-            stage = Path(scratch) / version
-            stage.mkdir()
-            for name in receipt["packages"]:
-                shutil.copyfile(package_directory / name, stage / name)
-            tooling.write_json(stage / RECEIPT, receipt)
-            verify(stage)
-            stages.append(stage)
-
-        cleanup_failure = None
-
-        def verify_local():
-            nonlocal cleanup_failure
-            verify(local)
-            if len(stages) == 1:
-                return
-            check_destination(external)
-            external_verified = False
-
-            def verify_external():
-                nonlocal external_verified
-                verify(external)
-                external_verified = True
-
-            try:
-                tooling.publish(stages[1], external, verify_external)
-            except BaseException as error:
-                if not external_verified:
-                    raise
-                verify(external)
-                cleanup_failure = error
-
-        check_destination(local)
-        tooling.publish(stages[0], local, verify_local)
-        if cleanup_failure is not None:
-            raise cleanup_failure
 
 
 def main(argv=None):
@@ -320,9 +223,9 @@ def main(argv=None):
     with tempfile.TemporaryDirectory(dir=output, prefix="polar-x64-") as directory:
         candidate = Path(directory)
         core = candidate / "core"
-        bindings.run("cargo", "fetch", "--locked", cwd=ROOT, env=env)
+        bindings.run(*locked_fetch_args(), cwd=ROOT, env=env)
         revision = stage_core(env, core)
-        bindings.run("cargo", "fetch", "--locked", cwd=core, env=env)
+        bindings.run(*locked_fetch_args(), cwd=core, env=env)
         verify_inherited_notices(core)
         remaps = [
             (ROOT, "/software-licensing-polar"),
@@ -438,12 +341,13 @@ def main(argv=None):
             ],
             "notRun": not_run,
         }
-        retain_evidence(
+        publish_versioned_x64(
             candidate / "packages",
             receipt,
             version=vendor_native.version,
-            output=output,
-            artifacts=artifact_root,
+            receipt_name=RECEIPT,
+            output_dir=output,
+            artifact_root=artifact_root,
             tooling=artifacts,
         )
     print(f"Windows x64 Polar and SoftwareLicensing acceptance passed on Windows {host}.")
