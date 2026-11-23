@@ -2,14 +2,14 @@ SDK_TOOLING ?= mise run sdk-tooling --
 SWIFT_FLAGS := -Xswiftc -strict-concurrency=complete -Xswiftc -warnings-as-errors
 
 .DEFAULT_GOAL := check
-.PHONY: check check-source test-managed check-distribution native native-verify lint test test-rust test-fixtures test-c test-dotnet test-consumer test-installed-consumers format
+.PHONY: check check-source test-managed check-distribution native native-verify lint test test-rust test-distribution-tools test-c test-dotnet test-consumer test-installed-consumers format
 
 check: check-source test test-consumer
 
 check-source: lint test-rust test-managed
 
-check-distribution: native-verify test-fixtures test-c test-dotnet
-	python3 -B -m fixtures.distribution.bindings --verify-swift-pin
+check-distribution: native-verify test-distribution-tools test-c test-dotnet
+	python3 -B -m distribution.verify_bindings --verify-swift-pin
 
 native:
 	$(SDK_TOOLING) native
@@ -37,14 +37,14 @@ test-rust:
 	cargo test --workspace --locked --offline
 
 test-c:
-	$(SDK_TOOLING) python -m fixtures.distribution.bindings --c-only
+	$(SDK_TOOLING) python -m distribution.verify_bindings --c-only
 
 test-dotnet:
-	$(SDK_TOOLING) python -m fixtures.distribution.bindings --dotnet-only
+	$(SDK_TOOLING) python -m distribution.verify_bindings --dotnet-only
 
-test-fixtures:
-	$(SDK_TOOLING) python -m unittest discover -s fixtures/distribution/tests -v
+test-distribution-tools:
+	$(SDK_TOOLING) python -m unittest discover -s distribution/tests -v
 
 test-managed:
-	python3 -B -m fixtures.distribution.bindings --prepare-dotnet
+	python3 -B -m distribution.verify_bindings --prepare-dotnet
 	dotnet run --configuration Release --project bindings/dotnet/tests/SoftwareLicensing.Polar.Tests/SoftwareLicensing.Polar.Tests.csproj

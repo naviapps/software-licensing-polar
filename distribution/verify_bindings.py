@@ -16,7 +16,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from xml.sax.saxutils import escape
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[1]
 VENDOR_PACKAGE = "NaviApps.SoftwareLicensing.Polar"
 CORE_PACKAGE = "NaviApps.SoftwareLicensing"
 CORE_URL = "https://github.com/naviapps/software-licensing.git"
@@ -45,7 +45,7 @@ def locked_core_revision():
 def verify_swift_core_pin(env):
     revision = locked_core_revision()
     env = {key: value for key, value in env.items() if key != "SOFTWARE_LICENSING_PACKAGE_PATH"}
-    for package in (ROOT, ROOT / "fixtures/swift-consumer"):
+    for package in (ROOT, ROOT / "fixtures/consumers/swift"):
         with TemporaryDirectory(prefix="polar-swift-pin-") as scratch:
             manifest = json.loads(
                 subprocess.check_output(
@@ -123,16 +123,15 @@ def framework_binary(root, module):
     )
 
 
-def pack_and_consume(dotnet, core, vendor_library, core_library, rid, env, output, *, tooling):
+def pack_and_consume(dotnet, core, vendor_library, core_library, rid, env, output, *, load_tools):
     """Pack resolved core without modifying its source checkout or runtime staging folder."""
     suffix = ".dll" if rid.startswith("win-") else ".dylib"
     prefix = "" if rid.startswith("win-") else "lib"
     vendor_name = prefix + "software_licensing_polar" + suffix
     core_name = prefix + "software_licensing" + suffix
-    staged_vendor = tooling.stage_native(
-        vendor_library, output / "vendor-native" / rid / vendor_name
-    )
-    staged_core = tooling.stage_native(core_library, output / "core-native" / rid / core_name)
+    stage_native = load_tools("artifacts").stage_native
+    staged_vendor = stage_native(vendor_library, output / "vendor-native" / rid / vendor_name)
+    staged_core = stage_native(core_library, output / "core-native" / rid / core_name)
     packages = output / "packages"
     packages.mkdir(parents=True, exist_ok=True)
     core_project = core / "bindings/dotnet/src" / CORE_PACKAGE / (CORE_PACKAGE + ".csproj")
@@ -153,7 +152,8 @@ def pack_and_consume(dotnet, core, vendor_library, core_library, rid, env, outpu
 </ItemGroup></Project>""",
         encoding="utf-8",
     )
-    tooling.pack_project(
+    pack_project = load_tools("dotnet").pack_project
+    pack_project(
         dotnet,
         core_project,
         output=packages,
@@ -167,7 +167,7 @@ def pack_and_consume(dotnet, core, vendor_library, core_library, rid, env, outpu
             "IncludeSourceRevisionInInformationalVersion": "false",
         },
     )
-    tooling.pack_project(
+    pack_project(
         dotnet,
         ROOT / "bindings/dotnet/src" / VENDOR_PACKAGE / (VENDOR_PACKAGE + ".csproj"),
         output=packages,
@@ -192,6 +192,7 @@ def pack_and_consume(dotnet, core, vendor_library, core_library, rid, env, outpu
         packages / (name + "." + versions[name] + ".nupkg")
         for name in (CORE_PACKAGE, VENDOR_PACKAGE)
     ]
+    nuget = load_tools("nuget")
     hashes = {}
     for package, source_root, filename, staged in (
         (built[0], core, core_name, staged_core),
@@ -206,17 +207,17 @@ def pack_and_consume(dotnet, core, vendor_library, core_library, rid, env, outpu
         license_file = source_root / "LICENSE"
         if source_root == ROOT or license_file.is_file():
             retained["LICENSE"] = license_file
-        hashes[package.name] = tooling.audit_package(
+        hashes[package.name] = nuget.audit_package(
             package,
             expected_files=retained,
             runtime_files={"runtimes/" + rid + "/native/" + filename: staged},
             forbidden_nuspec_elements=("repository",),
         )
-    tooling.run_isolated_consumer(
+    nuget.run_isolated_consumer(
         dotnet,
         packages=built,
         references={VENDOR_PACKAGE: versions[VENDOR_PACKAGE]},
-        source=(ROOT / "fixtures/dotnet-consumer/Program.cs").read_text(encoding="utf-8"),
+        source=(ROOT / "fixtures/consumers/dotnet/Program.cs").read_text(encoding="utf-8"),
         work_parent=output,
         env=env,
         runtime=rid,
@@ -257,7 +258,6 @@ def main():
         raise SystemExit("Run the Windows distribution fixture on an existing worker for x64")
     from sdk_tooling.adapters import load
 
-    tooling = load("bindings")
     env = dict(
         os.environ,
         DOTNET_CLI_TELEMETRY_OPTOUT="1",
@@ -274,7 +274,7 @@ def main():
     output = ROOT / "build/bindings"
     output.mkdir(parents=True, exist_ok=True)
     if not args.dotnet_only:
-        tooling.compile_c(
+        load("c_compiler").compile_c(
             ROOT / "crates/ffi/tests/c/abi.c",
             compiler=("xcrun", "clang"),
             output=output / "abi",
@@ -297,7 +297,7 @@ def main():
         env["SOFTWARE_LICENSING_POLAR_NATIVE_LIBRARY"] = str(library)
         env["SOFTWARE_LICENSING_NATIVE_LIBRARY"] = str(core_library)
         core_project = core / "bindings/dotnet/src" / CORE_PACKAGE / (CORE_PACKAGE + ".csproj")
-        tooling.run_managed(
+        load("dotnet").run_managed(
             dotnet,
             ROOT
             / "bindings/dotnet/tests/SoftwareLicensing.Polar.Tests/SoftwareLicensing.Polar.Tests.csproj",
@@ -309,7 +309,7 @@ def main():
         )
         rid = "osx-arm64" if platform.machine().lower() in ("arm64", "aarch64") else "osx-x64"
         packages = pack_and_consume(
-            dotnet, core, library, core_library, rid, env, output, tooling=tooling
+            dotnet, core, library, core_library, rid, env, output, load_tools=load
         )
         (output / "acceptance.json").write_text(
             json.dumps(

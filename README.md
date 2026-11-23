@@ -22,7 +22,8 @@ outputs, not a published feed.
 | `crates/ffi`              | Owned C ABI, header and callback lifecycle tests     |
 | `Sources`, `Tests`        | Swift adapter and no-network fixtures                |
 | `bindings/dotnet`         | .NET adapter, fixtures and package definition        |
-| `fixtures`                | Distribution and installed-consumer checks           |
+| `fixtures/consumers`      | Independent SDK clients                              |
+| `distribution`            | SDK-specific package checks                          |
 | `Artifacts`, `ThirdParty` | Source-bound framework and original upstream notices |
 
 SoftwareLicensing owns secure-record semantics, operation ordering and offline
@@ -155,7 +156,7 @@ administration belong to the merchant's operator workflow.
 
 Use the tools pinned by `mise.toml` and `rust-toolchain.toml`. The `sdk-tooling`
 task uses a public, fixed SDK Tooling revision through uv. `native.toml`
-defines the native artifact, and `fixtures/distribution/` contains the
+defines the native artifact, and `distribution/` contains the
 SDK-specific packaging checks. SwiftPM and NuGet consumers can install the SDK
 directly.
 
@@ -202,7 +203,7 @@ set `DOTNET_BIN` to the absolute path of the pinned x64 .NET SDK executable.
 Run the distribution fixture from the repository root.
 
 ```sh
-mise run sdk-tooling -- python -m fixtures.distribution.windows
+mise run sdk-tooling -- python -m distribution.verify_windows
 ```
 
 ARM64-hosted MSVC builds the two x64 DLLs. Rust, C, and .NET fixtures run as

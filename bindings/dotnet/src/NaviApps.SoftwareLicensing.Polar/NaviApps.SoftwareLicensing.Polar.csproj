@@ -24,8 +24,8 @@
     <None Include="../../../../ThirdParty/**/*" Exclude="../../../../ThirdParty/**/.DS_Store;../../../../ThirdParty/**/registry-notices.json" Pack="true" PackagePath="licenses/" />
   </ItemGroup>
   <Target Name="RequireSoftwareLicensingSource" BeforeTargets="CollectPackageReferences;PrepareForBuild">
-    <Error Condition="'$(SoftwareLicensingProject)' == ''" Text="Run python3 -B -m fixtures.distribution.bindings --prepare-dotnet from the repository root to resolve the pinned core SDK, or set SoftwareLicensingProject explicitly for coordinated development." />
-    <Error Condition="'$(SoftwareLicensingProject)' != '' and !Exists('$(SoftwareLicensingProject)')" Text="Resolved core project is missing. Run python3 -B -m fixtures.distribution.bindings --prepare-dotnet again." />
+    <Error Condition="'$(SoftwareLicensingProject)' == ''" Text="Run python3 -B -m distribution.verify_bindings --prepare-dotnet from the repository root to resolve the pinned core SDK, or set SoftwareLicensingProject explicitly for coordinated development." />
+    <Error Condition="'$(SoftwareLicensingProject)' != '' and !Exists('$(SoftwareLicensingProject)')" Text="Resolved core project is missing. Run python3 -B -m distribution.verify_bindings --prepare-dotnet again." />
   </Target>
   <Target Name="RequirePolarNativeAsset" BeforeTargets="GenerateNuspec">
     <Error Condition="'$(PolarRuntimeIdentifier)' == '' or '$(PolarNativeFileName)' == ''" Text="Use the platform packaging tool with a source-built Polar native library." />

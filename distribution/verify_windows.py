@@ -17,9 +17,9 @@ from pathlib import Path
 from sdk_tooling.adapters import load, support_inputs
 from sdk_tooling.native_plan import builder
 
-from fixtures.distribution import bindings
+from distribution import verify_bindings as bindings
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[1]
 TARGET = "x86_64-pc-windows-msvc"
 RID = "win-x64"
 RECEIPT = "software-licensing-polar-windows.json"
@@ -111,7 +111,7 @@ def verify_inherited_notices(core):
                 raise ValueError("Polar inherited LicenseKit notice differs from SoftwareLicensing")
 
 
-def stage_library(native, *, windows, tooling, artifacts, cargo, env, tools, output, host):
+def stage_library(native, *, windows, artifacts, cargo, env, tools, output, host):
     built = windows.build_library(native, env, tools, "x64", native_host=host)
     with artifacts.build_lock(native.root / ".native-build"):
         verified, receipt = windows.verify_artifact(native, "x64", environment=env)
@@ -123,8 +123,8 @@ def stage_library(native, *, windows, tooling, artifacts, cargo, env, tools, out
             raise ValueError("Windows x64 artifact differs from the selected native host build")
         verify_notices(cargo, native, env)
         dll = native.library + ".dll"
-        library = tooling.stage_native(built / dll, output / dll)
-        library_import = tooling.stage_native(built / (dll + ".lib"), output / (dll + ".lib"))
+        library = artifacts.stage_native(built / dll, output / dll)
+        library_import = artifacts.stage_native(built / (dll + ".lib"), output / (dll + ".lib"))
         if digest(library) != receipt["outputs"][dll]:
             raise ValueError("Staged Windows x64 DLL differs from its native build receipt")
         if digest(library_import) != receipt["outputs"][dll + ".lib"]:
@@ -242,7 +242,6 @@ def main(argv=None):
     source = acceptance_source(os.environ)
     tool_inputs = support_inputs(ROOT)
     windows = load("windows")
-    tooling = load("bindings")
     artifacts = load("artifacts")
     cargo = load("cargo")
     environment = {
@@ -328,7 +327,6 @@ def main(argv=None):
             library, import_library, evidence = stage_library(
                 native,
                 windows=windows,
-                tooling=tooling,
                 artifacts=artifacts,
                 cargo=cargo,
                 env=env,
@@ -337,7 +335,7 @@ def main(argv=None):
                 host=host,
             )
             executable = native_output / (name + "-abi.exe")
-            tooling.compile_c(
+            load("c_compiler").compile_c(
                 native.ffi / "tests/c/abi.c",
                 output=executable,
                 compiler=[tools / "cl.exe"],
@@ -368,7 +366,7 @@ def main(argv=None):
             / bindings.CORE_PACKAGE
             / (bindings.CORE_PACKAGE + ".csproj")
         )
-        tooling.run_managed(
+        load("dotnet").run_managed(
             dotnet,
             ROOT
             / "bindings/dotnet/tests/SoftwareLicensing.Polar.Tests/SoftwareLicensing.Polar.Tests.csproj",
@@ -387,7 +385,7 @@ def main(argv=None):
             RID,
             test_env,
             candidate,
-            tooling=tooling,
+            load_tools=load,
         )
         if source != acceptance_source(os.environ):
             raise ValueError("Windows x64 acceptance source changed")

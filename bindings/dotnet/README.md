@@ -70,7 +70,7 @@ from the repository root:
 mise trust mise.toml
 mise install
 mise exec -- cargo fetch --locked
-mise exec -- python3 -B -m fixtures.distribution.bindings --prepare-dotnet
+mise exec -- python3 -B -m distribution.verify_bindings --prepare-dotnet
 mise exec -- dotnet build bindings/dotnet/src/NaviApps.SoftwareLicensing.Polar/NaviApps.SoftwareLicensing.Polar.csproj
 ```
 

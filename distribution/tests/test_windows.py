@@ -9,7 +9,7 @@ from unittest.mock import MagicMock, call, patch
 
 from sdk_tooling.adapters import load
 
-from fixtures.distribution import windows
+from distribution import verify_windows as windows
 
 TARGETS = {"arm64": "aarch64-pc-windows-msvc", "x64": windows.TARGET}
 
@@ -44,7 +44,7 @@ class WindowsTests(unittest.TestCase):
             built.mkdir()
             dll = built / (native.library + ".dll")
             dll.write_bytes(b"changed DLL")
-            shared, tooling, artifacts = MagicMock(), MagicMock(), MagicMock()
+            shared, artifacts = MagicMock(), MagicMock()
             shared.MSVC_TARGETS = TARGETS
             shared.build_library.return_value = built
             shared.verify_artifact.return_value = (
@@ -58,7 +58,7 @@ class WindowsTests(unittest.TestCase):
                     "outputs": {dll.name: "a" * 64},
                 },
             )
-            tooling.stage_native.side_effect = lambda source, destination: source
+            artifacts.stage_native.side_effect = lambda source, destination: source
             with (
                 patch.object(windows, "verify_notices"),
                 self.assertRaisesRegex(ValueError, "DLL differs from its native build receipt"),
@@ -66,7 +66,6 @@ class WindowsTests(unittest.TestCase):
                 windows.stage_library(
                     native,
                     windows=shared,
-                    tooling=tooling,
                     artifacts=artifacts,
                     cargo=MagicMock(),
                     tools=root / "msvc",
@@ -90,7 +89,8 @@ class WindowsTests(unittest.TestCase):
             (root / "mise.toml").write_text('[tools]\ndotnet = "10.0.403"\n')
             (root / "rust-toolchain.toml").write_text('[toolchain]\nchannel = "1.99.1"\n')
             shared = MagicMock()
-            tooling = MagicMock()
+            c_compiler = MagicMock()
+            dotnet_tools = MagicMock()
             cargo = MagicMock()
             artifacts = MagicMock()
             natives = MagicMock()
@@ -116,7 +116,8 @@ class WindowsTests(unittest.TestCase):
             natives.NativeBuilder.side_effect = create_builder
             modules = dict(
                 windows=shared,
-                bindings=tooling,
+                c_compiler=c_compiler,
+                dotnet=dotnet_tools,
                 artifacts=artifacts,
                 cargo=cargo,
                 native=natives,
@@ -191,7 +192,7 @@ class WindowsTests(unittest.TestCase):
             self.assertTrue(
                 all(entry[entry.index("--target") + 1] == windows.TARGET for entry in targets)
             )
-            executables = [entry.kwargs["output"] for entry in tooling.compile_c.call_args_list]
+            executables = [entry.kwargs["output"] for entry in c_compiler.compile_c.call_args_list]
             self.assertEqual(
                 [entry.name for entry in executables], ["core-abi.exe", "vendor-abi.exe"]
             )
@@ -199,7 +200,7 @@ class WindowsTests(unittest.TestCase):
                 shared.require_pe_machine.call_args_list,
                 [call(path, "x64") for path in executables],
             )
-            managed = tooling.run_managed.call_args
+            managed = dotnet_tools.run_managed.call_args
             self.assertEqual(managed.args[0], dotnet)
             self.assertEqual(managed.kwargs["runtime"], windows.RID)
             self.assertEqual(managed.kwargs["properties"]["UseAppHost"], "false")
@@ -210,7 +211,7 @@ class WindowsTests(unittest.TestCase):
                 ["software_licensing_polar.dll", "software_licensing.dll"],
             )
             self.assertEqual(pair[4], windows.RID)
-            self.assertEqual(pack.call_args.kwargs, {"tooling": tooling})
+            self.assertEqual(pack.call_args.kwargs, {"load_tools": load_tooling})
             receipt = retain.call_args.args[1]
             self.assertEqual(retain.call_args.kwargs["artifacts"], artifacts_dir)
             self.assertEqual(receipt["source"], source[0])

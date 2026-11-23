@@ -7,7 +7,7 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 from unittest.mock import patch
 
-from fixtures.distribution import bindings
+from distribution import verify_bindings as bindings
 
 
 class DependencySourceTests(unittest.TestCase):
