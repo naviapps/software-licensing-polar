@@ -1,0 +1,4 @@
+framework module CSoftwareLicensingPolar {
+  umbrella header "software_licensing_polar.h"
+  export *
+}

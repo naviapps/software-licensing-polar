@@ -1,0 +1,12 @@
+[package]
+name = "software-licensing-polar-git-consumer"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+[workspace]
+
+[dependencies]
+software-licensing-polar = { git = "https://github.com/naviapps/software-licensing-polar.git", rev = "@SDK_REVISION@" }
+software-licensing = { git = "https://github.com/naviapps/software-licensing.git", rev = "d2c93007c933e5cf6b65d7e9fff14e473efb1cd0" }
+tokio = { version = "=1.54.1", features = ["macros", "rt"] }
