@@ -162,22 +162,35 @@ SwiftPM or NuGet directly.
 mise trust mise.toml
 mise install
 mise exec -- cargo fetch --locked
-mise exec -- make native
 mise exec -- make check
 ```
 
-`make check` verifies native provenance, Rust behavior and cancellation, C ownership,
-managed callback fixtures and standalone SwiftPM and NuGet consumers. Both standalone
-bindings exercise the packaged Polar provider with the core license manager, including
-cancelled activation, typed preflight rejection, failed storage, retry and restart.
+`make check` runs source lint, Rust Clippy and tests, strict Swift tests and a
+standalone SwiftPM consumer using this SDK checkout. The consumer exercises the
+public Polar provider with the pinned SoftwareLicensing core.
 Rust protocol tests use local values. The owned loopback transport also exercises
 release recovery with the pinned licensing core, from an interrupted journal or a
-recorded `429` retry deadline through a confirmed `204` reply. Swift, C and .NET
-use invalid or pre-cancelled requests that cannot reach Polar.
+recorded `429` retry deadline through a confirmed `204` reply.
 
-The isolated Swift consumer resolves the pinned core without host credentials.
+GitHub Actions runs the Swift tests and standalone Swift consumer on macOS 26
+with Xcode 26.6 and on macOS 27 with Xcode 27.2. Public Windows x64 CI runs Rust
+tests and the managed provider fixture with the pinned SoftwareLicensing core.
+The fixtures use synthetic responses or invalid or pre-cancelled requests.
+
+### Distribution checks
+
+Set `NAVI_SDK_TOOLING_SOURCE` to the absolute path to a clean SDK Tooling
+checkout at the commit in `tools/tooling-sources.json`. Run `mise exec -- make
+check-distribution` for native provenance, C ownership, managed callback
+fixtures and installed NuGet checks. The NuGet consumer exercises cancelled
+activation, typed preflight rejection, failed storage, retry and restart.
+Reuse the pinned tooling for `make native` after changing native inputs and
+for `make native-verify`.
+
+The standalone Swift consumer resolves the pinned core without host credentials.
 Pass `--git-config PATH` to `tools/consumer.py` to use a Git configuration that
-rewrites the core's URL to a local mirror containing that commit.
+rewrites the core's URL to a local mirror containing that commit during the
+detailed distribution check.
 For independently installed Rust/C checks, pass a complete core repository or Git
 bundle as `--git-dependency-source "naviapps/software-licensing=$dependency"` to
 `tools/install-consumers.py`. Use `--evidence` with a new path outside this checkout
@@ -191,10 +204,14 @@ The driver builds the immutable SoftwareLicensing source separately and accepts
 the two NuGet packages together. Accepted packages and evidence are retained
 under `.native-build/win-x64/<version>` and, when set, `NAVI_CI_ARTIFACTS`.
 
-GitHub Actions runs the same strict Swift tests and standalone Swift consumer
-on macOS 26 with Xcode 26.6 and macOS 27 with Xcode 27. The macOS 27 distribution
-job and the Windows x64 job also check native artifacts and their consumers with
-the pinned SoftwareLicensing sources. CI uses fixture providers.
+Maintainers can run the macOS and Windows x64 distribution gates in the private
+SDK Tooling repository. Substitute the full SDK commit SHA on `main`:
+
+```sh
+gh workflow run check-sdk-distribution.yml -R naviapps/sdk-tooling \
+  -f sdk=software-licensing-polar -f revision=FULL_SDK_COMMIT_SHA
+```
+
 Test actual provider integration separately.
 
 ## License

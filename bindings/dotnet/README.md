@@ -98,15 +98,18 @@ cancellation/disposal races and DTO framing with an owned managed seam. Its
 pre-cancelled operations, which cannot contact Polar. Rust tests use owned
 loopback HTTP fixtures. None establish live provider behavior or migrate customers.
 
-For native local tests, set `SOFTWARE_LICENSING_POLAR_NATIVE_LIBRARY` to the exact
+For native local tests, configure the
+[pinned tooling checkout](../../README.md#distribution-checks). Set
+`SOFTWARE_LICENSING_POLAR_NATIVE_LIBRARY` to the exact
 source-matched provider library, and `SOFTWARE_LICENSING_NATIVE_LIBRARY` to the
 matching base library. `tools/bindings.py --c-only` and `--dotnet-only` consume
 macOS framework executables without rebuilding them. The clean NuGet consumer
 resolves both packaged native assets, then exercises cancellation, typed Polar
 preflight rejection, failed storage, retry and restart using an in-memory store.
 
-The Windows driver `tools/windows.py` builds `win-x64` packages and runs SDK and
-clean NuGet fixtures through x64 emulation on a prepared Windows ARM64 worker.
+With the pinned tooling checkout, the Windows driver `tools/windows.py` builds
+`win-x64` packages and runs SDK and clean NuGet fixtures through x64 emulation
+on a prepared Windows ARM64 worker.
 The isolated consumer restores the provider and its exact paired core package
 from an owned local feed. Report Windows target execution, macOS acceptance, and
 real provider behavior separately.

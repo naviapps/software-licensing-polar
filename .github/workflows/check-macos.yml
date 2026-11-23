@@ -40,10 +40,11 @@ jobs:
         run: xcrun swift test -Xswiftc -strict-concurrency=complete -Xswiftc -warnings-as-errors
       - name: Test standalone Swift consumer
         run: python3 -B tools/consumer.py
-  distribution:
-    name: SDK distribution checks
+
+  contributor:
+    name: Source checks
     runs-on: xcode-27
-    timeout-minutes: 45
+    timeout-minutes: 25
     env:
       DEVELOPER_DIR: /Applications/Xcode_27.2.app/Contents/Developer
       GIT_TERMINAL_PROMPT: "0"
@@ -52,10 +53,7 @@ jobs:
       - uses: actions/checkout@v6.1.0
         with:
           persist-credentials: false
-          fetch-depth: 0
-      - name: Check Swift toolchain
-        run: xcrun swift --version
-      - name: Install tools for standalone consumers and artifacts
+      - name: Install contributor tools
         uses: jdx/mise-action@v5.3.0
         with:
           version: "2026.11.12"
@@ -63,11 +61,5 @@ jobs:
           add_shims_to_path: false
       - name: Fetch locked Rust dependencies
         run: mise exec -- cargo fetch --locked
-      - name: Validate SDK distribution
-        run: mise exec -- make check-distribution
-      - name: Test independently installed Rust and C SDKs
-        run: |
-          dependency="$RUNNER_TEMP/software-licensing"
-          git clone "https://github.com/naviapps/software-licensing.git" "$dependency"
-          mise exec -- python3 -B tools/install-consumers.py \
-            --git-dependency-source "naviapps/software-licensing=$dependency"
+      - name: Check source and bindings
+        run: mise exec -- make check-source

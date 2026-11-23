@@ -2,9 +2,11 @@ SWIFT_FLAGS := -Xswiftc -strict-concurrency=complete -Xswiftc -warnings-as-error
 DOTNET_BIN ?= dotnet
 
 .DEFAULT_GOAL := check
-.PHONY: check check-distribution native native-verify lint test test-rust test-tools test-c test-dotnet test-consumer test-installed-consumers format
+.PHONY: check check-source test-managed check-distribution native native-verify lint test test-rust test-tools test-c test-dotnet test-consumer test-installed-consumers format
 
-check: check-distribution test test-consumer
+check: check-source test test-consumer
+
+check-source: lint test-rust test-managed
 
 check-distribution: lint native-verify test-rust test-tools test-c test-dotnet
 
@@ -41,3 +43,7 @@ test-dotnet:
 
 test-tools:
 	python3 -B -m unittest discover -s tools/tests -v
+
+test-managed:
+	python3 -B tools/bindings.py --prepare-dotnet
+	dotnet run --configuration Release --project bindings/dotnet/tests/SoftwareLicensing.Polar.Tests/SoftwareLicensing.Polar.Tests.csproj
