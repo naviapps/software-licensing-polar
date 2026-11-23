@@ -93,7 +93,7 @@ class WindowsTests(unittest.TestCase):
             dotnet_tools = MagicMock()
             cargo = MagicMock()
             artifacts = MagicMock()
-            natives = MagicMock()
+            ffi = MagicMock()
             dotnet = root / "x64-dotnet.exe"
             artifacts_dir = root / "vm-artifacts"
             env = {
@@ -104,23 +104,23 @@ class WindowsTests(unittest.TestCase):
             shared.MSVC_TARGETS = TARGETS
             shared.native_environment.return_value = (env, root / "msvc", dotnet)
 
-            def create_builder(path, *, symbol_prefix, minimum_macos):
+            def create_product(path, *, symbol_prefix, specification):
                 return SimpleNamespace(
                     root=path,
                     ffi=path / "crates/ffi",
                     version="0.1.0",
                     symbol_prefix=symbol_prefix,
-                    minimum_macos=minimum_macos,
+                    specification=specification,
                 )
 
-            natives.NativeBuilder.side_effect = create_builder
+            ffi.FfiProduct.side_effect = create_product
             modules = dict(
                 windows=shared,
                 c_compiler=c_compiler,
                 dotnet=dotnet_tools,
                 artifacts=artifacts,
                 cargo=cargo,
-                native=natives,
+                ffi=ffi,
                 vm_environment=load("vm_environment"),
             )
 
@@ -149,11 +149,13 @@ class WindowsTests(unittest.TestCase):
                 patch.object(windows, "load", side_effect=modules.__getitem__) as load_tooling,
                 patch.object(
                     windows,
-                    "builder",
-                    side_effect=lambda path, **_: create_builder(
-                        path, symbol_prefix="software_licensing_polar_", minimum_macos="26.0"
+                    "ffi_product",
+                    side_effect=lambda path, *, factory: factory(
+                        path,
+                        symbol_prefix="software_licensing_polar_",
+                        specification="native.toml",
                     ),
-                ) as vendor_builder,
+                ) as vendor_product,
                 patch.object(
                     windows, "support_inputs", side_effect=[tool_inputs, final_tool_inputs]
                 ),
@@ -184,7 +186,11 @@ class WindowsTests(unittest.TestCase):
                     return
                 windows.main([])
 
-            vendor_builder.assert_called_once_with(root, tooling=load_tooling)
+            vendor_product.assert_called_once_with(root, factory=ffi.FfiProduct)
+            core, vendor = ffi.FfiProduct.call_args_list
+            self.assertEqual(core.args[0].name, "core")
+            self.assertEqual(core.kwargs["specification"], "tools/native.py")
+            self.assertEqual(vendor.kwargs["specification"], "native.toml")
             shared.native_environment.assert_called_once_with(host, {}, target_architecture="x64")
             shared.require_rust_target_stdlib.assert_called_once_with("rust-stdlib", windows.TARGET)
             targets = [entry.args for entry in run.call_args_list if "--target" in entry.args]

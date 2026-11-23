@@ -15,7 +15,7 @@ from contextlib import ExitStack
 from pathlib import Path
 
 from sdk_tooling.adapters import load, support_inputs
-from sdk_tooling.native_plan import builder
+from sdk_tooling.native_plan import ffi_product
 
 from distribution import verify_bindings as bindings
 
@@ -297,14 +297,15 @@ def main(argv=None):
                 *[f"--remap-path-prefix={path}={alias}" for path, alias in remaps],
             ]
         )
+        product = load("ffi").FfiProduct
         if (core / "native.toml").is_file():
-            core_native = builder(core, tooling=load)
+            core_native = ffi_product(core, factory=product)
         else:
             # Older pinned core revisions bind their receipts to the historical Python recipe.
-            core_native = load("native").NativeBuilder(
-                core, symbol_prefix="software_licensing_", minimum_macos="26.0"
+            core_native = product(
+                core, symbol_prefix="software_licensing_", specification="tools/native.py"
             )
-        vendor_native = builder(ROOT, tooling=load)
+        vendor_native = ffi_product(ROOT, factory=product)
         bindings.run("cargo", "fmt", "--all", "--", "--check", cwd=ROOT, env=env)
         accepted = {}
         native_output = candidate / "dlls"

@@ -12,10 +12,10 @@ check-distribution: native-verify test-distribution-tools test-c test-dotnet
 	python3 -B -m distribution.verify_bindings --verify-swift-pin
 
 native:
-	$(SDK_TOOLING) native
+	$(SDK_TOOLING) xcframework
 
 native-verify:
-	$(SDK_TOOLING) native --verify
+	$(SDK_TOOLING) xcframework --verify
 
 lint:
 	$(SDK_TOOLING) quality check --dotnet
@@ -31,7 +31,7 @@ test-consumer:
 	$(SDK_TOOLING) swift-consumer
 
 test-installed-consumers:
-	$(SDK_TOOLING) installed-consumers
+	$(SDK_TOOLING) rust-c-consumers
 
 test-rust:
 	cargo test --workspace --locked --offline

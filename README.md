@@ -195,7 +195,7 @@ to use a Git configuration that redirects the core's URL to a local mirror
 containing that commit.
 For independently installed Rust/C checks, pass a complete core repository or Git
 bundle as `--git-dependency-source "naviapps/software-licensing=$dependency"` to
-`mise run sdk-tooling -- installed-consumers`. Use `--evidence` with a new path
+`mise run sdk-tooling -- rust-c-consumers`. Use `--evidence` with a new path
 outside this checkout to retain the result. This validates local Git delivery.
 
 Windows packages target `win-x64`. On an owned prepared Windows ARM64 worker,
