@@ -63,9 +63,8 @@ a matching version is required for automatic retry of a rate-limited mutation.
 
 ## Development
 
-Authenticate Git access to this repository, `software-licensing` and the pinned
-`sdk-tooling` revision, then prepare a standalone checkout from the repository
-root:
+Clone this repository and prepare the pinned `software-licensing` dependency
+from the repository root:
 
 ```sh
 mise trust mise.toml

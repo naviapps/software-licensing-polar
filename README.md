@@ -154,9 +154,9 @@ administration belong to the merchant's operator workflow.
 
 ## Development and verification
 
-Use the tools pinned by `mise.toml` and `rust-toolchain.toml`. Developer drivers
-resolve the immutable `sdk-tooling` revision in `tools/tooling-sources.json`; normal
-SDK consumers do not run them. See the [shared setup](https://github.com/naviapps/sdk-tooling#readme).
+Use the tools pinned by `mise.toml` and `rust-toolchain.toml`. The developer
+scripts live in this repository under `tools/`. Ordinary SDK consumers can use
+SwiftPM or NuGet directly.
 
 ```sh
 mise trust mise.toml
@@ -176,17 +176,16 @@ recorded `429` retry deadline through a confirmed `204` reply. Swift, C and .NET
 use invalid or pre-cancelled requests that cannot reach Polar.
 
 The isolated Swift consumer resolves the pinned core without host credentials.
-For a private checkout, supply file-only mirror Git configuration as documented by
-[sdk-tooling](https://github.com/naviapps/sdk-tooling/blob/main/docs/REFERENCE.md#external-swiftpm-consumers).
+Pass `--git-config PATH` to `tools/consumer.py` to use a Git configuration that
+rewrites the core's URL to a local mirror containing that commit.
 For independently installed Rust/C checks, pass a complete core repository or Git
 bundle as `--git-dependency-source "naviapps/software-licensing=$dependency"` to
 `tools/install-consumers.py`. Use `--evidence` with a new path outside this checkout
 to retain the result. This validates local Git delivery.
 
 Windows packages target `win-x64`. On an owned prepared Windows ARM64 worker,
-run `python -E -S -B tools/windows.py --architecture x64 --tooling-source PATH
---tooling-revision SHA` with the approved tooling checkout and the absolute path
-to the sealed x64 .NET SDK in `DOTNET_BIN`. ARM64-hosted MSVC builds the two x64
+run `python -E -S -B tools/windows.py` with the absolute path to the pinned x64
+.NET SDK executable in `DOTNET_BIN`. ARM64-hosted MSVC builds the two x64
 DLLs. Rust, C, and .NET fixtures run as x64 processes through Windows emulation.
 The driver builds the immutable SoftwareLicensing source separately and accepts
 the two NuGet packages together. Accepted packages and evidence are retained
@@ -195,7 +194,7 @@ under `.native-build/win-x64/<version>` and, when set, `NAVI_CI_ARTIFACTS`.
 GitHub Actions runs the same strict Swift tests and standalone Swift consumer
 on macOS 26 with Xcode 26.6 and macOS 27 with Xcode 27. The macOS 27 distribution
 job and the Windows x64 job also check native artifacts and their consumers with
-the pinned SoftwareLicensing and tooling sources. CI uses fixture providers.
+the pinned SoftwareLicensing sources. CI uses fixture providers.
 Test actual provider integration separately.
 
 ## License

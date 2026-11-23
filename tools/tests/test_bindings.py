@@ -1,4 +1,4 @@
-"""Vendor-owned dependency policy; shared package tests live in sdk-tooling."""
+"""Verify the provider's managed dependency and package policy."""
 
 import importlib.util
 import json

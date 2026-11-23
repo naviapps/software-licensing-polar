@@ -84,7 +84,10 @@ class WindowsTests(unittest.TestCase):
             with self.subTest(host=host):
                 self.check_x64_pipeline(host, compiler_host)
 
-    def check_x64_pipeline(self, host, compiler_host):
+    def test_x64_pipeline_does_not_retain_evidence_after_support_changes(self):
+        self.check_x64_pipeline("x64", TARGETS["x64"], change_support=True)
+
+    def check_x64_pipeline(self, host, compiler_host, *, change_support=False):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             (root / "mise.toml").write_text('[tools]\ndotnet = "10.0.403"\n')
@@ -130,12 +133,16 @@ class WindowsTests(unittest.TestCase):
 
             source = ("b" * 40, None)
             revision = "c" * 40
-            tools_revision = "d" * 40
+            tool_inputs = {"tools/support.py": "d" * 64}
+            final_tool_inputs = {"tools/support.py": "e" * 64} if change_support else tool_inputs
             with (
                 patch.object(windows, "ROOT", root),
                 patch.object(windows.Path, "home", return_value=root / "developer"),
                 patch.object(windows, "acceptance_source", return_value=source),
-                patch.object(windows, "load_candidate", return_value=modules.__getitem__) as select,
+                patch.object(windows, "load", side_effect=modules.__getitem__),
+                patch.object(
+                    windows, "support_inputs", side_effect=[tool_inputs, final_tool_inputs]
+                ),
                 patch.object(windows, "stage_core", return_value=revision),
                 patch.object(windows, "verify_inherited_notices"),
                 patch.object(windows, "stage_library", side_effect=stage),
@@ -156,11 +163,13 @@ class WindowsTests(unittest.TestCase):
                 patch.dict(windows.os.environ, {"DOTNET_HOST_PATH": "wrong-host"}, clear=True),
                 patch.object(windows, "print", create=True),
             ):
-                windows.main(
-                    ["--tooling-source", "reviewed-path", "--tooling-revision", tools_revision]
-                )
+                if change_support:
+                    with self.assertRaisesRegex(ValueError, "acceptance tooling changed"):
+                        windows.main([])
+                    retain.assert_not_called()
+                    return
+                windows.main([])
 
-            select.assert_called_once_with(Path("reviewed-path"), tools_revision)
             shared.native_environment.assert_called_once_with(host, {}, target_architecture="x64")
             shared.require_rust_target_stdlib.assert_called_once_with("rust-stdlib", windows.TARGET)
             targets = [entry.args for entry in run.call_args_list if "--target" in entry.args]
@@ -191,7 +200,7 @@ class WindowsTests(unittest.TestCase):
             receipt = retain.call_args.args[1]
             self.assertEqual(receipt["source"], source[0])
             self.assertEqual(receipt["coreRevision"], revision)
-            self.assertEqual(receipt["sdkToolingCommit"], tools_revision)
+            self.assertEqual(receipt["toolInputs"], tool_inputs)
             self.assertEqual(receipt["runtime"], "win-x64")
             self.assertEqual(
                 receipt["execution"], "x64-emulated-on-arm64" if host == "arm64" else "x64-native"

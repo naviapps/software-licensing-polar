@@ -15,7 +15,7 @@ import tomllib
 from contextlib import ExitStack
 from pathlib import Path
 
-from _tooling import load_candidate
+from _tooling import load, support_inputs
 
 import bindings
 
@@ -259,16 +259,14 @@ def retain_evidence(package_directory, receipt, *, version, output, artifacts, t
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--architecture", choices=("x64",), default="x64")
-    parser.add_argument("--tooling-source", type=Path, required=True)
-    parser.add_argument("--tooling-revision", required=True)
-    args = parser.parse_args(argv)
+    parser.parse_args(argv)
     source = acceptance_source(os.environ)
-    selected = load_candidate(args.tooling_source, args.tooling_revision)
-    windows = selected("windows")
-    tooling = selected("bindings")
-    artifacts = selected("artifacts")
-    cargo = selected("cargo")
-    builder = selected("native").NativeBuilder
+    tool_inputs = support_inputs()
+    windows = load("windows")
+    tooling = load("bindings")
+    artifacts = load("artifacts")
+    cargo = load("cargo")
+    builder = load("native").NativeBuilder
     environment = {
         key.upper(): value
         for key, value in os.environ.items()
@@ -410,6 +408,8 @@ def main(argv=None):
         )
         if source != acceptance_source(os.environ):
             raise ValueError("Windows x64 acceptance source changed")
+        if tool_inputs != support_inputs():
+            raise ValueError("Windows x64 acceptance tooling changed")
         if any(digest(library) != evidence["sha256"] for library, evidence in accepted.values()):
             raise ValueError("Accepted Windows x64 DLL changed during package validation")
         not_run = ["real License API", "host app integration"]
@@ -419,7 +419,7 @@ def main(argv=None):
             "source": source[0],
             "workspaceFingerprint": source[1],
             "coreRevision": revision,
-            "sdkToolingCommit": args.tooling_revision,
+            "toolInputs": tool_inputs,
             "dotnetVersion": dotnet_version,
             "compiler": compiler.splitlines()[0],
             "target": TARGET,
