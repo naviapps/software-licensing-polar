@@ -23,6 +23,7 @@ commands = [
 
 [windows]
 commands = [
+  ["rustup", "install", "--no-self-update"],
   ["python", "-E", "-S", "-B", "-m", "unittest", "discover", "-s", "tools/tests"],
   ["python", "-I", "-B", "{tooling}/tasks/sdk", "windows", "tools/windows.py"],
 ]
