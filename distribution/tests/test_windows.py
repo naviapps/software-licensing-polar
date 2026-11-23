@@ -114,7 +114,9 @@ class WindowsTests(unittest.TestCase):
     def check_x64_pipeline(self, host, compiler_host, *, change_support=False):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            (root / "mise.toml").write_text('[tools]\ndotnet = "10.0.403"\n')
+            (root / "global.json").write_text(
+                '{"sdk":{"version":"10.0.403","rollForward":"disable"}}'
+            )
             (root / "rust-toolchain.toml").write_text('[toolchain]\nchannel = "1.99.1"\n')
             shared = MagicMock()
             c_compiler = MagicMock()

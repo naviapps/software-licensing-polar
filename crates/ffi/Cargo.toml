@@ -9,7 +9,7 @@ rust-version = "1.99"
 
 [lib]
 name = "software_licensing_polar"
-crate-type = ["staticlib", "cdylib"]
+crate-type = ["cdylib"]
 
 [dependencies]
 serde = "1"

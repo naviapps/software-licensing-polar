@@ -7,6 +7,11 @@
 #include <stddef.h>
 #include <stdint.h>
 
+// ABI 3 preserves retry timing and mutation outcomes. Cancellation during a
+// retry wait returns the received rejection and its retry advice. A new
+// unconfirmed mutation may instead have an unknown outcome.
+#define SOFTWARE_LICENSING_POLAR_ABI_VERSION 3u
+
 typedef struct SoftwareLicensingPolarOperation SoftwareLicensingPolarOperation;
 
 typedef struct SoftwareLicensingPolarProvider SoftwareLicensingPolarProvider;
@@ -25,9 +30,6 @@ typedef struct {
 extern "C" {
 #endif // __cplusplus
 
-// ABI 3 preserves retry timing and mutation outcomes. Cancellation during a
-// retry wait returns the received rejection and its retry advice. A new
-// unconfirmed mutation may instead have an unknown outcome.
 uint32_t software_licensing_polar_abi_version(void);
 
 // Copies configuration JSON without network effects. On failure, returns null

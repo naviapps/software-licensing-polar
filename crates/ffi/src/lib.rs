@@ -84,9 +84,11 @@ impl Drop for Completion {
 /// ABI 3 preserves retry timing and mutation outcomes. Cancellation during a
 /// retry wait returns the received rejection and its retry advice. A new
 /// unconfirmed mutation may instead have an unknown outcome.
+pub const SOFTWARE_LICENSING_POLAR_ABI_VERSION: u32 = 3u32;
+
 #[unsafe(no_mangle)]
 pub extern "C" fn software_licensing_polar_abi_version() -> u32 {
-    3
+    SOFTWARE_LICENSING_POLAR_ABI_VERSION
 }
 
 /// Copies configuration JSON without network effects. On failure, returns null

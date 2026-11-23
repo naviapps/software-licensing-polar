@@ -15,6 +15,7 @@ from contextlib import ExitStack
 from pathlib import Path
 
 from sdk_tooling.adapters import load, support_inputs
+from sdk_tooling.dotnet import pinned_sdk_version
 from sdk_tooling.native_plan import ffi_product
 
 from distribution import verify_bindings as bindings
@@ -23,6 +24,23 @@ ROOT = Path(__file__).resolve().parents[1]
 TARGET = "x86_64-pc-windows-msvc"
 RID = "win-x64"
 RECEIPT = "software-licensing-polar-windows.json"
+CORE_WITHOUT_ABI_MACRO = "b69902197a294598901aa3c595f8cfb3b11c7404"
+
+
+def core_product(root, revision):
+    product = load("ffi").FfiProduct
+    if revision == CORE_WITHOUT_ABI_MACRO:
+
+        class PinnedCore(product):
+            def abi_versions(self, *, windows=False):
+                # The unchanged C fixture at this exact pin asserts the same ABI.
+                return {"software_licensing_abi_version": 4}
+
+        product = PinnedCore
+    if (root / "native.toml").is_file():
+        return ffi_product(root, factory=product)
+    # Older pinned core revisions bind their receipts to the historical Python recipe.
+    return product(root, symbol_prefix="software_licensing_", specification="tools/native.py")
 
 
 def digest(path):
@@ -279,8 +297,8 @@ def main(argv=None):
     dotnet_version = subprocess.check_output(
         [dotnet, "--version"], cwd=ROOT, env=env, text=True
     ).strip()
-    if dotnet_version != tomllib.loads((ROOT / "mise.toml").read_text())["tools"]["dotnet"]:
-        raise ValueError("Use the pinned x64 .NET SDK from mise.toml")
+    if dotnet_version != pinned_sdk_version(ROOT):
+        raise ValueError("Use the pinned x64 .NET SDK from global.json")
     compiler = subprocess.check_output(
         ["rustc", "--version", "--verbose"], cwd=ROOT, env=env, text=True
     )
@@ -319,15 +337,8 @@ def main(argv=None):
                 *[f"--remap-path-prefix={path}={alias}" for path, alias in remaps],
             ]
         )
-        product = load("ffi").FfiProduct
-        if (core / "native.toml").is_file():
-            core_native = ffi_product(core, factory=product)
-        else:
-            # Older pinned core revisions bind their receipts to the historical Python recipe.
-            core_native = product(
-                core, symbol_prefix="software_licensing_", specification="tools/native.py"
-            )
-        vendor_native = ffi_product(ROOT, factory=product)
+        core_native = core_product(core, revision)
+        vendor_native = ffi_product(ROOT, factory=load("ffi").FfiProduct)
         bindings.run("cargo", "fmt", "--all", "--", "--check", cwd=ROOT, env=env)
         accepted = {}
         native_output = candidate / "dlls"
