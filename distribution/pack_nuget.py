@@ -58,19 +58,14 @@ def pack_pair(root, runtimes):
             env=env | {"MISE_TRUSTED_CONFIG_PATHS": str(core)},
         )
         base = core / ".native-build/packages" / f"{bindings.CORE_PACKAGE}.{core_version}.nupkg"
-        notices = root / "ThirdParty"
-        files = {"LICENSE": root / "LICENSE", "README.md": managed / "README.md"}
-        files.update(
-            {
-                "licenses/" + path.relative_to(notices).as_posix(): path
-                for path in artifacts.files(notices)
-                if path.name not in (".DS_Store", "registry-notices.json")
-            }
-        )
         package = nuget.pack_native(
             provider,
             project=project,
-            package_files=files,
+            package_files={
+                "LICENSE": root / "LICENSE",
+                "README.md": managed / "README.md",
+                **nuget.retained_notice_files(root / "ThirdParty", "licenses"),
+            },
             nuget_config=managed / "NuGet.Config",
             input_files=[
                 Path(__file__),
