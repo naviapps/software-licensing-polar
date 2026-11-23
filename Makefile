@@ -2,9 +2,11 @@ SWIFT_FLAGS := -Xswiftc -strict-concurrency=complete -Xswiftc -warnings-as-error
 DOTNET_BIN ?= dotnet
 
 .DEFAULT_GOAL := check
-.PHONY: check native native-verify lint test test-rust test-tools test-c test-dotnet test-consumer test-installed-consumers format
+.PHONY: check check-distribution native native-verify lint test test-rust test-tools test-c test-dotnet test-consumer test-installed-consumers format
 
-check: lint native-verify test-rust test-tools test test-consumer test-c test-dotnet
+check: check-distribution test test-consumer
+
+check-distribution: lint native-verify test-rust test-tools test-c test-dotnet
 
 native:
 	python3 tools/native.py

@@ -192,10 +192,11 @@ The driver builds the immutable SoftwareLicensing source separately and accepts
 the two NuGet packages together. Accepted packages and evidence are retained
 under `.native-build/win-x64/<version>` and, when set, `NAVI_CI_ARTIFACTS`.
 
-GitHub Actions runs the SDK and standalone consumer checks on Xcode 27 and
-Windows x64 with the pinned SoftwareLicensing and tooling sources. The macOS
-workflow also checks the SDK and its standalone Swift consumer with Xcode 26.6.
-CI uses fixture providers. Test actual provider integration separately.
+GitHub Actions runs the same strict Swift tests and standalone Swift consumer
+on macOS 26 with Xcode 26.6 and macOS 27 with Xcode 27. The macOS 27 distribution
+job and the Windows x64 job also check native artifacts and their consumers with
+the pinned SoftwareLicensing and tooling sources. CI uses fixture providers.
+Test actual provider integration separately.
 
 ## License
 
