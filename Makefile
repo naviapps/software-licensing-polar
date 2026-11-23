@@ -2,7 +2,7 @@ SDK_TOOLING ?= mise run sdk-tooling --
 SWIFT_FLAGS := -Xswiftc -strict-concurrency=complete -Xswiftc -warnings-as-errors
 
 .DEFAULT_GOAL := check
-.PHONY: check check-source test-managed check-distribution native native-verify lint test test-rust test-distribution-tools test-c test-dotnet test-consumer test-installed-consumers format
+.PHONY: check check-source test-managed check-distribution native native-verify lint test test-rust test-distribution-tools test-c test-dotnet test-consumer test-installed-consumers format clean
 
 check: check-source test test-consumer
 
@@ -48,3 +48,10 @@ test-distribution-tools:
 test-managed:
 	python3 -B -m distribution.verify_bindings --prepare-dotnet
 	dotnet run --configuration Release --project bindings/dotnet/tests/SoftwareLicensing.Polar.Tests/SoftwareLicensing.Polar.Tests.csproj
+
+clean:
+	$(SDK_TOOLING) clean target .build .native-build build fixtures/consumers/swift/.build \
+		bindings/dotnet/src/NaviApps.SoftwareLicensing.Polar/bin \
+		bindings/dotnet/src/NaviApps.SoftwareLicensing.Polar/obj \
+		bindings/dotnet/tests/SoftwareLicensing.Polar.Tests/bin \
+		bindings/dotnet/tests/SoftwareLicensing.Polar.Tests/obj
