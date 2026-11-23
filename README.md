@@ -209,14 +209,15 @@ ARM64-hosted MSVC builds the two x64 DLLs. Rust, C, and .NET fixtures run as
 x64 processes through Windows emulation.
 The driver builds the immutable SoftwareLicensing source separately and accepts
 the two NuGet packages together. Accepted packages and evidence are retained
-under `.native-build/win-x64/<version>` and, when set, `NAVI_CI_ARTIFACTS`.
+under `.native-build/win-x64/<version>`. When `VM_RUNNER_ARTIFACTS_DIR` is supplied,
+copies are retained there under `win-x64/<version>`.
 
 Maintainers can run the macOS and Windows x64 distribution gates in the
-[SDK Tooling repository](https://github.com/naviapps/sdk-tooling). Substitute the full SDK commit SHA on `main`:
+[SDK Tooling repository](https://github.com/naviapps/sdk-tooling). Run this from the intended commit on `main`:
 
 ```sh
 gh workflow run check-sdk-distribution.yml -R naviapps/sdk-tooling \
-  -f sdk=software-licensing-polar -f revision=FULL_SDK_COMMIT_SHA
+  -f sdk=software-licensing-polar -f "revision=$(git rev-parse HEAD)"
 ```
 
 Test actual provider integration separately.

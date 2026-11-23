@@ -18,11 +18,11 @@ class WindowsTests(unittest.TestCase):
     def test_captured_source_requires_commit_fingerprint_and_matching_actions_source(self):
         approved = "b" * 40
         fingerprint = "d" * 64
-        env = {"NAVI_CI_SOURCE_COMMIT": approved, "NAVI_CI_SOURCE_FINGERPRINT": fingerprint}
+        env = {"VM_RUNNER_SOURCE_COMMIT": approved, "VM_RUNNER_SOURCE_FINGERPRINT": fingerprint}
         self.assertEqual(windows.acceptance_source(env), (approved, fingerprint))
         with self.assertRaisesRegex(ValueError, "workspace SHA-256"):
-            windows.acceptance_source({"NAVI_CI_SOURCE_COMMIT": approved})
-        with self.assertRaisesRegex(ValueError, "Actions source"):
+            windows.acceptance_source({"VM_RUNNER_SOURCE_COMMIT": approved})
+        with self.assertRaisesRegex(ValueError, "Actions revision"):
             windows.acceptance_source(dict(env, GITHUB_SHA="c" * 40))
 
     def test_core_checkout_must_match_pin_before_archiving(self):
@@ -95,7 +95,11 @@ class WindowsTests(unittest.TestCase):
             artifacts = MagicMock()
             natives = MagicMock()
             dotnet = root / "x64-dotnet.exe"
-            env = {"CARGO_ENCODED_RUSTFLAGS": "-Ctarget-feature=+crt-static"}
+            artifacts_dir = root / "vm-artifacts"
+            env = {
+                "CARGO_ENCODED_RUSTFLAGS": "-Ctarget-feature=+crt-static",
+                "VM_RUNNER_ARTIFACTS_DIR": str(artifacts_dir),
+            }
             shared.host_architecture.return_value = host
             shared.MSVC_TARGETS = TARGETS
             shared.native_environment.return_value = (env, root / "msvc", dotnet)
@@ -111,7 +115,12 @@ class WindowsTests(unittest.TestCase):
 
             natives.NativeBuilder.side_effect = create_builder
             modules = dict(
-                windows=shared, bindings=tooling, artifacts=artifacts, cargo=cargo, native=natives
+                windows=shared,
+                bindings=tooling,
+                artifacts=artifacts,
+                cargo=cargo,
+                native=natives,
+                vm_environment=load("vm_environment"),
             )
 
             def stage(native, *, output, host, **_):
@@ -203,6 +212,7 @@ class WindowsTests(unittest.TestCase):
             self.assertEqual(pair[4], windows.RID)
             self.assertEqual(pack.call_args.kwargs, {"tooling": tooling})
             receipt = retain.call_args.args[1]
+            self.assertEqual(retain.call_args.kwargs["artifacts"], artifacts_dir)
             self.assertEqual(receipt["source"], source[0])
             self.assertEqual(receipt["coreRevision"], revision)
             self.assertEqual(receipt["toolInputs"], tool_inputs)

@@ -6,7 +6,6 @@ import hashlib
 import io
 import json
 import os
-import re
 import shutil
 import subprocess
 import tarfile
@@ -31,27 +30,7 @@ def digest(path):
 
 
 def acceptance_source(env):
-    commit = env.get("NAVI_CI_SOURCE_COMMIT")
-    fingerprint = env.get("NAVI_CI_SOURCE_FINGERPRINT")
-    if commit is not None or fingerprint is not None:
-        if not re.fullmatch(r"[a-f0-9]{64}", fingerprint or ""):
-            raise ValueError("Captured Windows x64 acceptance requires the workspace SHA-256")
-    else:
-        if subprocess.check_output(
-            ["git", "status", "--porcelain=v1", "--untracked-files=all"],
-            cwd=ROOT,
-            env=env,
-            text=True,
-        ).strip():
-            raise ValueError("Windows x64 acceptance requires a clean committed checkout")
-        commit = subprocess.check_output(
-            ["git", "rev-parse", "HEAD"], cwd=ROOT, env=env, text=True
-        ).strip()
-    if not re.fullmatch(r"[a-f0-9]{40}", commit or ""):
-        raise ValueError("Windows x64 acceptance requires the full source commit SHA")
-    if env.get("GITHUB_SHA", commit) != commit:
-        raise ValueError("Windows x64 acceptance checkout differs from the Actions source")
-    return commit, fingerprint
+    return load("windows_delivery").acceptance_source(ROOT, match_actions=True, environment=env)
 
 
 def stage_core(env, destination):
@@ -274,6 +253,7 @@ def main(argv=None):
     host = windows.host_architecture()
     compiler_host = windows.MSVC_TARGETS[host]
     env, tools, dotnet = windows.native_environment(host, environment, target_architecture="x64")
+    artifact_root = load("vm_environment").artifacts_dir(env)
     env.update(DOTNET_GENERATE_ASPNET_CERTIFICATE="false", RUSTUP_AUTO_INSTALL="0")
     dotnet_version = subprocess.check_output(
         [dotnet, "--version"], cwd=ROOT, env=env, text=True
@@ -444,7 +424,7 @@ def main(argv=None):
             receipt,
             version=vendor_native.version,
             output=output,
-            artifacts=Path(env["NAVI_CI_ARTIFACTS"]) if env.get("NAVI_CI_ARTIFACTS") else None,
+            artifacts=artifact_root,
             tooling=artifacts,
         )
     print(f"Windows x64 Polar and SoftwareLicensing acceptance passed on Windows {host}.")
