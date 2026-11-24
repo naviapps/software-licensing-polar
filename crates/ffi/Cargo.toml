@@ -7,6 +7,9 @@ publish = false
 repository = "https://github.com/naviapps/software-licensing-polar"
 rust-version = "1.99"
 
+[package.metadata.c-bindings]
+module = "CSoftwareLicensingPolar"
+
 [lib]
 name = "software_licensing_polar"
 crate-type = ["cdylib"]

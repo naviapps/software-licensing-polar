@@ -168,9 +168,8 @@ and the standalone Swift consumer. Protocol tests use synthetic inputs and
 transport tests use loopback servers. GitHub Actions runs the Swift tests on
 macOS 26 and 27, and the Rust and .NET tests on Windows x64.
 
-After editing Rust FFI declarations or their documentation, run
-`mise exec -- make generate-header`, then run `mise exec -- make native`
-to rebuild the framework. Consumers use the packaged header directly.
+Run `mise exec -- make native` to regenerate the C header and module map
+and rebuild the framework. Consumers use the packaged header directly.
 
 ### Build the .NET binding from source
 
