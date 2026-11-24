@@ -7,7 +7,7 @@
     <PackageId>NaviApps.SoftwareLicensing.Polar</PackageId>
     <Version>0.1.0</Version>
     <Description>Rust-owned Polar License API provider for NaviApps.SoftwareLicensing.</Description>
-    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
