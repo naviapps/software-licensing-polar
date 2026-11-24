@@ -1,40 +1,38 @@
 # Polar licensing for .NET
 
 `NaviApps.SoftwareLicensing.Polar` implements the `ILicenseProvider` contract from
-`NaviApps.SoftwareLicensing`. The base package owns reusable lifecycle, secure
-storage, persistence and offline policy. This provider owns the separate native
-library `software_licensing_polar`; it does not add exports to the base library.
+`NaviApps.SoftwareLicensing`. See the
+[provider contract](https://github.com/naviapps/software-licensing-polar#protocol-and-security-contract)
+for license scope, retries and recovery.
 
 ## Installation
 
 Use .NET 10 with a matching package runtime. Use `win-x64` with x64 .NET on
-Windows, including on Windows 11 ARM64 under emulation. Use `osx-arm64` on
-Apple Silicon or `osx-x64` on Intel, with the corresponding .NET SDK.
+Windows, including on Windows 11 ARM64 under emulation. On macOS 26 or later,
+use `osx-arm64` on Apple Silicon or `osx-x64` on Intel.
 
 Download the `software-licensing-polar-nuget-<revision>-<attempt>` artifact
 from a successful [SDK distribution run](https://github.com/naviapps/sdk-tooling/actions/workflows/check-sdk-distribution.yml).
-Put the provider and the Software Licensing package from the artifact's
-`dependencies/` directory in the same local feed. Both packages cover all three
-runtimes, and the provider requires the matching base version.
-In an empty consumer directory, create a console project and add the exact provider
-version.
+Check each archive's SHA-256 against its `.nupkg.json` receipt. Copy the provider
+package from the artifact root and Software Licensing from `dependencies/` into
+one local feed. Both packages cover all three runtimes, and the provider requires
+the exact base version from the same artifact.
+
+In an empty directory, create a console project and use the exact provider version
+from the artifact. Restore with a fresh cache each time you switch between packages
+with the same version.
 
 ```sh
 dotnet new console --framework net10.0 --no-restore
 dotnet package add NaviApps.SoftwareLicensing.Polar --version "[0.1.0]" --no-restore
-```
-
-Copy the [standalone .NET consumer](https://github.com/naviapps/software-licensing-polar/blob/main/fixtures/consumers/dotnet/Program.cs)
-from the same revision to `Program.cs`. Restore from the verified package directory
-and run with the matching .NET SDK. Substitute your package directory.
-
-```sh
 dotnet restore --source "/path/to/verified/packages" --packages .nuget-packages -p:UseAppHost=false
-dotnet run --no-restore -p:UseAppHost=false
 ```
 
-The smoke test exercises provider preflight, cancellation and storage recovery with
-synthetic inputs without contacting Polar.
+To try the package, select the artifact's revision in the
+[SDK repository](https://github.com/naviapps/software-licensing-polar) and copy
+`fixtures/consumers/dotnet/Program.cs` to your project. Run
+`dotnet run --no-restore -p:UseAppHost=false` to check cancellation and storage
+recovery with synthetic inputs.
 
 ## Configuration
 
@@ -66,90 +64,21 @@ Retry and timeout properties are nullable overrides. Leave them unset to inherit
 Rust defaults, or provide explicit numbers to override them. Rebuild applications
 using the earlier managed configuration signature.
 
-Rust validates the UUIDs and benefit allowlist, owns fixed production/sandbox HTTPS
-endpoints, and sends the versioned Polar customer-portal API requests. It performs
-response scoping, bounded body reads, retries, deadlines and cancellation. The
-managed adapter has no HTTP client, merchant credential or endpoint override.
+## .NET behavior
 
-The managed adapter rejects unpaired UTF-16 surrogates before JSON encoding
-and sends valid Unicode text unchanged. Configuration failures use
-`InvalidProviderConfiguration`. Operation input failures use `InvalidData`
-with mutation outcome `NotApplied`, since native work has yet to start.
+The binding rejects unpaired UTF-16 surrogates before JSON encoding and preserves
+valid Unicode. Configuration errors use `InvalidProviderConfiguration`. Invalid
+operation inputs use `InvalidData` with mutation outcome `NotApplied`.
 
-Successful activations retain source `polar`, an activation UUID and the granted
-benefit UUID as their plan identifier. `ExpiresAt == null` does not identify a
-lifetime purchase: active subscriptions also have no expiry date. Product-to-plan
-mapping remains a host responsibility. Keep the issuing source on stored
-activations and send them only to their original issuer.
+`LicenseErrorCode.IncompatibleAbiVersion` identifies a native ABI mismatch.
+`UnsupportedVersion` identifies a persisted-record version the core cannot read.
 
-Native completion may happen before start returns. Cancelling or disposing an
-operation retains its managed context until completion. Disposal prevents new
+Native completion can happen before start returns. Cancellation and disposal
+retain the managed context until completion. Disposing the provider prevents new
 operations and requests cancellation of pending work. A confirmed native success
-is preserved when host cancellation races with it. Cancellation cannot undo a
-server-side activation; retain typed mutation uncertainty for durable recovery.
-A generic HTTP 404 is not evidence of successful deactivation.
-Mutation failures preserve the HTTP status and retry advice. A 4xx response
-without a single matching `Polar-Version` leaves the mutation outcome unknown, and
-a matching version is required for automatic retry of a rate-limited mutation.
+survives a cancellation race. Keep pending records when the mutation outcome is
+unknown, as described in the
+[failure and recovery contract](https://github.com/naviapps/software-licensing-polar#failure-and-recovery).
 
-## Development
-
-Clone this repository and prepare the pinned `software-licensing` dependency
-from the repository root:
-
-```sh
-mise trust mise.toml
-mise install
-mise exec -- cargo fetch --locked
-mise exec -- python3 -B -m distribution.verify_bindings --prepare-dotnet
-mise exec -- dotnet build bindings/dotnet/src/NaviApps.SoftwareLicensing.Polar/NaviApps.SoftwareLicensing.Polar.csproj
-```
-
-Preparation resolves the immutable core dependency using Cargo metadata and writes
-the ignored local `build/bindings/core.props`. It neither compiles Rust nor requires
-a sibling checkout. Re-run it after pins or resolved cache paths change. For
-coordinated development, pass the absolute core project as
-`-p:SoftwareLicensingProject=...`; immutable acceptance uses the actual pinned
-dependency.
-
-Building managed sources does not stage either native library. Platform packaging
-tools pack the independent provider and core assets into their respective NuGet
-packages. Packed consumers use the ordinary `NaviApps.SoftwareLicensing` package
-dependency and need neither Cargo nor the developer bootstrap.
-
-Native ABI mismatch uses `LicenseErrorCode.IncompatibleAbiVersion`;
-`UnsupportedVersion` refers to unsupported persisted-record versions. Existing
-core records retain their source and instance identities.
-
-## Verification boundaries
-
-The fixture program exercises callback installation, exactly-once release,
-cancellation/disposal races and DTO framing with an owned managed seam. Its
-`--native` mode uses invalid configuration, invalid sources, empty keys and
-pre-cancelled operations, which cannot contact Polar. Rust tests use owned
-loopback HTTP fixtures. None establish live provider behavior or migrate customers.
-
-For native local tests, use the
-[pinned tooling tasks](../../README.md#distribution-checks). `make test-c` and
-`make test-dotnet` consume macOS framework executables without rebuilding them.
-The managed fixture build copies the selected provider and base libraries beside
-the executable. The clean NuGet consumer
-resolves both packaged native assets, then exercises cancellation, typed Polar
-preflight rejection, failed storage, retry and restart using an in-memory store.
-
-The Windows [distribution fixture](../../README.md#distribution-checks) builds
-and tests the two x64 DLLs and their local package pair. A prepared Windows
-ARM64 worker can run the same x64 fixtures through emulation. The distribution
-workflow then combines the accepted DLLs and the macOS frameworks into a pair
-of three-runtime packages. It restores and runs that exact pair in a fresh feed
-for each architecture.
-
-The GitHub-hosted Windows x64 distribution check also publishes and runs the
-Native AOT package fixture with JSON reflection disabled. On a prepared native
-Windows x64 worker with the Visual Studio C++ workload and pinned .NET SDK, run
-the same check from the SDK root with
-`mise run sdk-tooling -- windows -m distribution.verify_windows --native-aot`.
-For emulation on Windows ARM64, use the standard command without `--native-aot`.
-
-Local source verification uses its own runtime-specific package pair. Keep
-those files and the combined distribution pair in separate feeds.
+For building or verifying a package, see the
+[maintainer guide](https://github.com/naviapps/software-licensing-polar#distribution-checks).

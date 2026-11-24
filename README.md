@@ -172,6 +172,21 @@ After editing Rust FFI declarations or their documentation, run
 `mise exec -- make generate-header`, then run `mise exec -- make native`
 to rebuild the framework. Consumers use the packaged header directly.
 
+### Build the .NET binding from source
+
+After fetching the locked dependencies, prepare the core project and build the binding.
+
+```sh
+mise exec -- python3 -B -m distribution.verify_bindings --prepare-dotnet
+mise exec -- dotnet build bindings/dotnet/src/NaviApps.SoftwareLicensing.Polar/NaviApps.SoftwareLicensing.Polar.csproj
+```
+
+Preparation resolves the pinned core through Cargo metadata and writes the
+ignored `build/bindings/core.props`.
+Run it again after the core pin or cache path changes. To develop against a local
+core checkout, pass its absolute project path with `-p:SoftwareLicensingProject=...`.
+The managed build leaves native staging to the platform packaging tools.
+
 ## Distribution checks
 
 The [distribution plan](sdk-distribution.toml) checks the native build receipts,
@@ -183,6 +198,22 @@ The distribution workflow packages the accepted Windows DLLs and macOS
 frameworks for Polar and its fixed Software Licensing dependency. The
 [.NET installation guide](bindings/dotnet/README.md#installation) describes
 how to restore the same pair verified on both platforms.
+
+On macOS, `make test-c` and `make test-dotnet` use the existing XCFramework
+binaries. The managed fixture tests callback ownership, cancellation races and
+DTO framing. Its native mode and the clean NuGet consumer use synthetic inputs
+to check provider preflight, cancellation and storage recovery. Use a separate
+feed for the local runtime-specific packages and the combined distribution pair.
+
+The Windows x64 workflow also runs the Native AOT package fixture with JSON
+reflection disabled. On a prepared Windows x64 worker with the Visual Studio
+C++ workload and pinned .NET SDK, run the same fixture locally.
+
+```powershell
+mise run sdk-tooling -- windows -m distribution.verify_windows --native-aot
+```
+
+For x64 emulation on Windows ARM64, omit `--native-aot` to run the standard fixture.
 
 To run the independent Rust consumer against a clean Git checkout,
 point SDK Tooling at a complete checkout or bundle of the pinned SoftwareLicensing
