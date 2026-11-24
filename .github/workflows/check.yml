@@ -11,12 +11,18 @@ concurrency:
   group: polar-sdk-${{ github.ref }}
   cancel-in-progress: true
 jobs:
+  plan:
+    uses: naviapps/sdk-tooling/.github/workflows/plan-checks.yml@5b8ed6b1de70b0d7f0cf78519fd9fb1cbdf1f11a
   swift:
+    needs: plan
+    if: ${{ needs.plan.outputs.documentation-only != 'true' }}
     name: Swift
-    uses: naviapps/sdk-tooling/.github/workflows/check-swift.yml@51fde4fe947c1032b35b7e6bac47d5199c396891
+    uses: naviapps/sdk-tooling/.github/workflows/check-swift.yml@5b8ed6b1de70b0d7f0cf78519fd9fb1cbdf1f11a
     with:
       source-macos: "26"
   windows:
+    needs: plan
+    if: ${{ needs.plan.outputs.documentation-only != 'true' }}
     name: Windows x64 Rust and .NET tests
     runs-on: windows-2025
     timeout-minutes: 30
