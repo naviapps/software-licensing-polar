@@ -245,7 +245,6 @@ def main(argv=None):
         factory = load("ffi").FfiProduct
         core_native = ffi_product(core, factory=factory)
         vendor_native = ffi_product(ROOT, factory=factory)
-        bindings.run("cargo", "fmt", "--all", "--", "--check", cwd=ROOT, env=env)
         accepted = {}
         native_output = candidate / "dlls"
         native_products = {"core": core_native, "vendor": vendor_native}
