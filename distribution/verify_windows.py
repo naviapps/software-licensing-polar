@@ -12,7 +12,7 @@ import tempfile
 import tomllib
 from pathlib import Path
 
-from sdk_tooling.adapters import load, support_inputs
+from sdk_tooling.adapters import load, pinned_tooling, support_inputs
 from sdk_tooling.artifacts import file_sha256 as digest
 from sdk_tooling.c_headers import prepare_generated
 from sdk_tooling.dotnet import pinned_sdk_version
@@ -57,6 +57,7 @@ def stage_core(env, destination, *, include_macos=False):
             "rust-toolchain.toml",
             "crates",
             "LICENSE",
+            "mise.toml",
             "native.toml",
             "ThirdParty",
             "bindings/dotnet",
@@ -185,7 +186,6 @@ def main(argv=None):
     tool_inputs = support_inputs(ROOT)
     windows = load("windows")
     artifacts = load("artifacts")
-    cargo = load("cargo")
     environment = {
         key.upper(): value
         for key, value in os.environ.items()
@@ -242,13 +242,14 @@ def main(argv=None):
             ]
         )
         prepare_generated(ROOT, env=env)
-        factory = load("ffi").FfiProduct
-        core_native = ffi_product(core, factory=factory)
-        vendor_native = ffi_product(ROOT, factory=factory)
+        core_tooling = pinned_tooling(core, candidate / "core-tooling")
+        core_native = core_tooling("native_plan").ffi_product(core)
+        vendor_native = ffi_product(ROOT, factory=load("ffi").FfiProduct)
         accepted = {}
         native_output = candidate / "dlls"
         native_products = {"core": core_native, "vendor": vendor_native}
         for name, native in native_products.items():
+            producer = core_tooling if name == "core" else load
             # Keep test output separate from the source-bound native build stages.
             test_env = dict(env, CARGO_TARGET_DIR=str(candidate / (name + "-test")))
             commands = ("--workspace", "--target", TARGET, "--locked", "--offline")
@@ -266,9 +267,9 @@ def main(argv=None):
             bindings.run("cargo", "test", *commands, cwd=native.root, env=test_env)
             library, import_library, evidence = stage_library(
                 native,
-                windows=windows,
-                artifacts=artifacts,
-                cargo=cargo,
+                windows=producer("windows"),
+                artifacts=producer("artifacts"),
+                cargo=producer("cargo"),
                 env=env,
                 tools=tools,
                 output=native_output,

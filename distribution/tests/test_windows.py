@@ -196,13 +196,21 @@ class WindowsTests(unittest.TestCase):
                 )
 
             ffi.FfiProduct.side_effect = create_product
+            core_plan = MagicMock()
+            core_plan.ffi_product.side_effect = lambda path: create_product(
+                path, symbol_prefix="software_licensing_", specification="native.toml"
+            )
+            core_modules = {
+                "native_plan": core_plan,
+                "windows": MagicMock(),
+                "artifacts": MagicMock(),
+                "cargo": MagicMock(),
+            }
 
             def select_product(path, *, factory):
                 return factory(
                     path,
-                    symbol_prefix=(
-                        "software_licensing_polar_" if path == root else "software_licensing_"
-                    ),
+                    symbol_prefix="software_licensing_polar_",
                     specification="native.toml",
                 )
 
@@ -246,7 +254,10 @@ class WindowsTests(unittest.TestCase):
                 patch.object(windows, "stage_core", return_value=revision),
                 patch.object(windows, "verify_inherited_notices"),
                 patch.object(windows, "prepare_generated") as prepare,
-                patch.object(windows, "stage_library", side_effect=stage),
+                patch.object(
+                    windows, "pinned_tooling", return_value=core_modules.__getitem__
+                ) as select_core_tooling,
+                patch.object(windows, "stage_library", side_effect=stage) as stage_native,
                 patch.object(windows, "publish_versioned_x64") as retain,
                 patch.object(windows, "export_native") as export,
                 patch.object(windows.bindings, "run") as run,
@@ -275,6 +286,15 @@ class WindowsTests(unittest.TestCase):
                     options.append("--export-native")
                 windows.main(options)
                 prepare.assert_called_once_with(root, env=env)
+                core = core_plan.ffi_product.call_args.args[0]
+                self.assertEqual(core.name, "core")
+                core_plan.ffi_product.assert_called_once_with(core)
+                select_core_tooling.assert_called_once_with(core, core.parent / "core-tooling")
+                for name in ("windows", "artifacts", "cargo"):
+                    self.assertEqual(
+                        [invocation.kwargs[name] for invocation in stage_native.call_args_list],
+                        [core_modules[name], modules[name]],
+                    )
                 if export_native:
                     retain.assert_not_called()
                     export.assert_called_once()
@@ -284,11 +304,9 @@ class WindowsTests(unittest.TestCase):
                     return
                 export.assert_not_called()
 
-            core, vendor = ffi.FfiProduct.call_args_list
-            self.assertEqual(core.args[0].name, "core")
-            self.assertEqual(core.kwargs["specification"], "native.toml")
-            self.assertEqual(vendor.args[0], root)
-            self.assertEqual(vendor.kwargs["specification"], "native.toml")
+            ffi.FfiProduct.assert_called_once_with(
+                root, symbol_prefix="software_licensing_polar_", specification="native.toml"
+            )
             shared.native_environment.assert_called_once_with(host, {}, target_architecture="x64")
             shared.require_rust_target_stdlib.assert_called_once_with("rust-stdlib", windows.TARGET)
             targets = [entry.args for entry in run.call_args_list if "--target" in entry.args]
