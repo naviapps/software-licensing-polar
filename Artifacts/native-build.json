@@ -7403,7 +7403,7 @@
         },
         "inputs": {
           "Cargo.toml": "363e2c60ce13a45c2a27239fbef67f97685faa15b35c60bdd4974cd1e05eb053",
-          "crates/ffi/Cargo.toml": "931c6ecc82e97ad1c23a3890f98d3fa2821942212b1381b32ffa0d5a7cd68308"
+          "crates/ffi/Cargo.toml": "51c322afaf0072941f6e32f134bfb6230de51b68ae69c2e75784d958d0624404"
         },
         "name": "software-licensing-polar-ffi",
         "source": "workspace",
@@ -10043,7 +10043,7 @@
     "workspaceInputs": {
       "Cargo.lock": "19bfdb523b45aff67c53846edfc73e1e5c3c1fb7524ac56da88642667f161c7a",
       "Cargo.toml": "363e2c60ce13a45c2a27239fbef67f97685faa15b35c60bdd4974cd1e05eb053",
-      "crates/ffi/Cargo.toml": "931c6ecc82e97ad1c23a3890f98d3fa2821942212b1381b32ffa0d5a7cd68308",
+      "crates/ffi/Cargo.toml": "51c322afaf0072941f6e32f134bfb6230de51b68ae69c2e75784d958d0624404",
       "rust-toolchain.toml": "d13306be0ecda81ce779baa290ffb417380d525928477f16200884b5169cca33"
     }
   },
@@ -10257,7 +10257,7 @@
     "ThirdParty/zerovec-0.11.9/LICENSE": "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2",
     "ThirdParty/zerovec-derive-0.11.7/LICENSE": "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2",
     "ThirdParty/zmij-1.0.23/LICENSE-MIT": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
-    "crates/ffi/Cargo.toml": "931c6ecc82e97ad1c23a3890f98d3fa2821942212b1381b32ffa0d5a7cd68308",
+    "crates/ffi/Cargo.toml": "51c322afaf0072941f6e32f134bfb6230de51b68ae69c2e75784d958d0624404",
     "crates/ffi/include/software_licensing_polar.h": "f5dd928e20d36ecd518dda6a9de5113220698450e25df98bd4d6fcc040e99d8c",
     "crates/ffi/module.modulemap": "2467ace3b408c876cc350ad33913fe4529ec7f8a1ee87a4d0288e5d41c7258de",
     "crates/ffi/src/lib.rs": "0a1b45ca0b5290cce0f531358a0a4bbee9a5567601a1774bc2f311b5bc2b3bfb",

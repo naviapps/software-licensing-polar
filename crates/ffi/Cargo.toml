@@ -9,6 +9,7 @@ rust-version = "1.99"
 
 [package.metadata.c-bindings]
 module = "CSoftwareLicensingPolar"
+generated = true
 
 [lib]
 name = "software_licensing_polar"

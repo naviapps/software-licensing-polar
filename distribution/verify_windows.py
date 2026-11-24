@@ -14,6 +14,7 @@ from pathlib import Path
 
 from sdk_tooling.adapters import load, support_inputs
 from sdk_tooling.artifacts import file_sha256 as digest
+from sdk_tooling.c_headers import prepare_generated
 from sdk_tooling.dotnet import pinned_sdk_version
 from sdk_tooling.native_plan import ffi_product
 from sdk_tooling.windows_delivery import (
@@ -240,6 +241,7 @@ def main(argv=None):
                 *[f"--remap-path-prefix={path}={alias}" for path, alias in remaps],
             ]
         )
+        prepare_generated(ROOT, env=env)
         factory = load("ffi").FfiProduct
         core_native = ffi_product(core, factory=factory)
         vendor_native = ffi_product(ROOT, factory=factory)

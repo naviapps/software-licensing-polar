@@ -285,6 +285,9 @@ def main():
     output = ROOT / "build/bindings"
     output.mkdir(parents=True, exist_ok=True)
     if not args.dotnet_only:
+        from sdk_tooling.c_headers import prepare_generated
+
+        prepare_generated(ROOT, env=env)
         load("c_compiler").compile_c(
             ROOT / "crates/ffi/tests/c/abi.c",
             compiler=("xcrun", "clang"),

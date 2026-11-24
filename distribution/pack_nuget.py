@@ -8,6 +8,7 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 
 from sdk_tooling import artifacts, nuget
+from sdk_tooling.c_headers import prepare_generated
 from sdk_tooling.dotnet import subprocess_environment
 from sdk_tooling.windows_delivery import RID
 from sdk_tooling.workspaces import temporary_workspace
@@ -20,11 +21,12 @@ RUNTIMES = ("osx-arm64", "osx-x64", RID)
 
 
 def pack_pair(root, runtimes):
+    env = subprocess_environment()
+    env.pop(bindings.LEGACY_CORE_NATIVE_OVERRIDE, None)
+    prepare_generated(root, env=env)
     provider = xcframework(root)
     managed = root / "bindings/dotnet"
     project = managed / "src" / bindings.VENDOR_PACKAGE / (bindings.VENDOR_PACKAGE + ".csproj")
-    env = subprocess_environment()
-    env.pop(bindings.LEGACY_CORE_NATIVE_OVERRIDE, None)
     with temporary_workspace(None, prefix="polar-nuget-") as work:
         core = work / "software-licensing"
         stage_core(env, core, include_macos=True)

@@ -245,6 +245,7 @@ class WindowsTests(unittest.TestCase):
                 ),
                 patch.object(windows, "stage_core", return_value=revision),
                 patch.object(windows, "verify_inherited_notices"),
+                patch.object(windows, "prepare_generated") as prepare,
                 patch.object(windows, "stage_library", side_effect=stage),
                 patch.object(windows, "publish_versioned_x64") as retain,
                 patch.object(windows, "export_native") as export,
@@ -273,6 +274,7 @@ class WindowsTests(unittest.TestCase):
                 if export_native:
                     options.append("--export-native")
                 windows.main(options)
+                prepare.assert_called_once_with(root, env=env)
                 if export_native:
                     retain.assert_not_called()
                     export.assert_called_once()

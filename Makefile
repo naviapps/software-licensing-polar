@@ -11,10 +11,10 @@ check-source: lint check-header test-rust test-managed
 check-distribution: native-verify test-distribution-tools test-c test-dotnet
 	python3 -B -m distribution.verify_bindings --verify-swift-pin
 
-native: generate-header
+native:
 	$(SDK_TOOLING) xcframework
 
-native-verify: check-header
+native-verify:
 	$(SDK_TOOLING) xcframework --verify
 
 check-header:
