@@ -1,4 +1,27 @@
-[macos]
+[[native.artifacts]]
+id = "sdk"
+symbol_prefix = "software_licensing_polar_"
+minimum_macos = "26.0"
+
+[checks.swift]
+executable = "PolarConsumer"
+inputs = ["Package.swift", "Sources", "SwiftTests", "Artifacts", "ThirdParty", "LICENSE"]
+
+[checks.rust_c]
+git_url = "https://github.com/naviapps/software-licensing-polar.git"
+rust_packages = ["software-licensing-polar"]
+rust_git_dependencies = ["software-licensing"]
+rust_registry_dependencies = { tokio = ["macros", "rt"] }
+
+[checks.rust_c.c]
+framework = "Artifacts/CSoftwareLicensingPolar.xcframework/macos-arm64_x86_64/CSoftwareLicensingPolar.framework"
+header = "software_licensing_polar.h"
+
+[checks.nuget]
+package_id = "NaviApps.SoftwareLicensing.Polar"
+fixtures = ["fixtures/consumers/dotnet/Program.cs"]
+
+[distribution.macos]
 commands = [
   ["xcrun", "swift", "--version"],
   ["cargo", "fetch", "--locked"],
@@ -17,7 +40,7 @@ commands = [
   ],
 ]
 
-[windows]
+[distribution.windows]
 commands = [
   ["rustup", "install", "--no-self-update"],
   ["sdk-tooling", "python", "-m", "unittest", "discover", "-s", "distribution/tests"],
@@ -47,5 +70,5 @@ commands = [
   ],
 ]
 
-[nuget]
+[distribution.nuget]
 pack = "distribution/pack_nuget.py"

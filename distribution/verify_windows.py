@@ -16,6 +16,7 @@ from sdk_tooling.adapters import load, pinned_tooling, support_inputs
 from sdk_tooling.artifacts import file_sha256 as digest
 from sdk_tooling.c_headers import prepare_generated
 from sdk_tooling.dotnet import pinned_sdk_version
+from sdk_tooling.manifest import LEGACY_MANIFESTS, MANIFEST
 from sdk_tooling.native_plan import ffi_product
 from sdk_tooling.windows_delivery import (
     RID,
@@ -48,24 +49,30 @@ def stage_core(env, destination, *, include_macos=False):
     ):
         raise ValueError("Resolved SoftwareLicensing checkout differs from the pinned revision")
     # Build the core's own locked workspace without writing to Cargo's dependency checkout.
-    paths = (
-        []
-        if include_macos
-        else [
+    paths = []
+    if not include_macos:
+        manifests = subprocess.check_output(
+            ["git", "ls-tree", "--name-only", revision, "--", MANIFEST, LEGACY_MANIFESTS["native"]],
+            cwd=resolved,
+            env=git_env,
+            text=True,
+        ).splitlines()
+        if len(manifests) != 1:
+            raise ValueError("Pinned SoftwareLicensing revision must have one native manifest")
+        paths = [
             "Cargo.toml",
             "Cargo.lock",
             "rust-toolchain.toml",
             "crates",
             "LICENSE",
             "mise.toml",
-            "native.toml",
+            manifests[0],
             "ThirdParty",
             "bindings/dotnet",
             "README.md",
             ".editorconfig",
             ".gitattributes",
         ]
-    )
     archive = subprocess.check_output(
         ["git", "archive", revision, *paths], cwd=resolved, env=git_env
     )

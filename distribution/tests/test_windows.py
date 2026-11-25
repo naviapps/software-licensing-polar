@@ -39,6 +39,34 @@ class WindowsTests(unittest.TestCase):
             text=True,
         )
 
+    def test_windows_archive_selects_the_native_manifest_from_the_pinned_tree(self):
+        revision = "a" * 40
+        checkout = Path("from-cargo")
+        destination = Path("isolated-build")
+        for name in ("native.toml", "sdk-tooling.toml"):
+            with (
+                self.subTest(manifest=name),
+                patch.object(windows.bindings, "locked_core_revision", return_value=revision),
+                patch.object(windows.bindings, "core_root", return_value=checkout),
+                patch.object(
+                    windows.subprocess, "check_output", side_effect=[revision, name, b""]
+                ) as git,
+                patch.object(windows.tarfile, "open") as tar,
+            ):
+                self.assertEqual(windows.stage_core({}, destination), revision)
+                ls_tree, archive = git.call_args_list[1:]
+                self.assertEqual(
+                    ls_tree.args[0][:5], ["git", "ls-tree", "--name-only", revision, "--"]
+                )
+                self.assertEqual(set(ls_tree.args[0][5:]), {"native.toml", "sdk-tooling.toml"})
+                self.assertEqual(archive.args[0][:3], ["git", "archive", revision])
+                self.assertEqual(
+                    {"native.toml", "sdk-tooling.toml"}.intersection(archive.args[0]), {name}
+                )
+                tar.return_value.__enter__.return_value.extractall.assert_called_once_with(
+                    destination, filter="data"
+                )
+
     def test_export_keeps_both_native_receipts_and_rejects_changed_build_outputs(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -212,7 +240,7 @@ class WindowsTests(unittest.TestCase):
                 return factory(
                     path,
                     symbol_prefix="software_licensing_polar_",
-                    specification="native.toml",
+                    specification="sdk-tooling.toml",
                 )
 
             modules = dict(
@@ -241,8 +269,10 @@ class WindowsTests(unittest.TestCase):
 
             source = ("b" * 40, None)
             revision = "c" * 40
-            tool_inputs = {"native.toml": "d" * 64}
-            final_tool_inputs = {"native.toml": "e" * 64} if change_support else tool_inputs
+            tool_inputs = {"distribution/verify_windows.py": "d" * 64}
+            final_tool_inputs = (
+                {"distribution/verify_windows.py": "e" * 64} if change_support else tool_inputs
+            )
             with (
                 patch.object(windows, "ROOT", root),
                 patch.object(windows.Path, "home", return_value=root / "developer"),
@@ -307,7 +337,7 @@ class WindowsTests(unittest.TestCase):
                 export.assert_not_called()
 
             ffi.FfiProduct.assert_called_once_with(
-                root, symbol_prefix="software_licensing_polar_", specification="native.toml"
+                root, symbol_prefix="software_licensing_polar_", specification="sdk-tooling.toml"
             )
             shared.native_environment.assert_called_once_with(host, {}, target_architecture="x64")
             shared.require_rust_target_stdlib.assert_called_once_with("rust-stdlib", windows.TARGET)

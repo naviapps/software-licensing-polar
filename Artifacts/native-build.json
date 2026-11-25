@@ -3252,7 +3252,7 @@
       "software-licensing-polar-ffi"
     ],
     "package": "software-licensing-polar-ffi",
-    "specification": "native.toml",
+    "specification": "sdk-tooling.toml",
     "symbolPrefix": "software_licensing_polar_",
     "targets": [
       "aarch64-apple-darwin",
@@ -10268,8 +10268,8 @@
     "crates/ffi/include/software_licensing_polar.h": "f5dd928e20d36ecd518dda6a9de5113220698450e25df98bd4d6fcc040e99d8c",
     "crates/ffi/module.modulemap": "2467ace3b408c876cc350ad33913fe4529ec7f8a1ee87a4d0288e5d41c7258de",
     "crates/ffi/src/lib.rs": "0a1b45ca0b5290cce0f531358a0a4bbee9a5567601a1774bc2f311b5bc2b3bfb",
-    "native.toml": "740f2349759a004c27607106af277c1113f7c0678ea919caadb8a39778170c4d",
     "rust-toolchain.toml": "6b1cf8341d9a08d76c6deb1e9df90a0b208d0ef0d00ee05e0173e9cd4f0f425d",
+    "sdk-tooling.toml#native": "1c82f1f3ca486f1761bc23c5018a1148f23f495afcf752ee34f6e62f214b597d",
     "src/lib.rs": "b28cc609b38471b560df5f87f78da456ba27dc57ad6550e915b1ad0f2ce583a4",
     "src/protocol.rs": "d9e1dd75b929b4569145c8ac9d2f0a2989a8d3cb67b9256ad0fa209837cd0387",
     "src/transport.rs": "923c3658963f2085503523cffdca0ba59beb5e390250592af179717bfbeb222f"
@@ -10302,8 +10302,9 @@
     "cargo.py": "4f468ebfd98d094b464bbb4ac354b65726a1b099f8cfd50c9c37a3fc495c8544",
     "cargo_build.py": "96a1a5b00a20fd64d8691eeba89839144e7e5bd8fd989e9cb0a4a80152f98590",
     "crates/rustc-dep-info/src/main.rs": "0a59fb162cc855001899ad9b83875fac0ed837e73caafd116453352c9b56e2cf",
-    "ffi.py": "ea75aea07673c1b54ac4cf5178876abef3e20063eb5774b5d181e5d9ebc681c9",
-    "native_plan.py": "126791c1993dded2be0f46784a28528d40ed1218c46d1f1aadb2c026f047dcd3",
-    "xcframework.py": "277c2e390f94f45614479e289deccea9c2c3e0af71d5c6ce5421872161671558"
+    "ffi.py": "0b43b65842f7460b13c230df430413eedfc180150f9b998b870e7606600ecddb",
+    "manifest.py": "8b082abe499aaa4c5f2cbb4f0a49f0c1bebae6398f800433ce97b6cd823f45a7",
+    "native_plan.py": "52077659d94b626098ad0795639e40c1596987cae243a2af4116d4ee7fe7fc14",
+    "xcframework.py": "ab709f9f34cc63f2cd342cf8657634212797f69460ae0f93043b9ae74f265d0f"
   }
 }
