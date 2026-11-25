@@ -42,7 +42,11 @@ let package = Package(
         "CSoftwareLicensingPolar",
       ]),
     .testTarget(
-      name: "SoftwareLicensingPolarTests", dependencies: ["SoftwareLicensingPolar"],
+      name: "SoftwareLicensingPolarTests",
+      dependencies: [
+        "SoftwareLicensingPolar",
+        .product(name: "SoftwareLicensing", package: "software-licensing"),
+      ],
       path: "SwiftTests/SoftwareLicensingPolarTests"),
   ]
 )
