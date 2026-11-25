@@ -61,7 +61,7 @@
         "name": "bytes",
         "source": "registry+https://github.com/rust-lang/crates.io-index",
         "targetName": "bytes",
-        "version": "1.12.1"
+        "version": "1.12.2"
       },
       {
         "compilation": "target",
@@ -180,7 +180,7 @@
         "name": "form_urlencoded",
         "source": "registry+https://github.com/rust-lang/crates.io-index",
         "targetName": "form_urlencoded",
-        "version": "1.2.2"
+        "version": "1.2.3"
       },
       {
         "compilation": "target",
@@ -366,7 +366,7 @@
         "name": "hyper",
         "source": "registry+https://github.com/rust-lang/crates.io-index",
         "targetName": "hyper",
-        "version": "1.12.0"
+        "version": "1.13.0"
       },
       {
         "compilation": "target",
@@ -637,7 +637,7 @@
         "name": "mio",
         "source": "registry+https://github.com/rust-lang/crates.io-index",
         "targetName": "mio",
-        "version": "1.2.4"
+        "version": "1.2.5"
       },
       {
         "compilation": "host",
@@ -718,7 +718,7 @@
         "name": "pin-project-lite",
         "source": "registry+https://github.com/rust-lang/crates.io-index",
         "targetName": "pin_project_lite",
-        "version": "0.2.17"
+        "version": "0.2.18"
       },
       {
         "compilation": "target",
@@ -863,7 +863,7 @@
         "name": "rustls-pki-types",
         "source": "registry+https://github.com/rust-lang/crates.io-index",
         "targetName": "rustls_pki_types",
-        "version": "1.15.1"
+        "version": "1.16.0"
       },
       {
         "compilation": "target",
@@ -1021,7 +1021,7 @@
         "name": "smallvec",
         "source": "registry+https://github.com/rust-lang/crates.io-index",
         "targetName": "smallvec",
-        "version": "1.16.5"
+        "version": "1.16.6"
       },
       {
         "compilation": "target",
@@ -1043,7 +1043,7 @@
           "lib"
         ],
         "name": "software-licensing",
-        "source": "git+https://github.com/naviapps/software-licensing.git?rev=0d601499646fb9209d547de699b98ef0022f4d8e#0d601499646fb9209d547de699b98ef0022f4d8e",
+        "source": "git+https://github.com/naviapps/software-licensing.git?rev=011eae1033f3e919b1d23ab15fc3cd39939d7660#011eae1033f3e919b1d23ab15fc3cd39939d7660",
         "targetName": "software_licensing",
         "version": "0.1.0"
       },
@@ -1440,7 +1440,7 @@
         "name": "url",
         "source": "registry+https://github.com/rust-lang/crates.io-index",
         "targetName": "url",
-        "version": "2.5.8"
+        "version": "2.5.9"
       },
       {
         "compilation": "target",
@@ -1549,7 +1549,7 @@
         "name": "zeroize",
         "source": "registry+https://github.com/rust-lang/crates.io-index",
         "targetName": "zeroize",
-        "version": "1.9.1"
+        "version": "1.9.2"
       },
       {
         "compilation": "host",
@@ -1677,7 +1677,7 @@
         "name": "bytes",
         "source": "registry+https://github.com/rust-lang/crates.io-index",
         "targetName": "bytes",
-        "version": "1.12.1"
+        "version": "1.12.2"
       },
       {
         "compilation": "target",
@@ -1796,7 +1796,7 @@
         "name": "form_urlencoded",
         "source": "registry+https://github.com/rust-lang/crates.io-index",
         "targetName": "form_urlencoded",
-        "version": "1.2.2"
+        "version": "1.2.3"
       },
       {
         "compilation": "target",
@@ -1982,7 +1982,7 @@
         "name": "hyper",
         "source": "registry+https://github.com/rust-lang/crates.io-index",
         "targetName": "hyper",
-        "version": "1.12.0"
+        "version": "1.13.0"
       },
       {
         "compilation": "target",
@@ -2253,7 +2253,7 @@
         "name": "mio",
         "source": "registry+https://github.com/rust-lang/crates.io-index",
         "targetName": "mio",
-        "version": "1.2.4"
+        "version": "1.2.5"
       },
       {
         "compilation": "host",
@@ -2334,7 +2334,7 @@
         "name": "pin-project-lite",
         "source": "registry+https://github.com/rust-lang/crates.io-index",
         "targetName": "pin_project_lite",
-        "version": "0.2.17"
+        "version": "0.2.18"
       },
       {
         "compilation": "target",
@@ -2479,7 +2479,7 @@
         "name": "rustls-pki-types",
         "source": "registry+https://github.com/rust-lang/crates.io-index",
         "targetName": "rustls_pki_types",
-        "version": "1.15.1"
+        "version": "1.16.0"
       },
       {
         "compilation": "target",
@@ -2637,7 +2637,7 @@
         "name": "smallvec",
         "source": "registry+https://github.com/rust-lang/crates.io-index",
         "targetName": "smallvec",
-        "version": "1.16.5"
+        "version": "1.16.6"
       },
       {
         "compilation": "target",
@@ -2659,7 +2659,7 @@
           "lib"
         ],
         "name": "software-licensing",
-        "source": "git+https://github.com/naviapps/software-licensing.git?rev=0d601499646fb9209d547de699b98ef0022f4d8e#0d601499646fb9209d547de699b98ef0022f4d8e",
+        "source": "git+https://github.com/naviapps/software-licensing.git?rev=011eae1033f3e919b1d23ab15fc3cd39939d7660#011eae1033f3e919b1d23ab15fc3cd39939d7660",
         "targetName": "software_licensing",
         "version": "0.1.0"
       },
@@ -3056,7 +3056,7 @@
         "name": "url",
         "source": "registry+https://github.com/rust-lang/crates.io-index",
         "targetName": "url",
-        "version": "2.5.8"
+        "version": "2.5.9"
       },
       {
         "compilation": "target",
@@ -3165,7 +3165,7 @@
         "name": "zeroize",
         "source": "registry+https://github.com/rust-lang/crates.io-index",
         "targetName": "zeroize",
-        "version": "1.9.1"
+        "version": "1.9.2"
       },
       {
         "compilation": "host",
@@ -3241,7 +3241,7 @@
       }
     ]
   },
-  "compiler": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: aarch64-apple-darwin\nrelease: 1.99.1\nLLVM version: 23.1.1",
+  "compiler": "rustc 1.100.0 (0ef1bc386 2026-11-09)\nbinary: rustc\ncommit-hash: 0ef1bc386059596dada8fb65b50425aab2ea637a\ncommit-date: 2026-11-09\nhost: aarch64-apple-darwin\nrelease: 1.100.0\nLLVM version: 23.1.5",
   "configuration": {
     "ffi": "crates/ffi",
     "library": "software_licensing_polar",
@@ -3426,7 +3426,7 @@
         "version": "2.13.2"
       },
       {
-        "checksum": "fc652a48c352aef3ea3aed32080501cf3ef6ed5da78602a020c991775b0aff04",
+        "checksum": "776dfebd015e2d8732c684a2c71003674ccb49457b539b9e82151ba38e96dd7c",
         "features": {
           "aarch64-apple-darwin": [
             "default",
@@ -3438,18 +3438,18 @@
           ]
         },
         "inputs": {
-          ".cargo_vcs_info.json": "d635e8adac4b12eb20a70167844eccde198939ca3fcb20ce7ba6fd4d26c33faf",
-          "CHANGELOG.md": "0c4407c0700f0d64663f5c07579ac734e70b5febcbd491fb53367232e22ab820",
-          "Cargo.lock": "261a2e56650806259b188d7ef434d31406cc2b77aac69869becdf0fe24b500b3",
-          "Cargo.toml": "dc260d0d04b58aea819f8d6762c2feb51e66f8edd77e4e64cc1eac6f447a8143",
-          "Cargo.toml.orig": "4fc0d14d77a47a1fac1fbb445890db63e67360535c940dd47ffd69badc30cdc6",
+          ".cargo_vcs_info.json": "5f140d54b1ebc50f58731db894bb9dec5fa169b5f0b23b17e4bd4842e7daef63",
+          "CHANGELOG.md": "73f25a9cb41a649f80cab7d063b8f902ff9d10a33a7b4037713174deab052b1b",
+          "Cargo.lock": "27c679042c11c25db42d0864d218a7641f572f3e34a5f19c2f70fde568088b12",
+          "Cargo.toml": "a736aa968e78955bf41e5e384d0e5a773e600f6f3de395ae9102c859658bccd7",
+          "Cargo.toml.orig": "a70d1a185f8463773cdee3fe97379e2a833c53c83de7dd20c15afbce353dc1f8",
           "LICENSE": "45f522cacecb1023856e46df79ca625dfc550c94910078bd8aec6e02880b3d42",
           "README.md": "275ac7bc295e3cc659d28f05261645ac5bd6286476afe2ee3c1ed719f7b6df02",
           "SECURITY.md": "a3335079977c2f13bad59e323fdc1056bdae5adfe55f18d15ac2c930d741828c",
           "clippy.toml": "583b79f56f20c85fb7820fcfa97985e03a4b41da31c8bbe6c03b721d3df5e800",
-          "src/buf/buf_impl.rs": "f1095872bba7c9d5170207750f4ebe4fa61c4e35a282569491c2ee8ea2dc6714",
-          "src/buf/buf_mut.rs": "c76d0a846cf6e2c42af7acf0bbedc49a30ce3b9185392835c6a6f8b06a128b9e",
-          "src/buf/chain.rs": "27ff0a6fce049c51a24d45003b9741b655c28330b48af23ad1514587760b0c93",
+          "src/buf/buf_impl.rs": "6e7ee4432342e26c6f76da9920029d6f4fe76006d05614f7e9a6a4af14b87c48",
+          "src/buf/buf_mut.rs": "4efa6c6d83e8405548625cfcc6fda11e8c860978b45bd0f63f1415dad5b65c5c",
+          "src/buf/chain.rs": "1c937bc547767acab8123cbab86ca6511b34d0edb90ddf66e3308e6b2ef036c7",
           "src/buf/iter.rs": "d4dca5b7f9b1cb441f22ac1862e28b10086721879163a810955aefb5cd7f3e58",
           "src/buf/limit.rs": "e005ba140b70f68654877c96b981a220477e415ff5c92438c1b0cb9bc866d872",
           "src/buf/mod.rs": "3f60295316d44b510b942abb31a0d975ae488bd4b52c87f5252d73f88f82715a",
@@ -3457,31 +3457,32 @@
           "src/buf/take.rs": "443766677fae38b398271693ed6134c7cc14949cdb9fce299c44dd55ecf84fb3",
           "src/buf/uninit_slice.rs": "52629b93ff7a08db45fc69395580b34fa3609fd9309ea01f86e58488b02b08a3",
           "src/buf/vec_deque.rs": "baac165527d1bdfc3bb259380bb4722e70c3f11e8a901e8bab6e4f951b060711",
-          "src/buf/writer.rs": "b137608cb40944a5c3e061a73087c5a48e50048dae002d0334a23cf4d3547065",
-          "src/bytes.rs": "eee15c02105022837d6ed01c6863fee58802ce7bd7c300e158521c9ae61257fc",
-          "src/bytes_mut.rs": "48bf55ffb1e3062082cae343c223e063104e3eee0a18f291a72942026062adbd",
+          "src/buf/writer.rs": "e6db9603d8f1e625e55bb2b815aa6561c1ac916a02eddf2486366d21c688324c",
+          "src/bytes.rs": "3df7710f9f9ae787259795c4b78e0364313be74348fce6a9e09aceace948f0d7",
+          "src/bytes_mut.rs": "601bf4ef25552606c53ed188c17a885a0feb313a08298e82740ac4f9ab30235d",
           "src/fmt/debug.rs": "4d217b8f43e489925bb6904010df617efc63b50a3cc1ab126eec54b43b66eb3e",
           "src/fmt/hex.rs": "54c05ab7d95d7381e499079d63773fabd2672f3c4929b56b02ab87d4495902b5",
           "src/fmt/mod.rs": "b38222dcfff70eb3ffb6ce305b95f3fcfd9fa68cca85693eb2ed01d3da7ddb88",
           "src/lib.rs": "053fc1b7e028cd1ccab019ea695f3e620129ef26a5b3f80a747b402a9871dfbf",
           "src/loom.rs": "7c89f9f5f900d5b9b7c43d08d467957933eba90d5dcff1b38cf9a7e48494a577",
           "src/serde.rs": "3ecd7e828cd4c2b7db93c807cb1548fad209e674df493edf7cda69a7b04d405d",
-          "tests/test_buf.rs": "941b6ac1c547aa522a1576fefa3da98edc7636f1f322feebc5768701199caa83",
-          "tests/test_buf_mut.rs": "1f28f3d125e98b81a813a414a89a8c9b5d45369b10dda187a68614ff285c820e",
-          "tests/test_bytes.rs": "2b102b8c04cd45076940691d11ae3962c6e31f32ae8f283bcbcf0b8e93c46545",
+          "tests/test_buf.rs": "1f79325045e762e1572349f51ca2a81275b4162a15ff1bb28fd723b8fdf2d570",
+          "tests/test_buf_mut.rs": "264275d89a6004cb7a2ec483ecb3bfdca4c41a52bac6a663774f60186230ff51",
+          "tests/test_bytes.rs": "44523ad41e260b08e3f7130ebb352cb539b9265aee72532c63c0e4236c22330a",
           "tests/test_bytes_odd_alloc.rs": "ad5df84a35038359413199762c65017989d905e6e965a7b863beaa9962a7e1e8",
           "tests/test_bytes_vec_alloc.rs": "5a0e77cab12b32374b2822df8d9a6479afe68b55c1cba1511ebf4199be532caa",
-          "tests/test_chain.rs": "1784287560d45e0225b2cd9d24498264031c36f42cebb7e92108e11641d1cce0",
+          "tests/test_chain.rs": "73edc54122a560cad141264ec1504b44b6401f56fdb8eb434a1f29cc25dc3f10",
           "tests/test_debug.rs": "13299107172809e8cbbd823964ac9450cd0d6b6de79f2e6a2e0f44b9225a0593",
           "tests/test_iter.rs": "665e1837c1294d7695ffa352a666ce8673fb46fa603164556524e87d5517a6cb",
           "tests/test_limit.rs": "6c5801f1e94f0abb2b4994aa1ade8e36464f26bf9e13e3dcac02d0f2f6f08ed5",
           "tests/test_reader.rs": "050b872d89376b3b83841839b4334066d8357b01aaf3783a180aac25a5550f3d",
           "tests/test_serde.rs": "2691f891796ba259de0ecf926de05c514f4912cc5fcd3e6a1591efbcd23ed4d0",
-          "tests/test_take.rs": "fb34700a8ed75b3c6937a4dee0bffadb64f7c7f735bd9faa8730eb96a9e9b651"
+          "tests/test_take.rs": "fb34700a8ed75b3c6937a4dee0bffadb64f7c7f735bd9faa8730eb96a9e9b651",
+          "tests/test_writer.rs": "c8996030bd645bb60a28226a15f1e90b8d69b55d023643506c9f37d61c2db8fc"
         },
         "name": "bytes",
         "source": "registry+https://github.com/rust-lang/crates.io-index",
-        "version": "1.12.1"
+        "version": "1.12.2"
       },
       {
         "checksum": "4e7648175b45a9a48536d676f68d918270699102aa8dab5496df06904c914600",
@@ -3794,7 +3795,7 @@
         "version": "2.5.0"
       },
       {
-        "checksum": "cb4cb245038516f5f85277875cdaa4f7d2c9a0fa0468de06ed190163b1581fcf",
+        "checksum": "afa489199eaffb1211795df1c6236ce1ad0d41a6fa45250add73e3b02420f06e",
         "features": {
           "aarch64-apple-darwin": [
             "alloc",
@@ -3806,17 +3807,17 @@
           ]
         },
         "inputs": {
-          ".cargo_vcs_info.json": "b376a9800c7c6ff3ee0adbeb3bc2055994bcbb994b6fdf81ad58cdb8fac454f6",
-          "Cargo.lock": "1dbf555d3a0e46fb4fde0559cd29ef38290eed9e08e7e9df2c02cee663aa0ba0",
-          "Cargo.toml": "118b1d87e862ea329b8bc84b389085a2f8e049d4c0b8b3c38ac2bffbe3501928",
-          "Cargo.toml.orig": "d523fbc2da822b802fb51843d81d4aa9da7a6f660ad3805c40325e9fb0d1257c",
+          ".cargo_vcs_info.json": "1566e69a00a98914bfb5b34cac55714b07d75f999c0654f5f15c39610e2a6058",
+          "Cargo.lock": "251ed4ddc1c65537dbfbfc9c6126415397da10f6119a17a7674250601311775a",
+          "Cargo.toml": "47a39fced5fea0239010d6cc5e65bdd6312ef348e029be8389e4be8a14b5ce99",
+          "Cargo.toml.orig": "ec6d88693dc9d81b2dc3ab510295130a0a61edf0f7ee30b0c67ca4df2f1295e5",
           "LICENSE-APACHE": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
           "LICENSE-MIT": "20c7855c364d57ea4c97889a5e8d98470a9952dade37bd9248b9a54431670e5e",
-          "src/lib.rs": "766b5d679064e01f7e6cce6f127a23885f79806ce3bccc49e4fe41933b83fd8d"
+          "src/lib.rs": "99f16d4890b77f5a809476ff957babda3c08b7f3455726915162fdeb50d87da3"
         },
         "name": "form_urlencoded",
         "source": "registry+https://github.com/rust-lang/crates.io-index",
-        "version": "1.2.2"
+        "version": "1.2.3"
       },
       {
         "checksum": "b1f9e3d69d39e4862ffed03ed071a76f9a13ba1d9109d355b0f0aa6b15e393c4",
@@ -4474,7 +4475,7 @@
         "version": "1.0.3"
       },
       {
-        "checksum": "2c3e324da4c95177d6291d4c8730197c0d1822f8a9766814a4a44fa5ab797c9c",
+        "checksum": "229c6ff5584df4c6becbfe00567128bac768c8cd32ebc8a8366bd81ed072e8f3",
         "features": {
           "aarch64-apple-darwin": [
             "client",
@@ -4488,24 +4489,24 @@
           ]
         },
         "inputs": {
-          ".cargo_vcs_info.json": "ce2a9a274c279810c04796e650842b1db82faac0a8da8a59a5f2cd536774f256",
-          "Cargo.lock": "eccfa5f4325ec5623d82c7ef8a1b598a647a885f0048962ed1b558bf7547d023",
-          "Cargo.toml": "dda7caddb7df155f479d2bd4764f201c57311f04969a0e7c893362765857161a",
-          "Cargo.toml.orig": "226a36792ab1b4cfbb7082ca10d477858a8bd0ab7b6171071f4376b02f83a85f",
+          ".cargo_vcs_info.json": "094c56b3c958a71f5126e75b8ac004446341bd2f2f122d3adb1642f5378bee64",
+          "Cargo.lock": "0b8b8ddd849b4461c9468eed667190c37c330fc45a5346e2c241b7c051bfb804",
+          "Cargo.toml": "0ee5680969aec4c71e2ad63acd332fcf9ed47c575e661590355b8e78dcc080e0",
+          "Cargo.toml.orig": "673e79e34fcd17bec3b40b67f7521961a78680cdda59ea5d0b5ef5898937f0ed",
           "LICENSE": "2d01890414494742ba4a509fcec8efa40f6d8be22cbd72be7cff08d6fda4ec89",
           "README.md": "9f8d9269b8bfb0cfb17d119c65cebcc33f67310bcec7fbf06b8527def78c1502",
           "src/body/chan.rs": "3e95f496a94e6881e2121b8e40e6d6b233e80a40ada76e92aa0d39419943644b",
-          "src/body/incoming.rs": "11b8d262650730750721d6f93faf567e9cce6aa2e8a326aeb8f2cad908fdd485",
-          "src/body/length.rs": "81a1ec988bc76df77a65a6a34d47c6935eb3f72f242bdc6f0c141e02e9a6f498",
+          "src/body/incoming.rs": "7c78360dbc906cd47f01365e742bad16f0a41ccee54679848fd19d051178ca9e",
+          "src/body/length.rs": "c1fbd673dc321700baa33aa43044743c67d0e7c7e3e2f77efb77186ee02822f0",
           "src/body/mod.rs": "5296424f2f8148925c8cf18992e4d59b827b9fa84eb8b3a8dad040c532ce04ef",
           "src/cfg.rs": "de5fee5bba45a982c10e8f09fc24677be5494bf6da0b39a3a132f0f6eb3fe41e",
           "src/client/conn/http1.rs": "6ec8124f5dc3f176baae99d9528d467e976e2522912d5bab13603a792fecb203",
-          "src/client/conn/http2.rs": "0ec553b8106fbc1eec7ed2b84ce4f37128512e4bbbf73096b822c2c1a8bbfcb5",
+          "src/client/conn/http2.rs": "d6df0f9cd76392f0efd7145ecf32d7e4c04660e17c109ed74a98ebb8cff4e6cf",
           "src/client/conn/mod.rs": "9a3a11f287ac5f8a2eb2f27af4d66cf201f92dc580f773f9cb5495f32756ee28",
-          "src/client/dispatch.rs": "cce049418dcd9e1700b87701d6e78a4a021ba0e9912e9b669fec3d3f037d4e29",
+          "src/client/dispatch.rs": "23c2208fb893dbdc27908230adbdf983134cef4967041c9b6699a21b473fbc72",
           "src/client/mod.rs": "6bab8369943bad42c3258eff7631efc757fa6db8c56bf4271dc48f1c45b243a5",
           "src/client/tests.rs": "de0001609ef0b82d34d6e152b20d19f0b2f79ab6708bc4b3748a40acd3325238",
-          "src/common/buf.rs": "5fc624b4bebfada06c394babe3e654346f51cf48b9465a12e4d21e3e783284c1",
+          "src/common/buf.rs": "50be5f733b617ac0e047271b44ccd126c5a121a6cbd451ba3e0b035eaf79cc8f",
           "src/common/date.rs": "6b48438b51d0cccb110112acb0eb5cbd87f5ad8089bf5301c633548e801baae9",
           "src/common/either.rs": "cf162a4087419ea3d83514177da81813e301736bbe5399b58f39c96f214c6429",
           "src/common/future.rs": "dbeb3a936470ad0fc320780654c6437b9e94c17795ad33a5999879cf8bbe9002",
@@ -4516,7 +4517,7 @@
           "src/common/mod.rs": "c0a7b8316329e37b6e5776fe585adb9ef482e889de5d61634dac686a69b480bf",
           "src/common/task.rs": "a85877dfc0d233dacf6df0568d135ee7b0abb1f54873cc237bbdf4e14240edf5",
           "src/common/time.rs": "348a438955d3984b0244090bd8f37c10e6626ecc675bdc08f964b5217b1f9ef1",
-          "src/error.rs": "d5ebaa35a6a8464d1474023d9aa756dc9632145aeab812879f7cc35dae10b795",
+          "src/error.rs": "07a2ac7fd3a4d7d5af9903382be6c0c7fbb868c1519968e5a469572b39268823",
           "src/ext/h1_reason_phrase.rs": "14ce65c6ab3d8f5437ccbf7296e02d7a57f25e82d6146ae4b220efe289f2ceeb",
           "src/ext/informational.rs": "1e5618061f60f55beacc7790f7b817be3dd1997ed1356668161802a6bfd73bc0",
           "src/ext/mod.rs": "f500418e9d3fefa6938860dae5280a022c0694593007171815d6263b8423d285",
@@ -4529,39 +4530,39 @@
           "src/ffi/mod.rs": "80639b0ff428ff21ebf1e87c7800558002efc5f51424fe21fba6bf57ca8818e6",
           "src/ffi/task.rs": "3d81ac2f00965c7dd24c265ca733776abe5d3ec404dace230d70d204bcb624c5",
           "src/headers.rs": "c8acc76bb2a2aac07896df1e356d84b7c1d9d718594cf950277b3b5ffbe98fae",
-          "src/lib.rs": "d2db6fe1da5f09a8062a8fb4f44fac931a17220f5c18603ff455846706b3d243",
+          "src/lib.rs": "e1a52773cca49c83671b32287511c267de73bc2a5503a6f64b4e415ae8f2e260",
           "src/mock.rs": "7c77d16f952bda6ce51995548b1a1b8652739fca70115df96598440a524d86d4",
-          "src/proto/h1/conn.rs": "59a6db81bd098c126d7929e1996a3a6bf9d6e997da76b47d88178fd8206ad44a",
-          "src/proto/h1/decode.rs": "5fc4f3a580cdeef18ad986fac7d63099637d0482acfd54f78d7ec08de40b295a",
-          "src/proto/h1/dispatch.rs": "9cd6638c59ae4857ae43ee58857abf585cc6a52dfda616c3631e2e48c02eaba2",
-          "src/proto/h1/encode.rs": "eec0acd88ff2a10b3d981417b2c6daf2aef7828a9197d1b16e632a21059bf136",
-          "src/proto/h1/io.rs": "27287bec2aeb9d23fbf3440b5eea5186a1826301f7de2d855e78fcfce465c745",
-          "src/proto/h1/mod.rs": "7b6c67444fe2290284b49992ccdb02896a26b4c60fc867cd9fedd954be6856fb",
-          "src/proto/h1/role.rs": "ee27600c6d7ae2f23e148af5cef02fa029def6ea5999cce84af4aac058ceb03e",
-          "src/proto/h2/client.rs": "56d715d09cdeddb91606dd0a9cfaa3de360ef31c07179ab9df6d24d9da0868af",
-          "src/proto/h2/mod.rs": "8f10d6023aa310984b7e9450e9fe9db2dde3a5c34ad6f78c6a16210ad868258a",
+          "src/proto/h1/conn.rs": "13b4054ce6d15f884658d5a6c243a251bc9c7edb4abde1a41f6e54520878dc0b",
+          "src/proto/h1/decode.rs": "98b980d832cf52216a4d04d98842d6aa4938d1dd93882f919bf4e92ca6ff9eea",
+          "src/proto/h1/dispatch.rs": "8ff74bbb164869c4e5997df35f4a47ed5c88d9deb5df5208be097bfc54dffc4f",
+          "src/proto/h1/encode.rs": "a1a624275ecd3141a6e8198e99901decb98fe323827dfa6203503404e3567eea",
+          "src/proto/h1/io.rs": "149ab934041e1425f970dd172ab31ae01d77e673d0016bf6dc4583b5a667d24b",
+          "src/proto/h1/mod.rs": "a5f94534fdad0be8e196090bdfdefa1836711e8a6cf1cdad72091b918239942f",
+          "src/proto/h1/role.rs": "0749d56f62d5cf6e28609de525187d3a8dea17dbced742097a679fa1e4221ede",
+          "src/proto/h2/client.rs": "34bb460b39af7eeade54a73d77f0ace44a42eefc998d42e3dc1d031981b9ddae",
+          "src/proto/h2/mod.rs": "10599421d93b2c13f72e2b68bafc6d1a9eaccdff7d061138f66b9f7e6047670a",
           "src/proto/h2/ping.rs": "44cdfcd5ecef5fc7d5ee42e87ba4be6a1f02ba13c6bb813d0a37cb6c9162293c",
-          "src/proto/h2/server.rs": "4a31750ff85d513011234d497cd00114a6b8ebb83e7c416cdfbace185e9fb47f",
-          "src/proto/h2/upgrade.rs": "ce6bdec717c291a4ecbbc2354d3e1170875d05661946dd1ab9d2af2e58ccb376",
+          "src/proto/h2/server.rs": "3a25cdd358bb47cf46a771c2298aca58dd0a967901c49c8caf74933308e91b4d",
+          "src/proto/h2/upgrade.rs": "91de3c7a7e9f46350f6b3027bf587b1222e18506e22ee604c204e29426728202",
           "src/proto/mod.rs": "7a1ac66edcc24b364eae3581abf151459a5259b4c521561aa7203c9ca4473da4",
           "src/rt/bounds.rs": "bc1d1865d67672625afcfef4ef495c249f94b73c9cd6910662d3aed2e73d0f32",
           "src/rt/io.rs": "97231117887089e0a9fcd165b14f839c9abb6e3fc75dee5c02cb76604ae9730e",
           "src/rt/mod.rs": "4bdc9348a48e924b262c965265863a7ff465881f91c393b019120854241cd386",
           "src/rt/timer.rs": "9f377be659ac9f60a5de4716d17bea6dd6f1af1f5693166db4d2bbb3b8b2c4f6",
-          "src/server/conn/http1.rs": "6f84d0e780f49dc8745b9e54125edf1360b1ec54cada21c0a238e5098decf162",
-          "src/server/conn/http2.rs": "625bc621eab3dd7110574a8e5e0bc9bfe931556d062cfea8cef104c708802ea5",
+          "src/server/conn/http1.rs": "e0303429ffc67a682ea829430068a5c5ec0b7b756da2a1de65ec8264bd6e9696",
+          "src/server/conn/http2.rs": "7dfea3b0bca068cc5dfe66820bad09fbdb2afc93b01a5fff5fa9d9a3aab23ae3",
           "src/server/conn/mod.rs": "b2393dc0d68c09b560f7c9bcc61ed3bf99fce4d746eda9e1ad158891ee56f2be",
           "src/server/mod.rs": "192142f7d2f2da63699abeaca0bbfedc06bd1714531da2e53795828da5e946f3",
           "src/service/http.rs": "74b6a556f77bcbf6d2a17e8be3d619c54cc2e73f04bcb66666169d3f40c78a11",
           "src/service/mod.rs": "91711508cdef3879404859238f5978eb3e066dcdae1c2c06c8bfd84787103053",
           "src/service/service.rs": "e08f14d369311406bf34159f4e831d1dadd5be83bc78a21fb3dad78031017df6",
           "src/service/util.rs": "a35d37abcd2fcf5c3c6a0c0241a9a9361922fe0da989f3314ab0b490db6b2b0b",
-          "src/trace.rs": "a766c472433c7569440862e978eceeea78220af170220e9fdc90b71bab731344",
+          "src/trace.rs": "57282478c3fe06ccfaaaf2eda9c0aa22a18da195c6f509d39c663a2a556e373f",
           "src/upgrade.rs": "a9406f2cf45bb2f3574371a60cab20a60733f36fee65828c4f395f1fcf31e520"
         },
         "name": "hyper",
         "source": "registry+https://github.com/rust-lang/crates.io-index",
-        "version": "1.12.0"
+        "version": "1.13.0"
       },
       {
         "checksum": "70206fc6890eaca9fde8a0bf71caa2ddfc9fe045ac9e5c70df101a7dbde866e0",
@@ -5948,7 +5949,7 @@
         "version": "2.8.3"
       },
       {
-        "checksum": "1788edb87fdc09c7e26304471e2f5be8cdefb1b6930d6e3985fc02ff53bf86ee",
+        "checksum": "20521a903f02b0a573cd6840e9d0a5a0cc043d361fe924092cd70f8556cc9c4a",
         "features": {
           "aarch64-apple-darwin": [
             "net",
@@ -5962,11 +5963,11 @@
           ]
         },
         "inputs": {
-          ".cargo_vcs_info.json": "b8ae62c2e384cbccbff55a866b5c500aaa7423e0379ffc92fac1b534adb17689",
-          "CHANGELOG.md": "6994067daa8b24eb98098ab03474fafa77fdbaefc43072ae6ca4624d3f9d3c41",
-          "Cargo.lock": "aa25bad2043d17118428abac0f2f2eb8e1d39900a652386b4c38ced65823b7fc",
-          "Cargo.toml": "a8842f7fd53967d0f6b3faa359c4354c60ad6fd2927a5e0c4894933fdca55768",
-          "Cargo.toml.orig": "ba5f24b8b3c75c43cbb0047c77048ee596213f67c839eecf9b30d5ccaf8b822c",
+          ".cargo_vcs_info.json": "36730794243a50ce36f24092da9d99b2009136283da00bbac3d835b96bf3b58e",
+          "CHANGELOG.md": "db57d5146ab6b0351595ccf2c6a42c6d1accc5e38a3147779e653afb656bfe17",
+          "Cargo.lock": "6e6d635b7652ee8039430c1f04c2c9ab72c6e7ff511fbcecb65893f9da0c7c77",
+          "Cargo.toml": "821f34c0c5299d0caf25dd259cf7eb3c1677f1e2cf3db4fb93a6df32c898ee2a",
+          "Cargo.toml.orig": "0fadb87dc4a28408a56d701a837d32119943ffa81d44e82d49031b78b4ba413c",
           "LICENSE": "07919255c7e04793d8ea760d6c2ce32d19f9ff02bdbdde3ce90b1e1880929a9b",
           "README.md": "3b1ddb7c071aa87f5ce7633ea772fae217249dc8dd0a219d1ed475a801480f28",
           "examples/tcp_listenfd_server.rs": "3e11f2318584f252989f28e5af536a06b01cb953f14f06f87c8f7a0f663242d6",
@@ -5978,41 +5979,41 @@
           "src/event/source.rs": "848c081b4b9b1e8c322820a6ca76ecb8d32a78a76b5dc99aeb8f13cfd4bf1467",
           "src/interest.rs": "1a6975703d866ea636a41e8a0b278fbdf646b8f806d84c9616a8b959b5c4435c",
           "src/io_source.rs": "4d719ec26a4d8cf59a59bf5a6a5477f0341527089aa5df433848424c6b4b3797",
-          "src/lib.rs": "46c519a194423ce2bc4d2f529a9d254b9dd1c45147d002701853658ff00544df",
+          "src/lib.rs": "112ccbc7af5d5baeb42abd4118873bd62eebb4b791d75d293b78d2339b30e2b9",
           "src/macros.rs": "f0434378e9ba8abf5adb3f6be926be32414d84edc1cb82434f28aa17985ce0f2",
-          "src/net/mod.rs": "be5606d108b3d1003f86682025c068161dd18f6e54222d55e96131b3a13a336d",
+          "src/net/mod.rs": "23de35ab1abbb9f9994bb8cd45d7e9c027c389d5e248631b3d7d64604d0ea21f",
           "src/net/tcp/listener.rs": "2d56fd760c2027fc14aa6960c3e0df9bc3e8c6bf3001999273ff9ed913ebefc0",
           "src/net/tcp/mod.rs": "f2c50c1d338a69d704e18727142d8495be2927b390d7bbb77cc0cf4e945ed83a",
           "src/net/tcp/stream.rs": "127757a47bbfc770a49195154c2e7eb69a65eb33a8fbce0b2bf78fa5c5905e2d",
           "src/net/udp.rs": "f2c21503bec219d9c3d64667cbb27f1a26a8f028b0ff00b8d3f02754ddce7b51",
           "src/net/uds/datagram.rs": "7558c7caee33d6ae4fd619536228f6e4d095ce242f085356e4dffe6d27e12803",
           "src/net/uds/listener.rs": "d2b078e3489491ae69e4681afbded17af268324c273c9253a05f7afedd5eee9e",
-          "src/net/uds/mod.rs": "39d8e36750564c22830af93fe7a9b000b6cbbe1c0f3b5eb527df14b6fc61fe14",
-          "src/net/uds/stream.rs": "c9b59ec4f45984311d3c77264e6d26a76578fef5515e7175de9c24fd3eff8cf5",
+          "src/net/uds/mod.rs": "5f8ce335d4b039a9de20094af390499c2811121b673be683aeb6cb4f1b984c3c",
+          "src/net/uds/stream.rs": "61e7d38c6bbb65b868e827c5814bbc321a997b20f03917cde9890755ad4f05a6",
           "src/poll.rs": "521292491313ae94337d99bb73d96f537fb4e0a2db96b0fe99f58df1c26559b8",
           "src/sys/mod.rs": "3bb47fdf1b3066a890317288bd73dab25dc8d19a1eab088ee1d2f3c34d6db52a",
           "src/sys/shell/mod.rs": "e2647faf7fdf4eb9a336e0e5d4f947b9a62d9ae229abd4a63775e67835f5606d",
           "src/sys/shell/selector.rs": "13e42f067631c9a4b972041d904c72e02315e601aa2cb46212f4eae898550008",
           "src/sys/shell/tcp.rs": "130028f166fa918f5cf48551afa6204792d5dae88eccd4dc4565814d3c151546",
           "src/sys/shell/udp.rs": "0db637a4ce1ec3a5ccb410d1e94bcc525df8ad005c1d4235d7d50111d335dbde",
-          "src/sys/shell/uds.rs": "06b7e16d03fd7636401807548d145d99f666486b2d9a4976eccecc20499927ab",
+          "src/sys/shell/uds.rs": "0a5893cdf75da84de3b7691dae1398aaed224cff24e1c1fc755019fbb37b05cc",
           "src/sys/shell/waker.rs": "81bc18cf52345a8d17e8142291e43dd70a36dfd9f5eb486f3e787998ee4451dc",
-          "src/sys/unix/mod.rs": "a5fb6482479004e1521a4b9e27f1541e40d580e15e9131a9b47a42b075431e87",
-          "src/sys/unix/net.rs": "5b11f94f596eb53d50f701fd2d6a23ec45ae68609af0fadf863fb04423fb2e1c",
-          "src/sys/unix/pipe.rs": "cca37d3c55344f93d240c1e67283cd557d1b6cdddf9ffae2a9bbe53438f66b76",
+          "src/sys/unix/mod.rs": "b7188eb8c8b33e620bebcba9c7bb23d15d7dbb25b87c5346a335005190418885",
+          "src/sys/unix/net.rs": "938d7ad74786646a986d1566ae8287ba505960bffdd2abd14e52aa9694c2d68f",
+          "src/sys/unix/pipe.rs": "5460219cd06cef274012430033529fad40a5d9ba3451bb5f29c8370cef307596",
           "src/sys/unix/selector/epoll.rs": "b952cb6d4225f442524d1a5a15bb7cecad6ad4738afaed5776e6b9d4a1203891",
           "src/sys/unix/selector/event_ports.rs": "5dee563a510b4a4ad3d1680769f8b1a94397de3d8d353a9c8f46431c8e12e141",
-          "src/sys/unix/selector/kqueue.rs": "ed6e69041a6d154843c5c9509541a311f7415879c6c845b750b6ba29e1f48e84",
+          "src/sys/unix/selector/kqueue.rs": "889633a5d6e5fd7ed52b5d898b6356587961de07b93f146096aba938e43b4335",
           "src/sys/unix/selector/poll.rs": "f56b5bd2fbdc9cc79f14c34c8e291f339a0449b898ab9ef55bcc1107be1d35e7",
           "src/sys/unix/selector/registered_io_source.rs": "e1da5286dffc983b2fc712cce22a010a4f0bf0115c87f94c77d031806ced742c",
           "src/sys/unix/selector/stateless_io_source.rs": "25465ea28b12461e721bff291e5a90c5adac3e4cf35a4d744235d557f4c501c8",
           "src/sys/unix/sourcefd.rs": "f2d1c775de84db3f577ea84c1b66a4f61f1d3118de9ab6d357a8b9109ea0a50d",
-          "src/sys/unix/tcp.rs": "5746cfeef8431b8737d9cd97b98118f214f6c37cf88ddaa4f34f47317cc6e2f9",
+          "src/sys/unix/tcp.rs": "cbecc3001f8331d0b3c058b2cf89f3b93f82992f7b0ca7bccb608f1b54361bd3",
           "src/sys/unix/udp.rs": "2d9c704b059fdd0be6b844be4db8ef4dcad902fc146e9cf55eae5a5eef2fdb86",
           "src/sys/unix/uds/datagram.rs": "c09a1cd0d9ca43e5291a892e8059a48b8db85af16f2b75a725534a7cfbe55efb",
-          "src/sys/unix/uds/listener.rs": "a2a1c8d43898dc933a7e3bdfc64bbeec76aa93e8c5d5d321d1ee48b002697838",
-          "src/sys/unix/uds/mod.rs": "d2651beed0ee871561dfb70c1ac6029c1028cd26ac668416fe228dc13fc73a11",
-          "src/sys/unix/uds/stream.rs": "4b0ec759a550b65ce396bb19b9593fce4ea57576d5d91c3cab9f743ecc6defd8",
+          "src/sys/unix/uds/listener.rs": "1fea1e1a6f66cb00286e34df866714d04a42f0882d6b58e5ae80e6963f363b92",
+          "src/sys/unix/uds/mod.rs": "822c238d11135085d66da4ea90a7228e94ab686e9a9923d1fb6d37678e3c18cb",
+          "src/sys/unix/uds/stream.rs": "c60172f6fc7d61f5ba6488af6fc65a8cfce0ff3a184a43cf3e6ba781f9c935af",
           "src/sys/unix/waker/eventfd.rs": "960dd88f1bc39e9a93a3142adb55f849766cf5aa7bcde78c8c6faaf118d7cd69",
           "src/sys/unix/waker/pipe.rs": "06032c3dd49a77eb59f40abcc6c143fea248e867e3cc17e0950a429c3ff92875",
           "src/sys/unix/waker/selector.rs": "0f5be50a2482bbe7f86c485715a842170309faf1212ee17cba44a251862ab404",
@@ -6022,21 +6023,21 @@
           "src/sys/windows/event.rs": "2a40784b42d2cef9aeb02d281e73c2d3d96de74cb89609f439a0d080faa7dbd2",
           "src/sys/windows/handle.rs": "f75276733a6f930f755a1bc5651cba8be52320a45709eec0b4ce5efe8779c5b6",
           "src/sys/windows/io_status_block.rs": "052095e6b312244f1247c21cfac238dc66f593d19de3ceb1c430825c60fe01b2",
-          "src/sys/windows/iocp.rs": "480c1b05e9cb7e37baf3e5d4824ceff6af121df5993d9ce7240b26b3277588f8",
+          "src/sys/windows/iocp.rs": "e805099dfb14536ebf09d9be74a717fd3f42967674c37908d519ca679a6dbd5d",
           "src/sys/windows/mod.rs": "5ec972abad0319e9edcddf42c6841c936c8cfce64041ec97e7a241fde1de220b",
-          "src/sys/windows/named_pipe.rs": "8f7bf372ff4d8b1c5db59d4a5f24d10b7c94e12bbb2e24315167304b158ff64b",
-          "src/sys/windows/net.rs": "a7a7629842c89632b49f74cd7c73bd258d4f8fc53d7b8374452fcecf4d8124ba",
-          "src/sys/windows/overlapped.rs": "94fa619a7655228485c714ef5b5ed4b703a360e51130cdfc07d20c1aa38cb3c5",
-          "src/sys/windows/selector.rs": "76faa07846037dac8424f9b2937ef77685be108f5b4d2dff05661192162034f5",
+          "src/sys/windows/named_pipe.rs": "d3d2428774df63c41273455a57123dcdced167901de99acbbf15744df3b59066",
+          "src/sys/windows/net.rs": "d4f0629029d40c67f1f14a3596fe5450a0d5931e06e4018d3f4a7bfb3f121284",
+          "src/sys/windows/overlapped.rs": "f562b35f0a3ba16f21297b69111160710c23dc5a51d338f2ecbefa19261c6f0f",
+          "src/sys/windows/selector.rs": "de75753db4f4986b4f9dc2598095e8bb1046c410b67f98f559eef998d0660e78",
           "src/sys/windows/tcp.rs": "4ece198438b7686c4d8cf9686b77a9be76a521305a8051865e648d98c3676e48",
-          "src/sys/windows/udp.rs": "45cbba2941287d89e089f168e29f65cea03b8b11aa8f5b7fee173d53a5c0e6b0",
+          "src/sys/windows/udp.rs": "d4da60a9f5a57d1a7a9c24f52916947c29226565cbcbfd4a9fdc52f09e1c73c3",
           "src/sys/windows/waker.rs": "cf27f75061b86dabe362d936c5945fd0e644aea833993de45d40b4be5fbbe56c",
           "src/token.rs": "31be1c8634260e78f20beb152a318d75d0de1065b591a209b73a71f7caed8aa2",
           "src/waker.rs": "cd521418aede70369775607232d1162ff70f3993f4951ed113cc18fcd7af6539"
         },
         "name": "mio",
         "source": "registry+https://github.com/rust-lang/crates.io-index",
-        "version": "1.2.4"
+        "version": "1.2.5"
       },
       {
         "checksum": "465500e14ea162429d264d44189adc38b199b62b1c21eea9f69e4b73cb03bbf2",
@@ -6169,75 +6170,80 @@
         "version": "2.3.2"
       },
       {
-        "checksum": "a89322df9ebe1c1578d689c92318e070967d1042b512afbe49518723f4e6d5cd",
+        "checksum": "c938015719552d665fd0553b90d96cd7ff58e83e4c061ca99e6bb78865a72752",
         "features": {
           "aarch64-apple-darwin": [],
           "x86_64-apple-darwin": []
         },
         "inputs": {
-          ".cargo_vcs_info.json": "8963794f9697aaefa78e18e84868db11ccb35ccf181bee63080b4b8288aca713",
-          "CHANGELOG.md": "bc8ee542db08cd5c877ca45fb7266131d7da2be12271147d3596becec3825002",
-          "Cargo.lock": "da0e15b444ac71828ac931113ff6737f4d583ddad879a90a0171b211fb32840f",
-          "Cargo.toml": "473f9cfe9738986d0d1c46e306bd11ad3e36bca8f1eab5bbe9f7297313fb33f4",
-          "Cargo.toml.orig": "db145fe035b37a7965b03b7df78b5b4635a1bad60b13e76f87ec541667c3d143",
+          ".cargo_vcs_info.json": "64a2d817739fa000ccb010970e7ff183883f7e03ccac0612693c3d1c674f405e",
+          "CHANGELOG.md": "3c4119c253076d4129441c7d6e314619bb079dfb26ebf3b8a04fa4872d6723fb",
+          "Cargo.lock": "61bdcea3863e532d5ca09a2fca3f8e4361dfdfe87b42a93b8dcd01f36d64530d",
+          "Cargo.toml": "0189e4babedc03c55728bc0c9c3ccbe9301a3e255c5e690c7874bbafdb8844cd",
+          "Cargo.toml.orig": "657ff40838a13b845762c1d8d1cff66b11050db7d482bed7fe647f81727778a3",
           "LICENSE-APACHE": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
           "LICENSE-MIT": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
           "README.md": "a6221fce50cc09c13b03a7973fb1d4dbf59ce7f46ca06830bbd46d201ed3b2d8",
-          "src/lib.rs": "09a84ff233021dabb75200ef71ebcb1c5a47c94484ce294ef5dcf43797873ba4",
+          "src/lib.rs": "dcbf8fd5f58cb041118acd09dd1c4e21371e0a51a60cd83539f4965c0af71a6d",
           "tests/auxiliary/mod.rs": "52a78b77be05c67737c56865fbce4477eaacc6482d6377af2a5822f05a2ce061",
           "tests/compiletest.rs": "48cfd92c7271345d57a6c222a7a61e00449f38e6ba379130813c45b31a5589c9",
           "tests/drop_order.rs": "9b13b6461e44be1c1beca6ec47387de83efcb988326e4ff832183b8fad17a3f4",
           "tests/expand/.rustfmt.toml": "3025e466e14d8ac54e5371397434f79be4976b5bf3faf64e36c5e941980a0cf2",
-          "tests/expand/default/enum.expanded.rs": "a0e001a28bd060f5091a977141eddfe169b2e1ebffe4b180e3af20b6837b4f02",
+          "tests/expand/default/enum.expanded.rs": "e599c080e48d9d7a7c8d9201ede76f603408c79a655b888154f6679fc5965c33",
           "tests/expand/default/enum.rs": "ebe6b6403e35459420f6fe979243c382972d2d582376d69f6c630ab5ba2599b5",
-          "tests/expand/default/struct.expanded.rs": "437332ba78e77ddf56431f897f2032994654a8d0a958bc97fb155072282c91ae",
+          "tests/expand/default/struct.expanded.rs": "5bb59d6af8e0758c7b54165827981636ff0bf922fc69d975c4fb303c14900939",
           "tests/expand/default/struct.rs": "05767cd68ec5cddc481cff5ad677b5146f7d6fd1effcf1ff131d24c334d85032",
-          "tests/expand/multifields/enum.expanded.rs": "f6ed5344acfb0ebcd55cbe0e9a70bedad50815e2f540729f1ca59bb33e77b463",
+          "tests/expand/multifields/enum.expanded.rs": "fdf52bfc4935aa1cfec6542b1a5d0ac1060ac7f713be04c91bb69caaffecfb3c",
           "tests/expand/multifields/enum.rs": "d38eb301c86307edbf5cb07ed434b64a10a68aaef32dfb8b15029b5cc5586b0b",
-          "tests/expand/multifields/struct.expanded.rs": "7257c732191d5dd697ddf7939d24f5600bda10cc72f80c92c1217b3209832dff",
+          "tests/expand/multifields/struct.expanded.rs": "f65db549bc5123d354917d00731fc44c6d42d1ca2d4b7eab8264415c7d66d537",
           "tests/expand/multifields/struct.rs": "1fe2b911e8782eaac5952d9e0914473d46d82db45b1da859bdc6b8dc3978e549",
-          "tests/expand/naming/enum-all.expanded.rs": "a0e001a28bd060f5091a977141eddfe169b2e1ebffe4b180e3af20b6837b4f02",
+          "tests/expand/naming/enum-all.expanded.rs": "e599c080e48d9d7a7c8d9201ede76f603408c79a655b888154f6679fc5965c33",
           "tests/expand/naming/enum-all.rs": "ebe6b6403e35459420f6fe979243c382972d2d582376d69f6c630ab5ba2599b5",
-          "tests/expand/naming/enum-mut.expanded.rs": "72712b60b635d79ff6d53dcefac952335fc7b2c1befd245f122921b23a7bfa9e",
+          "tests/expand/naming/enum-mut.expanded.rs": "19cbeb253149678dfd0d50796ed3648331b5e6ba07e0759793be6f22cb09bd58",
           "tests/expand/naming/enum-mut.rs": "bf215d055b29a7f9fdb84cabf34576d9dec8e87c33cebe2b553d1fe5e5cb0882",
-          "tests/expand/naming/enum-none.expanded.rs": "6c00c1ab0d340fe72ea6c2fe502073ad74c6801250a6261d7cd3612a315ae798",
+          "tests/expand/naming/enum-none.expanded.rs": "6b51c559ec34e152886276d4022fbc1948ca0b8b3762dfdab6f68ca55c0ff509",
           "tests/expand/naming/enum-none.rs": "115968816e1a1a6b3634b8594dde4815d4641d817d69ebdd90879b96a8a2808e",
-          "tests/expand/naming/enum-ref.expanded.rs": "fa708877f09333c49c6fc5c101ff0d5c70a1372f7ee6d4830939ce5ff197ac48",
+          "tests/expand/naming/enum-ref.expanded.rs": "cbb2ca0cd93726f8ea21827f462504303ca3646a8fd88c4e270a5935af9b6876",
           "tests/expand/naming/enum-ref.rs": "e09ce2ca812b9fcf7dc59b486e5b50b84db08860a2ceda63ba094d7351bb391f",
-          "tests/expand/naming/struct-all.expanded.rs": "fdfdb4d9c696ff9103cdbdea350dbe0dd2b40d5680e19295747bb167f3791b94",
+          "tests/expand/naming/struct-all.expanded.rs": "f100f59c83cce088264ff0c60293895c4865b9785c680cfb9a3ca0e87e5e5e12",
           "tests/expand/naming/struct-all.rs": "0d6b64bc687fbc19329a5558461329e3d2cfa367ff8adb7be76efe2d3160d33e",
-          "tests/expand/naming/struct-mut.expanded.rs": "d7f0c80f787de540c97faed814c51efd66d08b0e5bb8db3185a923f1bfdbf19f",
+          "tests/expand/naming/struct-mut.expanded.rs": "475de4d546ec14af133e35e514f59dcda40474c3cbbfea3d7b784a7f108e5826",
           "tests/expand/naming/struct-mut.rs": "36edd8db816c122c80ccb139b4305cad8edfdf9b7ee4aebacafa1180613a5075",
-          "tests/expand/naming/struct-none.expanded.rs": "437332ba78e77ddf56431f897f2032994654a8d0a958bc97fb155072282c91ae",
+          "tests/expand/naming/struct-none.expanded.rs": "5bb59d6af8e0758c7b54165827981636ff0bf922fc69d975c4fb303c14900939",
           "tests/expand/naming/struct-none.rs": "05767cd68ec5cddc481cff5ad677b5146f7d6fd1effcf1ff131d24c334d85032",
-          "tests/expand/naming/struct-ref.expanded.rs": "8c5d5efc6f18f08c84c977d8b4e8f2e3505a75a198c418cf0c60cd7b51d2024b",
+          "tests/expand/naming/struct-ref.expanded.rs": "d6880e3b0aeaf31050f62ca69d5305f1a12771bfe2e54d8cd8895a7f11b21faa",
           "tests/expand/naming/struct-ref.rs": "dd249875f962d16dd9ec821acf0c2b5c1ed0ed05569f6e874ccd5caca2759acf",
-          "tests/expand/not_unpin/enum.expanded.rs": "1c2dde8ff53bff0716a490ca6dc2fed351d4db1ef7bbd4cf40d48b8f7d305839",
+          "tests/expand/not_unpin/enum.expanded.rs": "180ccb25c288f2b360c23b8a3008ee075a1383853073289f1ff839ab078756a2",
           "tests/expand/not_unpin/enum.rs": "c65aac4d2083e83d2dfc3bec8ce243e3e9169ef5f986f077f0a8b4226d39f7c3",
-          "tests/expand/not_unpin/struct.expanded.rs": "3ba32743c7578aad45354b59e1ad2d9dcb64a753f34ad25431c529b436260e15",
+          "tests/expand/not_unpin/struct.expanded.rs": "068a93dc544370bcd72952587b7a57ff5bae9dac071823cb6b2e9d9696ba3ae6",
           "tests/expand/not_unpin/struct.rs": "99d77727393e4a050d2ceb99710172dfdd13dfcb6e6416f63de39e5df3a9f03f",
           "tests/expand/pinned_drop/enum.expanded.rs": "8776e664d0af9102c6af6f41dfb3e6cd8c69a5cb4fb3fd8ed8fb0aaca95dc711",
           "tests/expand/pinned_drop/enum.rs": "8f590791cb4693bb077c562f0d93128f9452e6a5f60c631b5fd624a221883ebd",
           "tests/expand/pinned_drop/struct.expanded.rs": "9643f7d71b94675a71c7c0ff8d8a3b1e3f716bb1f7c0efdea5c6c74b76274d2b",
           "tests/expand/pinned_drop/struct.rs": "8da271d7d3182b33be297d985a1e3b57d6067406db21eca8ac2c448ef1a0869a",
-          "tests/expand/pub/enum.expanded.rs": "c52cfaa064ffbf04821386180d3ddf8a57a54012ece5114114f4ae4c7215d93f",
+          "tests/expand/pub/enum.expanded.rs": "492d9d6e8033015a5445bed75e84126d6c9f9d7722e173fef642599ce4b89df2",
           "tests/expand/pub/enum.rs": "fdbd806e92cfad4e67737d1f782544aa4e3116bae702161c43b5c22bfbf3a208",
-          "tests/expand/pub/struct.expanded.rs": "9e84c170b1e6505ffed33d66c976c44338cffa35838ddaef52c3598dec7cfe55",
+          "tests/expand/pub/struct.expanded.rs": "a23487a6ea35d19696c5e4070cf6e4539dc006ad6ba2afd75d6617fa6fc0c7ae",
           "tests/expand/pub/struct.rs": "05cb3f03ef9801fecf0a7c86bbd236c97218b34ac01ee507cb7de9a78efaeffa",
           "tests/expandtest.rs": "a4336ab879d79824ab3144ea385a7a00ba77604c3b6639ae53b6283850b421df",
           "tests/include/basic.rs": "8c06c765c92d696284dde5b4762488100ce0ee1661ead307023a85d5c82d8ddc",
           "tests/proper_unpin.rs": "83790eb38ae2fd5aed97fc67da79d91c1071f08d1e5aaef0c71e65d8b5767403",
           "tests/test.rs": "3bfff987a820770bd0126656a77871d5609f21c9c3b6825bd1606561aa37b572",
+          "tests/ui-disabled/README.md": "fbb20a375fb65aa473a85e79107f974ce066ab1c209f0872283b307eb06d5b25",
+          "tests/ui-disabled/pin_project/packed.rs": "6a24ac14e61e5d3e3b495f49d226318ec500e5aa46f34acf8e4f3e0827bd9604",
+          "tests/ui-disabled/pin_project/packed.stderr": "87b287980cc26fe0f086d3f6a733339c96da4fa6cec904e3005d16345c2fb08b",
           "tests/ui/not_unpin/conflict-unpin.rs": "23c7e081d86f2000838c32844dce1eee98d1b118eb1a29daf65c705aad5c68fb",
           "tests/ui/not_unpin/conflict-unpin.stderr": "af2198329d947c0ce17478f84e2f9930eec2fbf7724fe3d498cddc649882afc6",
           "tests/ui/not_unpin/negative_impls_stable.rs": "f014d5398d505ca5f482905cb9597a2d5fced563b9350229468c3751dd7f92ae",
           "tests/ui/not_unpin/negative_impls_stable.stderr": "3753d61c5ac847522b778a89000ed023ce69b5f9bf1078184e6f54a071f9854b",
+          "tests/ui/pin_project/conflict-drop-unsized.rs": "758ae0830881338d477c23283765e60f6d30eaa96a351eedd1db49f07b5b0585",
+          "tests/ui/pin_project/conflict-drop-unsized.stderr": "8c4e4096abae4e618d2610a9cde4d0d5af578a86708b3a7f2e746e010b91e753",
           "tests/ui/pin_project/conflict-drop.rs": "a1964fa136080cc354479ff55b8428e5fa79305681fb2475cc37d6071cd64112",
           "tests/ui/pin_project/conflict-drop.stderr": "623613517ebc409a6b9f85c70f392610f7f04600719be3fe2393e3a7161c9c3a",
           "tests/ui/pin_project/conflict-unpin.rs": "37e7b2f9ab1be70d0521c9dbbc954067f22a2321511e008f0f72e13d0edb4afe",
           "tests/ui/pin_project/conflict-unpin.stderr": "c927a3fb51a27faea9a622ac4389023a7bd2d12d91579977c42688efa3823f8b",
           "tests/ui/pin_project/invalid-bounds.rs": "4068e272a4f5d44851e0901dd6cfa806ead000c2e1a507a2b42be51d26d17056",
-          "tests/ui/pin_project/invalid-bounds.stderr": "2a666eda02fbd995399a7f835e97d46512d6d473585f6a65045a1ba245820d15",
+          "tests/ui/pin_project/invalid-bounds.stderr": "1f957771ac114ac9a08108a43e1bdf44aaa39791f2752c6f6d5612a24aa18ee2",
           "tests/ui/pin_project/invalid.rs": "1c84cc089623dd31f483011ed6543f169af341b028a212fcf00146bc96dd792f",
           "tests/ui/pin_project/invalid.stderr": "b6da005d80c9cd83075b767e03b2b7783c6ce1e7d91af2d2c8dc8b147e1984f9",
           "tests/ui/pin_project/negative_impls_stable.rs": "1e70055fbec4bc0a53454fd93a0663f8785440d37dcf359ab29958d97fd51e9d",
@@ -6245,9 +6251,7 @@
           "tests/ui/pin_project/overlapping_lifetime_names.rs": "ac9c29b389e8e067e9e384cf04be69c0e5bb862cf373de0e3b4296fe2007809b",
           "tests/ui/pin_project/overlapping_lifetime_names.stderr": "a957ca87b4f6fceb65ffd53eb306ce0bcab49e8268a51a979477b9051d7c9c83",
           "tests/ui/pin_project/overlapping_unpin_struct.rs": "cb3d6d4087b8b4c917bc71e55764775f6bb018a77cda5c6b726afacd66789859",
-          "tests/ui/pin_project/overlapping_unpin_struct.stderr": "5008d2ab8d761f307bf82c97555b5c25ade7a1fa3a9d2cb84b9840e3c8eff544",
-          "tests/ui/pin_project/packed.rs": "6a24ac14e61e5d3e3b495f49d226318ec500e5aa46f34acf8e4f3e0827bd9604",
-          "tests/ui/pin_project/packed.stderr": "87b287980cc26fe0f086d3f6a733339c96da4fa6cec904e3005d16345c2fb08b",
+          "tests/ui/pin_project/overlapping_unpin_struct.stderr": "3e49fd9cbfa4e6f658a9cd51eb7c22b751808976b8037f2abb10bad8be3130ad",
           "tests/ui/pin_project/unpin_sneaky.rs": "6e6385e067679c3bf5233163b3fa99ff2fc28bcb93fe594a5c987c0db7c0eaa6",
           "tests/ui/pin_project/unpin_sneaky.stderr": "cc0b8a2b832d309e3ac73bdbdc369fbbb738ed20898ccff89b1f6fb2bd4fa301",
           "tests/ui/pin_project/unsupported.rs": "3ad5f584f9e56be3573133fba026a7bb378595d0a4b7b1bcbb6b78e37cef20a7",
@@ -6259,7 +6263,7 @@
         },
         "name": "pin-project-lite",
         "source": "registry+https://github.com/rust-lang/crates.io-index",
-        "version": "0.2.17"
+        "version": "0.2.18"
       },
       {
         "checksum": "d83eb9bc6d8e5cf568e7a1101d60ee05e81ed50ea106026f3d18deeb046d7661",
@@ -6843,7 +6847,7 @@
         "version": "1.1.6"
       },
       {
-        "checksum": "2f4925028c7eb5d1fcdaf196971378ed9d2c1c4efc7dc5d011256f76c99c0a96",
+        "checksum": "102f35f7de7b06d8c61f1cff6592f5253e0dea431c74867aad5dfd70f44663fb",
         "features": {
           "aarch64-apple-darwin": [
             "alloc",
@@ -6857,15 +6861,15 @@
           ]
         },
         "inputs": {
-          ".cargo_vcs_info.json": "1e417879e7d3ee527e02fc924bfca3f475f819f8615c657dca6a7abf1a547d88",
-          "Cargo.lock": "128e78b5c1d41dfc3ac5c60ccb9a5c7f5d94c0fe3e71e463f2f5826b801b551a",
-          "Cargo.toml": "f47414e4c62453298a6f39b38d612289b035e2ad8300125c998bfeb4eaa69c8a",
-          "Cargo.toml.orig": "4813261876b3d05e62fe5e23880cc97c1daa985888fb8ed4679434930f2de073",
+          ".cargo_vcs_info.json": "3fd109cc263827edbb2d735cc361eaf870801e6caee6376739381e8f05607c53",
+          "Cargo.lock": "53e33717312bcd18ae3c590d0c4e57e0e637c54d240807175ecec8c98ba04e0c",
+          "Cargo.toml": "2a154a236267dcd894b6dddbf989d9a9e5d308404cb569607ec2f586407679e5",
+          "Cargo.toml.orig": "7e37b5b98e29d2836d09070817393a94a2d45034cc5cee6f3b0030b73f9bfc50",
           "LICENSE-APACHE": "45fd05c4865e7c350b98ad7ac50e1b15462d49af4a91e9b0c9dd933dc9a69742",
           "LICENSE-MIT": "9117d922e667125508dde62b02c1f57ed22f5ad21eb536aa2e2d99e1c796e639",
           "README.md": "52ab92f5b204b89f9ad02b778ca2b6ad6d32c7f94916e1917dae4e95569d0b92",
-          "src/alg_id.rs": "16ad8158a1d9ac992262ba0dd6c63dcefa64930de4d1c0ce229d7e78ce7ad8b3",
-          "src/base64.rs": "b72362a35405bde9709ff31e6e96689d19f2bc593c0ee08f5e9f452d8d647479",
+          "src/alg_id.rs": "0eb7635719cd0c8e159683f7ab18d2f9b9c32271ed86be50bde4e2352b53e673",
+          "src/base64.rs": "15008e96cc12e11e645702727dce405262c25bc398765fe53077977b80d0825c",
           "src/data/README.md": "a20436d042d01819b65817bde6872147da740ac726016bdd6121a3f773b8ceb3",
           "src/data/alg-ecdsa-p256.der": "431ab0da5859f972141d7a6b17bfff1006ec2465878890eecacf4764748f999a",
           "src/data/alg-ecdsa-p256k1.der": "00905fc68a9ba09041e71c6f12869f8e9d4cb3adfd90d8439f540e7ccf516dcd",
@@ -6886,13 +6890,13 @@
           "src/data/alg-rsa-pss-sha256.der": "6eeb65499d8c64c3ef3e74305f2daaca0d947e7fca735ad072b5581392d73068",
           "src/data/alg-rsa-pss-sha384.der": "b6e27adae679feb8f49925f4457da316657a6b7a55a1bfd164c66eec59d7d090",
           "src/data/alg-rsa-pss-sha512.der": "60cea04c0dcb23c248eb644fe036d1b6b883004f73c68785895c885c8fa5d688",
-          "src/lib.rs": "02a4b87a92ec8b12a329d5e90128d01c2a216cfdf8134a4ec634347220c62088",
-          "src/pem.rs": "b0fbf1416f09894808cb058fdb05989bb9ca2364e288c9c6a7c20c18d15d3051",
-          "src/server_name.rs": "4e15ee1510f1514963b264eeeead70a8db27911e37157e5b52ab816f37208223"
+          "src/lib.rs": "176b489998fee9d3e8fbf692fb87b2bcdff3ba4caade6d9727e77ce21cbc2700",
+          "src/pem.rs": "a32c500d979ceee7127dd64dd53e1690f7fea207aa0292840971837322ca0841",
+          "src/server_name.rs": "1b60b51c71964337203bb60d0e354825dfa35c3a6370f5d7c7da609d5041b5fe"
         },
         "name": "rustls-pki-types",
         "source": "registry+https://github.com/rust-lang/crates.io-index",
-        "version": "1.15.1"
+        "version": "1.16.0"
       },
       {
         "checksum": "b7f4bc775c73d9a02cde8bf7b2ec4c9d12743edf609006c7facc23998404cd1d",
@@ -7305,7 +7309,7 @@
         "version": "0.4.12"
       },
       {
-        "checksum": "149309498a5f7334b12ddae0cad8aba81ce785fe91755068867e017cf98fee46",
+        "checksum": "3244542535d5de959d90ec55d1b5ff0fd2bb7b1310223907d5f11932847f7b59",
         "features": {
           "aarch64-apple-darwin": [
             "const_generics",
@@ -7317,21 +7321,22 @@
           ]
         },
         "inputs": {
-          ".cargo_vcs_info.json": "001cce04d825508962abb40945b88b9276f5163e55d9dcaafb21cfecffa17567",
-          "Cargo.lock": "748e64539d8f65c8f8a97dec82922d1b623596aa9d0e4aa9c8f96724fc953985",
-          "Cargo.toml": "56123e7598360eb41a5d7c05f8ca22955e274c6f7cced5916d08742985e2e410",
-          "Cargo.toml.orig": "a1c837f292dea1234f55133b842efc658f8db5c4b276e5a1c54e542bac7b400b",
+          ".cargo_vcs_info.json": "955bd7a5fe7485aee499fd300fa26c1c0af47bc9d169af47c5d5d95ce4706ea3",
+          ".gitignore": "6ed50d7bde26437b81cc4cbb084a5f308ca9f0b5d6a10ea027e0b1bb71592094",
+          "Cargo.lock": "0c48c935d1c974b95fd23337bd2af4b35c88c244860cbd8ce6792ba897af1666",
+          "Cargo.toml": "3cf40c83931839b5d0566300b8084043064436f84c5fcfd142e13a4138bc2e7a",
+          "Cargo.toml.orig": "93459c7f00ab2397c7f119053078fac79e1adf57d0686c4ae83db189b0ef8daa",
           "LICENSE-APACHE": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
           "LICENSE-MIT": "0b28172679e0009b655da42797c03fd163a3379d5cfa67ba1f1655e974a2a1a9",
           "README.md": "0f0a485d0d6a9afb48e3f28d0e708745f88760174202fdd9a81f72d26ff39f49",
-          "src/arbitrary.rs": "8ffbd752c5ec31089bfb91f702a496a3e26d0079d8f34ffb617dd75fc21503b4",
-          "src/lib.rs": "e1d274de2f597c99cd860c5b531398323e5f663a3bb4e769ad9e5427ed677eda",
-          "src/specialization.rs": "46433586203399251cba496d67b88d34e1be3c2b591986b77463513da1c66471",
-          "src/tests.rs": "e453d846bc54bc5204a50b83bdc53f2a844879ff3f59b8414ed38afe91ac477d"
+          "src/arbitrary.rs": "d7b083121ce24d88dc31a2a962391a9126923c250c2b516523b66a72b17e223e",
+          "src/lib.rs": "de9cfac60660ad17998f64e2d4ee279f639c906cf570c77b2ab47caeb56c9649",
+          "src/specialization.rs": "618e0ef3d23055feb2c43ad78d594df00fde616805b8896d360543e8c102d45a",
+          "src/tests.rs": "0322980a98f2469577ed622526559f1319df5d3361be8449584165feb45d7e23"
         },
         "name": "smallvec",
         "source": "registry+https://github.com/rust-lang/crates.io-index",
-        "version": "1.16.5"
+        "version": "1.16.6"
       },
       {
         "checksum": "c3d1e2c7f27f8d4cb10542a02c49005dbd6e93095799d6f3be745fae9f8fedd4",
@@ -7381,7 +7386,7 @@
           "crates/core/tests/values.rs": "f2550675b90bbbab8cd2948e619f60d937886398f437ab7557ced8b48ff5a6f9"
         },
         "name": "software-licensing",
-        "source": "git+https://github.com/naviapps/software-licensing.git?rev=0d601499646fb9209d547de699b98ef0022f4d8e#0d601499646fb9209d547de699b98ef0022f4d8e",
+        "source": "git+https://github.com/naviapps/software-licensing.git?rev=011eae1033f3e919b1d23ab15fc3cd39939d7660#011eae1033f3e919b1d23ab15fc3cd39939d7660",
         "version": "0.1.0"
       },
       {
@@ -7390,7 +7395,7 @@
           "x86_64-apple-darwin": []
         },
         "inputs": {
-          "Cargo.toml": "363e2c60ce13a45c2a27239fbef67f97685faa15b35c60bdd4974cd1e05eb053"
+          "Cargo.toml": "963728c69f78103d49d3f38f572756879e2134f06034c68132ebffd8684062f3"
         },
         "name": "software-licensing-polar",
         "source": "workspace",
@@ -7402,7 +7407,7 @@
           "x86_64-apple-darwin": []
         },
         "inputs": {
-          "Cargo.toml": "363e2c60ce13a45c2a27239fbef67f97685faa15b35c60bdd4974cd1e05eb053",
+          "Cargo.toml": "963728c69f78103d49d3f38f572756879e2134f06034c68132ebffd8684062f3",
           "crates/ffi/Cargo.toml": "51c322afaf0072941f6e32f134bfb6230de51b68ae69c2e75784d958d0624404"
         },
         "name": "software-licensing-polar-ffi",
@@ -9525,7 +9530,7 @@
         "version": "1.0.27"
       },
       {
-        "checksum": "ff67a8a4397373c3ef660812acab3268222035010ab8680ec4215f38ba3d0eed",
+        "checksum": "f00cd2407bb42c0ef17be88d4cf020f5cceffd121665bac9b8b9493a369b3b1a",
         "features": {
           "aarch64-apple-darwin": [
             "default",
@@ -9537,29 +9542,29 @@
           ]
         },
         "inputs": {
-          ".cargo_vcs_info.json": "79d39e19f84f35830fef9637c62027c992e1107f6d850abce545f8277bd99aed",
-          "Cargo.lock": "f219c87b25034c1046eeffa7e75288646b719131dd49cf27e1efe64141c65ba7",
-          "Cargo.toml": "7003e5562b5ab8454b9d78376303151af79011f5dd684c1891e0f46bc9112016",
-          "Cargo.toml.orig": "71ca556493d5a7be3df490bee1cfe11da6174f5d1bd6e346efd76e682b26696b",
+          ".cargo_vcs_info.json": "6694ea703881edb84f8b077df14120796b034ce81e1fa501e1b477cd8242f6c1",
+          "Cargo.lock": "afd7075167dbbfd9761bc1aa41c4349d2eb11801f0653804da3d6acbd9974750",
+          "Cargo.toml": "8f084b776440d30dd3c1334d0a35126ecf2d2fa8ef18d3ac6c4318ec747adbbd",
+          "Cargo.toml.orig": "4524a58196e7fb6bfc6dc4704400799596ad3c6c40924a04167f4979e65a583e",
           "LICENSE-APACHE": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
           "LICENSE-MIT": "b38f11f6096706e6de553dabe2a7ed142d59b6fa8c97e290c67496154745cdd5",
           "README.md": "141354cfa79fe3a7e739834bf6e001ff1293169e1809cf9eb6d5c8af0b7a191f",
           "src/host.rs": "24bba45b14cb843ea0fe5c857284d458097a13a84847f5c6a15a14c9e1334335",
-          "src/lib.rs": "51f47a93654528f3b8cb92c94fc26ad25775860d84197fff0c3124a687f8c5e3",
-          "src/origin.rs": "e8ffaf759aa78c92574c6ae49f76999a751064621c399059b3d4eb819cb0d821",
-          "src/parser.rs": "2dd4210e1773fc5d3fdc15ce506ecff30dbf8eb358a79bbbc2835cc30d513c3a",
-          "src/path_segments.rs": "28c8b6ffa880c7da76dcf43af8dcae2c46cd74389472e6e43efdf2973026a462",
+          "src/lib.rs": "208c0d522e74e04bafe1107b58acd2c932095b013a86de60e9126f15cb73f0c8",
+          "src/origin.rs": "53d1fb0b3832609ba6be7001df906f03226a501acee1d114e22c6d572ebfadad",
+          "src/parser.rs": "9f868941a6291c323bf8020db4a733b0b460397b693164cb7da863e69ecfc69e",
+          "src/path_segments.rs": "a9c23a17afa6551b87b789a28407b83493ce73251d8cb16b9268ebb5f499eac9",
           "src/quirks.rs": "c3c8380f9dbecf65924272e904cad8876bda0c62e0e48a3c6b1344fac258102f",
           "src/slicing.rs": "b59bf2fa4cbfd31619b860766268d4e99b46537d3b9702b73f6d0a979a7de24a",
-          "tests/expected_failures.txt": "dd016d320be3fe6ad3810c22302f8eabd755d9effc937b2193dbf222855c4b7f",
-          "tests/setters_tests.json": "a3a4cbd7b798bc2c4d9656dc50be7397a5a5ed1f0b52daa1da1ad654d38c1dcd",
-          "tests/unit.rs": "7eb96c1194fba03fd7f469c44cbbe28699dae14399be72e4c5c675a90fe08dc7",
-          "tests/urltestdata.json": "58d67bea710d5f46324fe6841df5fd82090fe4ec2d882bc0fc7c1784d4771884",
-          "tests/wpt.rs": "2d083ab72ad8cc9b116dd164e63440dd120f07977ac306377633cfe214f34a62"
+          "tests/expected_failures.txt": "9c258df221787cbd08f2e6016c7bd64da28008c5e9c38bd7a155b0a440112019",
+          "tests/setters_tests.json": "ca0fd23fa12bedd6a1258c66f641500349abd942fad9c23336f23d88ed4a9a47",
+          "tests/unit.rs": "3c95ebee99f84189407ec0ec68e3a10903249d09fe59957eb4711ecb76d287e2",
+          "tests/urltestdata.json": "d2eef2efe1d230f86456b2910ddf268d755dcec4ee491efc1ecd7cf742d1499e",
+          "tests/wpt.rs": "1a8e313fd63b93a263dc58cfd09dcbc0598618b8f8b736ffff05d4b33a1e7ada"
         },
         "name": "url",
         "source": "registry+https://github.com/rust-lang/crates.io-index",
-        "version": "2.5.8"
+        "version": "2.5.9"
       },
       {
         "checksum": "af3bd9d3e571c26fcce9d033b87ea5ab061b8d2ffe9b7a5675d810d68f03edf0",
@@ -9773,7 +9778,7 @@
         "version": "0.1.8"
       },
       {
-        "checksum": "e13084392c5e4bc371903e2935a5eaeed24905a7511356b883835e18a78f6879",
+        "checksum": "85ccff8a4805aba1eaa4cd4afcd49f7557dd2cf5fd79ffc37f8959466effc5aa",
         "features": {
           "aarch64-apple-darwin": [
             "alloc",
@@ -9789,26 +9794,28 @@
           ]
         },
         "inputs": {
-          ".cargo_vcs_info.json": "7a11e311bd1e907404fa4449fe43ba7641f55157408b6e9237b1985ee66cc417",
-          "CHANGELOG.md": "5c191abeca49c59b9a7a1c19d02e7e8352ce8615b1b806ac8037c78ca5306274",
-          "Cargo.lock": "af94ccebb35032b49bdeb242a12b5e5d42c56cea08c83f795f96d3b296cf5d9b",
-          "Cargo.toml": "71dd9b47dcf1ea92e55517d3543d1524448c76582a0a49d1d4c16c24a09f7cb0",
-          "Cargo.toml.orig": "5a02315966d889fc90c682768796c8d8c92bb41b7a3568876ba9808d3976350b",
+          ".cargo_vcs_info.json": "ecccb601287862aeeb845ebccf395c199e18c962390625c53718c600a2c21b2f",
+          "CHANGELOG.md": "e088f887597f155bbd573bbd17bb77af89fea25c70034d6d9ff1f3d044962b0f",
+          "Cargo.lock": "960a0bda293e7541bcb870ecca53efcf26bb4969847833a1122457b3fdab586c",
+          "Cargo.toml": "7f7ef31a1110e829ef7ec101bafe66bee5b1e2521213c7c4b6da89156d14b4de",
+          "Cargo.toml.orig": "4d846c10425ac2391d89aa4c6aaf6467b34b1abf38226e4969dea14dd4b983a0",
           "LICENSE-APACHE": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
           "LICENSE-MIT": "8c7516d4b27b1e495be5e38b612298b63de48d05f49cdac94f70f3cd70f8864b",
-          "README.md": "cda76c899179e07b295d7daac7227db266795adbc548dcaf99d71360f81fbbf5",
+          "README.md": "75c9436d167f67f83c3f7474c2be23ba2c663740dc79f0d15563579c347285de",
+          "benches/zeroize.rs": "4a2984cc052fc3102848714cf23e7140b7e13294fa520bbe683cf468c2ea4ce1",
           "src/aarch64.rs": "86180b7aa417a1918165fbc6665227f7667e989384f008dfbe77137ae64f873c",
-          "src/barrier.rs": "99d5495396318717a050570dc6e6cfbdba77f218689c9fac513e1060499453be",
-          "src/lib.rs": "0ec1dcf0d7c33b0bab02f85d79d37f29bbb8f034f648513797859a7b37bca637",
+          "src/barrier.rs": "311713fb39ef9765344aceb7aff3524756d1b390fe2648c0234ede3bb75bbd78",
+          "src/bulk.rs": "3a6a8efcf90ae80f06e9eea49a93edc295b62dbca461776eeabb1857def5af6b",
+          "src/lib.rs": "008472abf4a0d15108dbd7c286b7390634bf9985aea0520b50afaf2af51d33ba",
           "src/stack.rs": "9ef73091eab4aeb562f87147008f66411d3c70ea4f9807437828a8ba50f4c9d5",
           "src/x86.rs": "cd87d6bf0f95df0702d94442643ca8d401c85515b6dc13d65ebd13723f07bc02",
           "tests/alloc.rs": "162a2e0fa9deba6110def41fe619206bd7849a16c98bbf953e3704305562fbd4",
-          "tests/zeroize.rs": "56a69fc036bcb0efccb393828d64f16311a819acc48fa753f2d5837dbb2dc807",
+          "tests/zeroize.rs": "e225ee15a92919dd99522f0c1854f02e0112183fe661e71afdd9f3009a60ece3",
           "tests/zeroize_derive.rs": "1dabb3a1fe3579fa3010e7af94a438fe76f41a4cd776e395d00ebd7209470a4a"
         },
         "name": "zeroize",
         "source": "registry+https://github.com/rust-lang/crates.io-index",
-        "version": "1.9.1"
+        "version": "1.9.2"
       },
       {
         "checksum": "3c50655cbb0fe3fc43170059e702f1ce5e19b84cec58dc87b037a09935c2f328",
@@ -10041,10 +10048,10 @@
       "x86_64-apple-darwin"
     ],
     "workspaceInputs": {
-      "Cargo.lock": "19bfdb523b45aff67c53846edfc73e1e5c3c1fb7524ac56da88642667f161c7a",
-      "Cargo.toml": "363e2c60ce13a45c2a27239fbef67f97685faa15b35c60bdd4974cd1e05eb053",
+      "Cargo.lock": "b754599a4741f6f99be8e1b463747c105d30b76d177b1be65a2a48d3ef59b25e",
+      "Cargo.toml": "963728c69f78103d49d3f38f572756879e2134f06034c68132ebffd8684062f3",
       "crates/ffi/Cargo.toml": "51c322afaf0072941f6e32f134bfb6230de51b68ae69c2e75784d958d0624404",
-      "rust-toolchain.toml": "d13306be0ecda81ce779baa290ffb417380d525928477f16200884b5169cca33"
+      "rust-toolchain.toml": "6b1cf8341d9a08d76c6deb1e9df90a0b208d0ef0d00ee05e0173e9cd4f0f425d"
     }
   },
   "deploymentTarget": "26.0",
@@ -10059,15 +10066,15 @@
     "_software_licensing_polar_result_view"
   ],
   "inputs": {
-    "Cargo.lock": "19bfdb523b45aff67c53846edfc73e1e5c3c1fb7524ac56da88642667f161c7a",
-    "Cargo.toml": "363e2c60ce13a45c2a27239fbef67f97685faa15b35c60bdd4974cd1e05eb053",
+    "Cargo.lock": "b754599a4741f6f99be8e1b463747c105d30b76d177b1be65a2a48d3ef59b25e",
+    "Cargo.toml": "963728c69f78103d49d3f38f572756879e2134f06034c68132ebffd8684062f3",
     "LICENSE": "e18e92825e5b064c568d67d636729c2d8669b61ea9d68b0fa5283b713d70aab1",
     "ThirdParty/LicenseKit/LICENSE": "b39443ebe1456bafd85250f7b01f85f3b4807b7db9e445298f2c442e020b6265",
     "ThirdParty/Rust/COPYRIGHT": "172020dbfd5b53a226dfde77616190a48dcff519b0bc0e6deb91a8450782c4af",
-    "ThirdParty/Rust/COPYRIGHT-library.html": "5647be074c8edf7339fd863055923a8fc80bc5610a8d4661ec3b767b9d392c27",
+    "ThirdParty/Rust/COPYRIGHT-library.html": "626556344c12679d7cab2c1aa2ce80de01937b62c2c88c62f0650a469be18799",
     "ThirdParty/Rust/LICENSE-APACHE": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
     "ThirdParty/Rust/LICENSE-MIT": "b71bd43a069ca0641a9ecfe585ca7b3c53b5cc1608f8b68321168698e28b5ea1",
-    "ThirdParty/Rust/provenance.json": "0972102a8b2dc81d46b07e861ab8b7f8de43c2a444c382bc0f55f2d8fb70ee7a",
+    "ThirdParty/Rust/provenance.json": "eed9af2d1c0de869ffb6117537a259735ed635f9c46119d578df4029289cd497",
     "ThirdParty/atomic-waker-1.1.2/LICENSE-APACHE": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
     "ThirdParty/atomic-waker-1.1.2/LICENSE-MIT": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
     "ThirdParty/atomic-waker-1.1.2/LICENSE-THIRD-PARTY": "6226d0632e2e1a80c23597e964da9812ae193c535fe058154afb034e94167aa5",
@@ -10075,7 +10082,7 @@
     "ThirdParty/base64-0.23.1/LICENSE-MIT": "ab499c75a0f0da8e0fe83bf9ba3a27e5c39705310f07107c6c66b69958d2401c",
     "ThirdParty/bitflags-2.13.2/LICENSE-APACHE": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
     "ThirdParty/bitflags-2.13.2/LICENSE-MIT": "6485b8ed310d3f0340bf1ad1f47645069ce4069dcc6bb46c7d5c6faf41de1fdb",
-    "ThirdParty/bytes-1.12.1/LICENSE": "45f522cacecb1023856e46df79ca625dfc550c94910078bd8aec6e02880b3d42",
+    "ThirdParty/bytes-1.12.2/LICENSE": "45f522cacecb1023856e46df79ca625dfc550c94910078bd8aec6e02880b3d42",
     "ThirdParty/cfg-if-1.0.5/LICENSE-APACHE": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
     "ThirdParty/cfg-if-1.0.5/LICENSE-MIT": "378f5840b258e2779c39418f3f2d7b2ba96f1c7917dd6be0713f88305dbda397",
     "ThirdParty/core-foundation-0.10.1/LICENSE-APACHE": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
@@ -10092,8 +10099,8 @@
     "ThirdParty/errno-0.3.15/LICENSE-MIT": "8764a597675778ddfd4e25f81b08a05dbcf089ac05662df7613fe67f150e3aa2",
     "ThirdParty/fastrand-2.5.0/LICENSE-APACHE": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
     "ThirdParty/fastrand-2.5.0/LICENSE-MIT": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
-    "ThirdParty/form_urlencoded-1.2.2/LICENSE-APACHE": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
-    "ThirdParty/form_urlencoded-1.2.2/LICENSE-MIT": "20c7855c364d57ea4c97889a5e8d98470a9952dade37bd9248b9a54431670e5e",
+    "ThirdParty/form_urlencoded-1.2.3/LICENSE-APACHE": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+    "ThirdParty/form_urlencoded-1.2.3/LICENSE-MIT": "20c7855c364d57ea4c97889a5e8d98470a9952dade37bd9248b9a54431670e5e",
     "ThirdParty/futures-channel-0.3.34/LICENSE-APACHE": "275c491d6d1160553c32fd6127061d7f9606c3ea25abfad6ca3f6ed088785427",
     "ThirdParty/futures-channel-0.3.34/LICENSE-MIT": "6652c868f35dfe5e8ef636810a4e576b9d663f3a17fb0f5613ad73583e1b88fd",
     "ThirdParty/futures-core-0.3.34/LICENSE-APACHE": "275c491d6d1160553c32fd6127061d7f9606c3ea25abfad6ca3f6ed088785427",
@@ -10118,7 +10125,7 @@
     "ThirdParty/httparse-1.10.1/LICENSE-MIT": "391a5396cec6230bfabd4ef4eb2350eb895bc5efce377a2218f5702ed020d3e3",
     "ThirdParty/httpdate-1.0.3/LICENSE-APACHE": "4d10fe5f3aa176b05b229a248866bad70b834c173f1252a814ff4748d8a13837",
     "ThirdParty/httpdate-1.0.3/LICENSE-MIT": "934887691e05d69d7c86ad3f2c360980fa30c15b035e351f3c9865e99da4debc",
-    "ThirdParty/hyper-1.12.0/LICENSE": "2d01890414494742ba4a509fcec8efa40f6d8be22cbd72be7cff08d6fda4ec89",
+    "ThirdParty/hyper-1.13.0/LICENSE": "2d01890414494742ba4a509fcec8efa40f6d8be22cbd72be7cff08d6fda4ec89",
     "ThirdParty/hyper-tls-0.6.0/LICENSE-APACHE": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
     "ThirdParty/hyper-tls-0.6.0/LICENSE-MIT": "7b033f57f23fffca5bee9406cf453ce31e919c1b867df54bfa7487e73d8c9c1f",
     "ThirdParty/hyper-util-0.1.21/LICENSE": "9e0a97848ea543aef745c98e84fde696a9a3e0735538f6daefdd3cb1942effc1",
@@ -10144,7 +10151,7 @@
     "ThirdParty/log-0.4.35/LICENSE-MIT": "6485b8ed310d3f0340bf1ad1f47645069ce4069dcc6bb46c7d5c6faf41de1fdb",
     "ThirdParty/memchr-2.8.3/COPYING": "01c266bced4a434da0051174d6bee16a4c82cf634e2679b6155d40d75012390f",
     "ThirdParty/memchr-2.8.3/LICENSE-MIT": "0f96a83840e146e43c0ec96a22ec1f392e0680e6c1226e6f3ba87e0740af850f",
-    "ThirdParty/mio-1.2.4/LICENSE": "07919255c7e04793d8ea760d6c2ce32d19f9ff02bdbdde3ce90b1e1880929a9b",
+    "ThirdParty/mio-1.2.5/LICENSE": "07919255c7e04793d8ea760d6c2ce32d19f9ff02bdbdde3ce90b1e1880929a9b",
     "ThirdParty/native-tls-0.2.18/LICENSE-APACHE": "c6596eb7be8581c18be736c846fb9173b69eccf6ef94c5135893ec56bd92ba08",
     "ThirdParty/native-tls-0.2.18/LICENSE-MIT": "f2ad7982ddbfa8c45eb965315718c55b70b9cc311b49afacb50d5fe84173ae2c",
     "ThirdParty/num-conv-0.2.2/LICENSE-Apache": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
@@ -10153,8 +10160,8 @@
     "ThirdParty/once_cell-1.21.4/LICENSE-MIT": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
     "ThirdParty/percent-encoding-2.3.2/LICENSE-APACHE": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
     "ThirdParty/percent-encoding-2.3.2/LICENSE-MIT": "b38f11f6096706e6de553dabe2a7ed142d59b6fa8c97e290c67496154745cdd5",
-    "ThirdParty/pin-project-lite-0.2.17/LICENSE-APACHE": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
-    "ThirdParty/pin-project-lite-0.2.17/LICENSE-MIT": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
+    "ThirdParty/pin-project-lite-0.2.18/LICENSE-APACHE": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+    "ThirdParty/pin-project-lite-0.2.18/LICENSE-MIT": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
     "ThirdParty/potential_utf-0.1.6/LICENSE": "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2",
     "ThirdParty/powerfmt-0.2.1/LICENSE-Apache": "155420c6403d4e0fca34105e3c03fdd6939b64c393c7ec6f95f5b72c5474eab0",
     "ThirdParty/powerfmt-0.2.1/LICENSE-MIT": "070dbc7dda03a29296f2d58bdb9b7331af90f2abc9f31df22875d1eabaf29852",
@@ -10162,15 +10169,15 @@
     "ThirdParty/proc-macro2-1.0.107/LICENSE-MIT": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
     "ThirdParty/quote-1.0.47/LICENSE-APACHE": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
     "ThirdParty/quote-1.0.47/LICENSE-MIT": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
-    "ThirdParty/registry-notices.json": "2070395cef93eb26f70ceec909839e5b767476f3d5122c6275db599ce6e08aeb",
+    "ThirdParty/registry-notices.json": "e767fcfa5a703d4abf854c12e4b0d09014a1d963f71922212036d5e164779a7f",
     "ThirdParty/reqwest-0.13.5/LICENSE-APACHE": "751963a8b88c0e3a9f27e98933079fbcf09b9998b2c13ac49c2e4d58444520d6",
     "ThirdParty/reqwest-0.13.5/LICENSE-MIT": "dd87e27dfbaa888cb77ea34592648a7743636b8dce07e49543bddda0fcfc73bc",
     "ThirdParty/rustix-1.1.6/COPYRIGHT": "377c2e7c53250cc5905c0b0532d35973392af16ffb9596a41d99d202cf3617c9",
     "ThirdParty/rustix-1.1.6/LICENSE-APACHE": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
     "ThirdParty/rustix-1.1.6/LICENSE-Apache-2.0_WITH_LLVM-exception": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5",
     "ThirdParty/rustix-1.1.6/LICENSE-MIT": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
-    "ThirdParty/rustls-pki-types-1.15.1/LICENSE-APACHE": "45fd05c4865e7c350b98ad7ac50e1b15462d49af4a91e9b0c9dd933dc9a69742",
-    "ThirdParty/rustls-pki-types-1.15.1/LICENSE-MIT": "9117d922e667125508dde62b02c1f57ed22f5ad21eb536aa2e2d99e1c796e639",
+    "ThirdParty/rustls-pki-types-1.16.0/LICENSE-APACHE": "45fd05c4865e7c350b98ad7ac50e1b15462d49af4a91e9b0c9dd933dc9a69742",
+    "ThirdParty/rustls-pki-types-1.16.0/LICENSE-MIT": "9117d922e667125508dde62b02c1f57ed22f5ad21eb536aa2e2d99e1c796e639",
     "ThirdParty/schannel-0.1.30/LICENSE.md": "aa72991ac35b4de0034da0afe943e62b48c4092fc2ba13ae47806d8e9a4ad551",
     "ThirdParty/security-framework-3.7.0/LICENSE-APACHE": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
     "ThirdParty/security-framework-3.7.0/LICENSE-MIT": "91e934255ba3b2f21103d68c5581c23ef34aa95c4628e4405b8c901935e11c69",
@@ -10185,8 +10192,8 @@
     "ThirdParty/serde_json-1.0.154/LICENSE-APACHE": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
     "ThirdParty/serde_json-1.0.154/LICENSE-MIT": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
     "ThirdParty/slab-0.4.12/LICENSE": "8ce0830173fdac609dfb4ea603fdc002c2f4af0dc9b1a005653f5da9cf534b18",
-    "ThirdParty/smallvec-1.16.5/LICENSE-APACHE": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
-    "ThirdParty/smallvec-1.16.5/LICENSE-MIT": "0b28172679e0009b655da42797c03fd163a3379d5cfa67ba1f1655e974a2a1a9",
+    "ThirdParty/smallvec-1.16.6/LICENSE-APACHE": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+    "ThirdParty/smallvec-1.16.6/LICENSE-MIT": "0b28172679e0009b655da42797c03fd163a3379d5cfa67ba1f1655e974a2a1a9",
     "ThirdParty/socket2-0.6.5/LICENSE-APACHE": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
     "ThirdParty/socket2-0.6.5/LICENSE-MIT": "378f5840b258e2779c39418f3f2d7b2ba96f1c7917dd6be0713f88305dbda397",
     "ThirdParty/stable_deref_trait-1.2.1/LICENSE-APACHE": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
@@ -10225,8 +10232,8 @@
     "ThirdParty/unicode-ident-1.0.27/LICENSE-APACHE": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
     "ThirdParty/unicode-ident-1.0.27/LICENSE-MIT": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
     "ThirdParty/unicode-ident-1.0.27/LICENSE-UNICODE": "f7db81051789b729fea528a63ec4c938fdcb93d9d61d97dc8cc2e9df6d47f2a1",
-    "ThirdParty/url-2.5.8/LICENSE-APACHE": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
-    "ThirdParty/url-2.5.8/LICENSE-MIT": "b38f11f6096706e6de553dabe2a7ed142d59b6fa8c97e290c67496154745cdd5",
+    "ThirdParty/url-2.5.9/LICENSE-APACHE": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+    "ThirdParty/url-2.5.9/LICENSE-MIT": "b38f11f6096706e6de553dabe2a7ed142d59b6fa8c97e290c67496154745cdd5",
     "ThirdParty/utf8_iter-1.1.0/COPYRIGHT": "c30152c94a6d75e021adbc52b3a52470366a46edb917e17deae3259251af244c",
     "ThirdParty/utf8_iter-1.1.0/LICENSE-APACHE": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
     "ThirdParty/utf8_iter-1.1.0/LICENSE-MIT": "3fa4ca83dcc9237839b1bdeb2e6d16bdfb5ec0c5ce42b24694d8bbf0dcbef72c",
@@ -10249,8 +10256,8 @@
     "ThirdParty/yoke-derive-0.8.4/LICENSE": "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2",
     "ThirdParty/zerofrom-0.1.8/LICENSE": "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2",
     "ThirdParty/zerofrom-derive-0.1.8/LICENSE": "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2",
-    "ThirdParty/zeroize-1.9.1/LICENSE-APACHE": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
-    "ThirdParty/zeroize-1.9.1/LICENSE-MIT": "8c7516d4b27b1e495be5e38b612298b63de48d05f49cdac94f70f3cd70f8864b",
+    "ThirdParty/zeroize-1.9.2/LICENSE-APACHE": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "ThirdParty/zeroize-1.9.2/LICENSE-MIT": "8c7516d4b27b1e495be5e38b612298b63de48d05f49cdac94f70f3cd70f8864b",
     "ThirdParty/zeroize_derive-1.5.0/LICENSE-APACHE": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
     "ThirdParty/zeroize_derive-1.5.0/LICENSE-MIT": "b8c6939380a400f53e11923d50fcc4dd2fa1ba8339fd9d04cda38a0251b6c9b0",
     "ThirdParty/zerotrie-0.2.5/LICENSE": "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2",
@@ -10262,7 +10269,7 @@
     "crates/ffi/module.modulemap": "2467ace3b408c876cc350ad33913fe4529ec7f8a1ee87a4d0288e5d41c7258de",
     "crates/ffi/src/lib.rs": "0a1b45ca0b5290cce0f531358a0a4bbee9a5567601a1774bc2f311b5bc2b3bfb",
     "native.toml": "740f2349759a004c27607106af277c1113f7c0678ea919caadb8a39778170c4d",
-    "rust-toolchain.toml": "d13306be0ecda81ce779baa290ffb417380d525928477f16200884b5169cca33",
+    "rust-toolchain.toml": "6b1cf8341d9a08d76c6deb1e9df90a0b208d0ef0d00ee05e0173e9cd4f0f425d",
     "src/lib.rs": "b28cc609b38471b560df5f87f78da456ba27dc57ad6550e915b1ad0f2ce583a4",
     "src/protocol.rs": "d9e1dd75b929b4569145c8ac9d2f0a2989a8d3cb67b9256ad0fa209837cd0387",
     "src/transport.rs": "923c3658963f2085503523cffdca0ba59beb5e390250592af179717bfbeb222f"
@@ -10274,12 +10281,12 @@
     "Artifacts/CSoftwareLicensingPolar.xcframework/macos-arm64_x86_64/CSoftwareLicensingPolar.framework/Headers": "036ae9446c4f0c59046671d1d96e2de4f606b340d8a5c1927b2d51bc293e0365",
     "Artifacts/CSoftwareLicensingPolar.xcframework/macos-arm64_x86_64/CSoftwareLicensingPolar.framework/Modules": "278b6b2d8f8418e2e4877a67a109b6e3865174e4fa7405870a643e95cbc2f783",
     "Artifacts/CSoftwareLicensingPolar.xcframework/macos-arm64_x86_64/CSoftwareLicensingPolar.framework/Resources": "c213ee8e9c523538d862da3e5716b64bf090f6a1be08914954ae33cfbda7dbb2",
-    "Artifacts/CSoftwareLicensingPolar.xcframework/macos-arm64_x86_64/CSoftwareLicensingPolar.framework/Versions/A/CSoftwareLicensingPolar": "6deb19a8d1b717586ef136eb9fbe70ea8cf649672316cdd34790e7f36811f93f",
+    "Artifacts/CSoftwareLicensingPolar.xcframework/macos-arm64_x86_64/CSoftwareLicensingPolar.framework/Versions/A/CSoftwareLicensingPolar": "11fbcd71f8b878c82c44e7e0a7e636859aea077b53ab54610651f7c7cf4b7f54",
     "Artifacts/CSoftwareLicensingPolar.xcframework/macos-arm64_x86_64/CSoftwareLicensingPolar.framework/Versions/A/Headers/software_licensing_polar.h": "f5dd928e20d36ecd518dda6a9de5113220698450e25df98bd4d6fcc040e99d8c",
     "Artifacts/CSoftwareLicensingPolar.xcframework/macos-arm64_x86_64/CSoftwareLicensingPolar.framework/Versions/A/Modules/module.modulemap": "2467ace3b408c876cc350ad33913fe4529ec7f8a1ee87a4d0288e5d41c7258de",
     "Artifacts/CSoftwareLicensingPolar.xcframework/macos-arm64_x86_64/CSoftwareLicensingPolar.framework/Versions/A/Resources/Info.plist": "c5f783ffc783e2b4c11ed6a9066c858f865098db9a42170dfe24eb9657f166b7",
-    "Artifacts/CSoftwareLicensingPolar.xcframework/macos-arm64_x86_64/CSoftwareLicensingPolar.framework/Versions/A/Resources/ThirdPartyNotices.txt": "57772d0d667c7ff89dd806473c41f5c6f1e4237201b396560c1e12faded010a5",
-    "Artifacts/CSoftwareLicensingPolar.xcframework/macos-arm64_x86_64/CSoftwareLicensingPolar.framework/Versions/A/_CodeSignature/CodeResources": "67a1ee88febf25cb8374db89b002d65abff2106a4045bc048028555b74286795",
+    "Artifacts/CSoftwareLicensingPolar.xcframework/macos-arm64_x86_64/CSoftwareLicensingPolar.framework/Versions/A/Resources/ThirdPartyNotices.txt": "a939b661217818dfbd0f733d432f541973ed94bd2dd791477753f284fbcd9801",
+    "Artifacts/CSoftwareLicensingPolar.xcframework/macos-arm64_x86_64/CSoftwareLicensingPolar.framework/Versions/A/_CodeSignature/CodeResources": "efc1489d65f8f305826f19783fdebc9bb337884ad35dc638a3e8c73255cf6522",
     "Artifacts/CSoftwareLicensingPolar.xcframework/macos-arm64_x86_64/CSoftwareLicensingPolar.framework/Versions/Current": "ee26006c07174064a7bed9b283a8b016d74a295e05c4e23a1846538d69b23c5f"
   },
   "productionSources": [

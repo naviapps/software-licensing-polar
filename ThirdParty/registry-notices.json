@@ -28,8 +28,8 @@
     "source": "registry+https://github.com/rust-lang/crates.io-index"
   },
   {
-    "checksum": "fc652a48c352aef3ea3aed32080501cf3ef6ed5da78602a020c991775b0aff04",
-    "directory": "bytes-1.12.1",
+    "checksum": "776dfebd015e2d8732c684a2c71003674ccb49457b539b9e82151ba38e96dd7c",
+    "directory": "bytes-1.12.2",
     "files": {
       "LICENSE": "45f522cacecb1023856e46df79ca625dfc550c94910078bd8aec6e02880b3d42"
     },
@@ -108,8 +108,8 @@
     "source": "registry+https://github.com/rust-lang/crates.io-index"
   },
   {
-    "checksum": "cb4cb245038516f5f85277875cdaa4f7d2c9a0fa0468de06ed190163b1581fcf",
-    "directory": "form_urlencoded-1.2.2",
+    "checksum": "afa489199eaffb1211795df1c6236ce1ad0d41a6fa45250add73e3b02420f06e",
+    "directory": "form_urlencoded-1.2.3",
     "files": {
       "LICENSE-APACHE": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
       "LICENSE-MIT": "20c7855c364d57ea4c97889a5e8d98470a9952dade37bd9248b9a54431670e5e"
@@ -232,8 +232,8 @@
     "source": "registry+https://github.com/rust-lang/crates.io-index"
   },
   {
-    "checksum": "2c3e324da4c95177d6291d4c8730197c0d1822f8a9766814a4a44fa5ab797c9c",
-    "directory": "hyper-1.12.0",
+    "checksum": "229c6ff5584df4c6becbfe00567128bac768c8cd32ebc8a8366bd81ed072e8f3",
+    "directory": "hyper-1.13.0",
     "files": {
       "LICENSE": "2d01890414494742ba4a509fcec8efa40f6d8be22cbd72be7cff08d6fda4ec89"
     },
@@ -384,8 +384,8 @@
     "source": "registry+https://github.com/rust-lang/crates.io-index"
   },
   {
-    "checksum": "1788edb87fdc09c7e26304471e2f5be8cdefb1b6930d6e3985fc02ff53bf86ee",
-    "directory": "mio-1.2.4",
+    "checksum": "20521a903f02b0a573cd6840e9d0a5a0cc043d361fe924092cd70f8556cc9c4a",
+    "directory": "mio-1.2.5",
     "files": {
       "LICENSE": "07919255c7e04793d8ea760d6c2ce32d19f9ff02bdbdde3ce90b1e1880929a9b"
     },
@@ -428,8 +428,8 @@
     "source": "registry+https://github.com/rust-lang/crates.io-index"
   },
   {
-    "checksum": "a89322df9ebe1c1578d689c92318e070967d1042b512afbe49518723f4e6d5cd",
-    "directory": "pin-project-lite-0.2.17",
+    "checksum": "c938015719552d665fd0553b90d96cd7ff58e83e4c061ca99e6bb78865a72752",
+    "directory": "pin-project-lite-0.2.18",
     "files": {
       "LICENSE-APACHE": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
       "LICENSE-MIT": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
@@ -492,8 +492,8 @@
     "source": "registry+https://github.com/rust-lang/crates.io-index"
   },
   {
-    "checksum": "2f4925028c7eb5d1fcdaf196971378ed9d2c1c4efc7dc5d011256f76c99c0a96",
-    "directory": "rustls-pki-types-1.15.1",
+    "checksum": "102f35f7de7b06d8c61f1cff6592f5253e0dea431c74867aad5dfd70f44663fb",
+    "directory": "rustls-pki-types-1.16.0",
     "files": {
       "LICENSE-APACHE": "45fd05c4865e7c350b98ad7ac50e1b15462d49af4a91e9b0c9dd933dc9a69742",
       "LICENSE-MIT": "9117d922e667125508dde62b02c1f57ed22f5ad21eb536aa2e2d99e1c796e639"
@@ -571,8 +571,8 @@
     "source": "registry+https://github.com/rust-lang/crates.io-index"
   },
   {
-    "checksum": "149309498a5f7334b12ddae0cad8aba81ce785fe91755068867e017cf98fee46",
-    "directory": "smallvec-1.16.5",
+    "checksum": "3244542535d5de959d90ec55d1b5ff0fd2bb7b1310223907d5f11932847f7b59",
+    "directory": "smallvec-1.16.6",
     "files": {
       "LICENSE-APACHE": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
       "LICENSE-MIT": "0b28172679e0009b655da42797c03fd163a3379d5cfa67ba1f1655e974a2a1a9"
@@ -800,8 +800,8 @@
     "source": "registry+https://github.com/rust-lang/crates.io-index"
   },
   {
-    "checksum": "ff67a8a4397373c3ef660812acab3268222035010ab8680ec4215f38ba3d0eed",
-    "directory": "url-2.5.8",
+    "checksum": "f00cd2407bb42c0ef17be88d4cf020f5cceffd121665bac9b8b9493a369b3b1a",
+    "directory": "url-2.5.9",
     "files": {
       "LICENSE-APACHE": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
       "LICENSE-MIT": "b38f11f6096706e6de553dabe2a7ed142d59b6fa8c97e290c67496154745cdd5"
@@ -922,8 +922,8 @@
     "source": "registry+https://github.com/rust-lang/crates.io-index"
   },
   {
-    "checksum": "e13084392c5e4bc371903e2935a5eaeed24905a7511356b883835e18a78f6879",
-    "directory": "zeroize-1.9.1",
+    "checksum": "85ccff8a4805aba1eaa4cd4afcd49f7557dd2cf5fd79ffc37f8959466effc5aa",
+    "directory": "zeroize-1.9.2",
     "files": {
       "LICENSE-APACHE": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
       "LICENSE-MIT": "8c7516d4b27b1e495be5e38b612298b63de48d05f49cdac94f70f3cd70f8864b"

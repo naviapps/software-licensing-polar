@@ -202,6 +202,7 @@ class WindowsTests(unittest.TestCase):
             )
             core_modules = {
                 "native_plan": core_plan,
+                "c_headers": MagicMock(),
                 "windows": MagicMock(),
                 "artifacts": MagicMock(),
                 "cargo": MagicMock(),
@@ -290,6 +291,7 @@ class WindowsTests(unittest.TestCase):
                 self.assertEqual(core.name, "core")
                 core_plan.ffi_product.assert_called_once_with(core)
                 select_core_tooling.assert_called_once_with(core, core.parent / "core-tooling")
+                core_modules["c_headers"].prepare_generated.assert_called_once_with(core, env=env)
                 for name in ("windows", "artifacts", "cargo"):
                     self.assertEqual(
                         [invocation.kwargs[name] for invocation in stage_native.call_args_list],

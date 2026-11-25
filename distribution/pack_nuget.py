@@ -10,6 +10,7 @@ from pathlib import Path
 from sdk_tooling import artifacts, nuget
 from sdk_tooling.c_headers import prepare_generated
 from sdk_tooling.dotnet import subprocess_environment
+from sdk_tooling.native_plan import ffi_product
 from sdk_tooling.windows_delivery import RID
 from sdk_tooling.workspaces import temporary_workspace
 from sdk_tooling.xcframework import xcframework
@@ -30,7 +31,7 @@ def pack_pair(root, runtimes):
     with temporary_workspace(None, prefix="polar-nuget-") as work:
         core = work / "software-licensing"
         stage_core(env, core, include_macos=True)
-        core_version = xcframework(core).version
+        core_version = ffi_product(core).version
         requirements = [
             node.get("Version")
             for node in ET.parse(project).findall("ItemGroup/PackageReference")

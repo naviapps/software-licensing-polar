@@ -243,6 +243,7 @@ def main(argv=None):
         )
         prepare_generated(ROOT, env=env)
         core_tooling = pinned_tooling(core, candidate / "core-tooling")
+        core_tooling("c_headers").prepare_generated(core, env=env)
         core_native = core_tooling("native_plan").ffi_product(core)
         vendor_native = ffi_product(ROOT, factory=load("ffi").FfiProduct)
         accepted = {}
