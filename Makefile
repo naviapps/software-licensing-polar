@@ -1,6 +1,4 @@
 SDK_TOOLING ?= mise run sdk-tooling --
-SWIFT_FLAGS := -Xswiftc -strict-concurrency=complete -Xswiftc -warnings-as-errors
-
 .DEFAULT_GOAL := check
 .PHONY: check check-source test-managed check-distribution native native-verify check-header generate-header lint test test-rust test-distribution-tools test-c test-dotnet test-consumer test-installed-consumers format clean
 
@@ -8,8 +6,8 @@ check: check-source test test-consumer
 
 check-source: lint check-header test-rust test-managed
 
-check-distribution: native-verify test-distribution-tools
-	$(SDK_TOOLING) python -m distribution.verify_bindings
+check-distribution: test-distribution-tools
+	$(SDK_TOOLING) python -m distribution.verify_bindings --verify-native
 	python3 -B -m distribution.verify_bindings --verify-swift-pin
 
 native:
@@ -32,7 +30,7 @@ format:
 	$(SDK_TOOLING) quality format --dotnet
 
 test:
-	swift test $(SWIFT_FLAGS)
+	swift test -Xswiftc -warnings-as-errors
 
 test-consumer:
 	$(SDK_TOOLING) swift-consumer

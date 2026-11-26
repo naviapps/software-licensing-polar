@@ -47,6 +47,7 @@ commands = [
   [
     "sdk-tooling",
     "windows",
+    "--driver-prepares-headers",
     "-m",
     "distribution.verify_windows",
     "--native-aot",

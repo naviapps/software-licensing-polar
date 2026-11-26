@@ -257,6 +257,9 @@ def main():
     )
     mode.add_argument("--c-only", action="store_true")
     mode.add_argument("--dotnet-only", action="store_true")
+    mode.add_argument(
+        "--verify-native", action="store_true", help="Verify the tracked framework first"
+    )
     mode.add_argument("--verify-swift-pin", action="store_true")
     args = parser.parse_args()
     if args.prepare_dotnet:
@@ -286,8 +289,11 @@ def main():
     output.mkdir(parents=True, exist_ok=True)
     if not args.dotnet_only:
         from sdk_tooling.c_headers import prepare_generated
+        from sdk_tooling.xcframework import xcframework
 
-        prepare_generated(ROOT, env=env)
+        prepare_generated(ROOT, env=env, verify=args.verify_native)
+        if args.verify_native:
+            xcframework(ROOT).verify()
         load("c_compiler").compile_c(
             ROOT / "crates/ffi/tests/c/abi.c",
             compiler=("xcrun", "clang"),
