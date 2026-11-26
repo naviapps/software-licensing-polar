@@ -14,4 +14,4 @@ uv = "0.13.10"
 "github:bnjbvr/cargo-machete" = { version = "0.10.1", platforms.windows-arm64.asset_pattern = "*-x86_64-pc-windows-msvc.tar.gz" }
 
 [tasks.sdk-tooling]
-run = "uvx --from git+https://github.com/naviapps/sdk-tooling.git@cf8488951a12565b80edb24dda5300021563d954 sdk-tooling"
+run = "uvx --from git+https://github.com/naviapps/sdk-tooling.git@fd6410ecc7b907d524d50077f2750b7bfed5bf37 sdk-tooling"
