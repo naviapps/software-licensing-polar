@@ -8,7 +8,8 @@ check: check-source test test-consumer
 
 check-source: lint check-header test-rust test-managed
 
-check-distribution: native-verify test-distribution-tools test-c test-dotnet
+check-distribution: native-verify test-distribution-tools
+	$(SDK_TOOLING) python -m distribution.verify_bindings
 	python3 -B -m distribution.verify_bindings --verify-swift-pin
 
 native:

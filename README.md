@@ -209,15 +209,23 @@ provider preflight, cancellation and storage recovery. Use a separate feed for
 the local runtime-specific packages and the combined distribution pair.
 
 The Windows x64 workflow generates the Polar C header and runs the Native AOT
-package fixture with JSON reflection disabled. On a prepared Windows x64 worker
-with the Visual Studio C++ workload and pinned .NET SDK, run the same fixture
-locally.
+package fixture with JSON reflection disabled. To run it locally, use a clean,
+committed checkout on an owned Windows worker. Install the host-native Rust
+version from [`rust-toolchain.toml`](rust-toolchain.toml), Visual Studio C++ tools
+for the x64 target, and the x64 .NET SDK from [`global.json`](global.json).
+Set `DOTNET_BIN` to the absolute path of that SDK's executable.
 
 ```powershell
-mise run sdk-tooling -- windows -m distribution.verify_windows --native-aot
+$env:DOTNET_BIN = 'C:\Program Files\dotnet\dotnet.exe'
+mise trust mise.toml
+mise install python uv "cargo:cbindgen"
+rustup target add x86_64-pc-windows-msvc
+mise run sdk-tooling -- python -m distribution.verify_windows --native-aot
 ```
 
-For x64 emulation on Windows ARM64, omit `--native-aot` to run the standard fixture.
+On ARM64, use native ARM64 PowerShell and Visual Studio `HostARM64` tools. Set
+`DOTNET_BIN` to the x64 installation, usually `C:\Program Files\dotnet\x64\dotnet.exe`,
+and omit `--native-aot` to run the standard x64 fixture under emulation.
 
 To run the independent Rust consumer against a clean Git checkout,
 point SDK Tooling at a complete checkout or bundle of the pinned SoftwareLicensing
