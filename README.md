@@ -223,8 +223,8 @@ rustup target add x86_64-pc-windows-msvc
 mise run sdk-tooling -- python -m distribution.verify_windows --native-aot
 ```
 
-On ARM64, use native ARM64 PowerShell and Visual Studio `HostARM64` tools. Set
-`DOTNET_BIN` to the x64 installation, usually `C:\Program Files\dotnet\x64\dotnet.exe`,
+On ARM64, follow the
+[Windows on Arm setup](https://github.com/naviapps/sdk-tooling#windows-on-arm)
 and omit `--native-aot` to run the standard x64 fixture under emulation.
 
 To run the independent Rust consumer against a clean Git checkout,
